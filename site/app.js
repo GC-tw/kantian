@@ -10,6 +10,12 @@ const COUNTY_ORDER = ['基隆市','臺北市','新北市','桃園市','新竹市
 const BF = [0,0.3,1.6,3.4,5.5,8.0,10.8,13.9,17.2,20.8,24.5];  // 蒲福風級下限（公尺／秒）
 const SYM = ['○','△','✕','—'], CLS = ['g','y','r','na'], WORD = ['適合','注意','不建議','時間已過或無資料'];
 const LV = lv => lv < 0 ? 3 : lv;                                // 燈號等級 -1 代表沒有資料
+const REGIONS = [['全台', []],                              // 標題列的地區快速切換；選了地區＝勾選該地區所有縣市
+  ['北部', ['基隆市','臺北市','新北市','桃園市','新竹市','新竹縣']],
+  ['中部', ['苗栗縣','臺中市','彰化縣','南投縣','雲林縣']],
+  ['南部', ['嘉義市','嘉義縣','臺南市','高雄市','屏東縣']],
+  ['東部', ['宜蘭縣','花蓮縣','臺東縣']],
+  ['離島', ['澎湖縣','金門縣','連江縣']]];
 const PAGE = 10;                                           // 山岳列表一次顯示幾座
 const H = 3600e3, STALE = 9*H;                              // 超過 9 小時沒更新就提醒
 
@@ -173,7 +179,7 @@ function render(){
   const title = week ? `一週 ${fmtH(dayAt(0))} – ${fmtH(dayAt(6))}` : `${MODES[state.mode].name} ${fmtH(d0)} 逐 3 小時`;
   $('h-picks-t').textContent = (week ? '這週' : MODES[state.mode].name) + '推薦';
   $('pick-info-body').innerHTML = pickInfo(week);
-  $('range-text').innerHTML = `${title}・共 ${rows.length} 座`;
+  $('range-text').innerHTML = `${title}・${regionNow()?.[0] || state.counties.size + ' 個縣市'}・共 ${rows.length} 座`;
   document.querySelectorAll('#seg .sd').forEach((e, i) => { const d = dayAt(i); e.textContent = fmt(d); e.classList.toggle('we', isWE(d)); });
   ['matrix','fav-matrix'].forEach(id => $(id).style.setProperty('--n', cols.length));
   document.querySelectorAll('.lg-ref').forEach(e => e.hidden = !week);
@@ -185,7 +191,9 @@ function render(){
     || `<div class="empty">${rows.length ? '這段期間沒有燈號為「適合」的山，可以參考下方列表。' : '沒有符合條件的山，請放寬類別或縣市。'}</div>`;
   const head = headRow();
   $('fav-tab-n').textContent = favRows.length || '';
-  $('filter-n').textContent = (state.cats.size + state.counties.size) || '';   // 手機「篩選」按鈕上顯示已選幾項
+  const rg = regionNow();
+  document.querySelectorAll('#f-region [data-rg]').forEach(b => b.setAttribute('aria-pressed', !!rg && REGIONS[+b.dataset.rg] === rg));
+  $('filter-n').textContent = (state.cats.size + (rg ? 0 : state.counties.size)) || '';   // 手機「篩選」按鈕：地區以外另外選了幾項
   $('fav-count').innerHTML = favRows.length ? `${title}・${favRows.length} 座，依燈號排序` : '';
   $('fav-box').hidden = !favRows.length; $('fav-empty').hidden = !!favRows.length;
   $('fav-matrix').tHead.innerHTML = head;
@@ -275,7 +283,10 @@ function chipGroup(box, attr, set, {allId, parse = v => v, keepOne, onChange}){
     sync(); onChange();
   });
   sync();
+  return sync;
 }
+const sameSet = (set, arr) => set.size === arr.length && arr.every(x => set.has(x));
+const regionNow = () => REGIONS.find(([, cs]) => sameSet(state.counties, cs));   // 目前縣市剛好等於某個地區，就回傳那個地區
 
 // ---------- 啟動與事件 ----------
 (function init(){
@@ -283,7 +294,15 @@ function chipGroup(box, attr, set, {allId, parse = v => v, keepOne, onChange}){
   $('f-county').innerHTML = `<button type="button" class="chip reset" id="c-all" aria-pressed="true">全部</button>` + counties.map(c=>`<button type="button" class="chip" data-co="${esc(c)}" aria-pressed="false">${esc(c)}</button>`).join('');
   $('f-slots').innerHTML = SLOTS.map(h=>`<button type="button" class="chip mono" data-h="${h}">${slotLabel(h)}</button>`).join('');
 
-  chipGroup($('f-county'), 'data-co', state.counties, {allId:'c-all', onChange: refilter});
+  const syncCounty = chipGroup($('f-county'), 'data-co', state.counties, {allId:'c-all', onChange: refilter});
+  $('f-region').innerHTML = REGIONS.map(([n], i) => `<button type="button" class="chip" data-rg="${i}" aria-pressed="false">${n}</button>`).join('');
+  $('f-region').onclick = e => {
+    const b = e.target.closest('[data-rg]'); if (!b) return;
+    state.counties.clear(); REGIONS[+b.dataset.rg][1].forEach(c => state.counties.add(c));
+    syncCounty();
+    if ($('view-find').hidden) $('tab-find').click();
+    refilter();
+  };
   chipGroup($('f-cat'), 'data-c', state.cats, {allId:'cat-all', onChange: refilter});
   chipGroup($('f-slots'), 'data-h', state.slots, {parse: Number, keepOne: true, onChange(){ store.set('slots', [...state.slots]); refresh(); }});
   store.set('slots', [...state.slots]);
