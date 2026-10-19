@@ -17,8 +17,7 @@ const MOUNTAINS = JSON.parse(fs.readFileSync(path.join(ROOT, 'data/mountains.jso
 const warnings = [];
 const warn = m => { warnings.push(m); console.warn('⚠ ' + m); };
 
-// 鄉鎮預報：全臺一次取得（089 為 3 天逐 3 小時、091 為一週），失敗時改用各縣市資料集
-const TOWN_ALL = {h3: 'F-D0047-089', week: 'F-D0047-091'};
+// 鄉鎮預報：各縣市資料集（n 為 3 天逐 3 小時、n+2 為一週逐 12 小時）；F-D0047-089／091 只到縣市層級，不使用
 const TOWN_COUNTY = {'宜蘭縣':1,'桃園市':5,'新竹縣':9,'苗栗縣':13,'彰化縣':17,'南投縣':21,'雲林縣':25,'嘉義縣':29,'屏東縣':33,'臺東縣':37,'花蓮縣':41,'澎湖縣':45,'基隆市':49,'新竹市':53,'嘉義市':57,'臺北市':61,'高雄市':65,'新北市':69,'臺中市':73,'臺南市':77,'連江縣':81,'金門縣':85};
 const ALERT_ID = 'W-C0033-001';   // 天氣警特報：各縣市目前生效中的特報
 
@@ -94,7 +93,9 @@ function locations(j){
           recs.push({s: Date.parse(s), e: e ? Date.parse(e) : null, vals});
         }
       }
-      out.push({county, name: pick(loc, 'LocationName', 'locationName'), lat: num(pick(loc, 'Latitude', 'lat')), lon: num(pick(loc, 'Longitude', 'lon')), recs});
+      const ps = [].concat(pick(pick(loc, 'ParameterSet') || {}, 'Parameter') || []);   // 登山預報點代碼（例如 D001）
+      const id = ps.find(x => /^id$/i.test(pick(x, 'ParameterName') || ''))?.ParameterValue || null;
+      out.push({county, id, name: pick(loc, 'LocationName', 'locationName'), lat: num(pick(loc, 'Latitude', 'lat')), lon: num(pick(loc, 'Longitude', 'lon')), recs});
     }
   }
   return out;
@@ -143,8 +144,8 @@ function periods12h(locs){                               // 前一天 18 時起�
 async function mountainDatasets(){
   // 氣象署的「育樂區」預報分很多組（登山、森林遊樂區、國家公園…），說明文字都一樣，
   // 所以逐一下載，看哪一組的地點名稱和我們的山最吻合。結果存在 data/datasets.json，之後直接使用。
-  const names = new Set(MOUNTAINS.filter(m => m.pid).map(m => m.cn));
-  let known = fs.existsSync(DATASETS_FILE) ? JSON.parse(fs.readFileSync(DATASETS_FILE, 'utf8')) : {};
+  const names = new Set(MOUNTAINS.filter(m => m.pid).flatMap(m => [m.cn, m.pid]));
+  let known = !FIXTURES && fs.existsSync(DATASETS_FILE) ? JSON.parse(fs.readFileSync(DATASETS_FILE, 'utf8')) : {};
   if (known.mountainH3 && known.mountainWeek && known.version === 2) return known;
   console.log('探查登山預報資料集代碼（每個代碼最多等 20 秒）…');
   known = {version: 2, probes: {}, errors: {}};
@@ -157,7 +158,7 @@ async function mountainDatasets(){
     try{
       const j = await getDataset(id, {}, {tries: 1, timeout: 20000});
       const d = describe(j), locs = locations(j);
-      const match = locs.filter(l => names.has(l.name)).length;
+      const match = locs.filter(l => names.has(l.id) || names.has(l.name)).length;
       known.probes[id] = {description: d, locations: locs.length, match, examples: locs.slice(0, 3).map(l => l.name)};
       console.log(`  ${id}：${d}（${locs.length} 個地點，吻合 ${match}）`);
       for (const k of ['h3', 'week']) if (want[k].test(d) && match > 0 && (!best[k] || match > best[k].match)) best[k] = {id, match};
@@ -184,6 +185,7 @@ function saveSample(name, j){                            // 只存第一個地�
 async function main(){
   const result = {version: 1, fetchedAt: new Date().toISOString(), datasets: {}, issued: null, points: {}, alerts: [], warnings};
   const nameToPid = new Map(MOUNTAINS.filter(m => m.pid).map(m => [m.cn, m.pid]));
+  const pids = new Set(nameToPid.values());
   const townsNeeded = new Set(MOUNTAINS.flatMap(m => m.tw || []));
 
   // 0. 先確認授權碼可以用（36 小時縣市預報，資料量小）
@@ -199,7 +201,7 @@ async function main(){
     result.datasets['mountain-' + kind] = {id, description: describe(j)};
     result.issued = result.issued || findKey(j, /^(issueTime|update)$/i) || null;
     for (const l of locations(j)){
-      const pid = nameToPid.get(l.name);
+      const pid = pids.has(l.id) ? l.id : nameToPid.get(l.name);     // 先比對預報點代碼，再比對名稱
       if (!pid) continue;
       const p = result.points[pid] ||= {name: l.name, lat: l.lat, lon: l.lon};
       p[kind] = kind === 'h3' ? slots3h(l) : periods12h(l);
@@ -210,23 +212,16 @@ async function main(){
 
   // 2. 鄉鎮預報
   for (const kind of ['h3', 'week']){
-    let sets = [];
-    try{
-      const j = await getDataset(TOWN_ALL[kind]);
-      const d = describe(j);
-      if (!/鄉鎮/.test(d)) throw new Error('資料集說明不符：' + d);
-      sets.push(j); result.datasets['town-' + kind] = {id: TOWN_ALL[kind], description: d};
-    }catch(e){
-      warn('全臺鄉鎮資料集無法使用（' + e.message + '），改用各縣市資料集');
-      for (const [county, n] of Object.entries(TOWN_COUNTY)){
-        if (![...townsNeeded].some(t => t.startsWith(county))) continue;
-        const id = 'F-D0047-' + String(kind === 'h3' ? n : n + 2).padStart(3, '0');
-        try{ sets.push(await getDataset(id)); }catch(e2){ warn(e2.message); }
-      }
+    const sets = [], ids = [];
+    for (const [county, n] of Object.entries(TOWN_COUNTY)){
+      if (![...townsNeeded].some(t => t.startsWith(county))) continue;
+      const id = 'F-D0047-' + String(kind === 'h3' ? n : n + 2).padStart(3, '0');
+      try{ sets.push(await getDataset(id)); ids.push(id); }catch(e){ warn(e.message); }
     }
+    result.datasets['town-' + kind] = {id: ids.join(','), description: describe(sets[0] || {})};
     if (sets[0]) saveSample('town-' + kind, sets[0]);
     for (const j of sets) for (const l of locations(j)){
-      const key = l.county + l.name;
+      const key = (l.county + l.name).replace(/台/g, '臺');
       if (!townsNeeded.has(key)) continue;
       const p = result.points[key] ||= {name: key, lat: l.lat, lon: l.lon};
       p[kind] = kind === 'h3' ? slots3h(l) : periods12h(l);
@@ -257,9 +252,11 @@ async function main(){
   fs.writeFileSync(OUT, JSON.stringify(result));
   const n = Object.values(result.points);
   console.log(`完成：${n.length} 個預報點（3 小時資料 ${n.filter(p=>p.h3?.length).length}、一週資料 ${n.filter(p=>p.week?.length).length}），特報 ${result.alerts.length} 則，警告 ${warnings.length} 則`);
+  summary = {points: n.length, h3: n.filter(p => p.h3?.length).length, week: n.filter(p => p.week?.length).length, alerts: result.alerts, datasets: result.datasets, issued: result.issued,
+    example: Object.fromEntries(Object.entries(result.points).slice(0, 2).map(([k, p]) => [k, {name: p.name, h3: p.h3?.slice(0, 3), week: p.week?.slice(0, 2)}]))};
   if (!n.some(p => p.h3?.length)) throw new Error('沒有任何可用的預報資料，停止更新網站');
 }
 // 每次執行結果寫進 data/last-run.json（會存回 GitHub），方便從專案直接看到成功或失敗原因
-const record = (ok, error) => { if (FIXTURES) return; fs.writeFileSync(path.join(ROOT, 'data/last-run.json'), JSON.stringify({time: new Date().toISOString(), ok, error: error || null, cause: error ? String(errCause || '') : null, warnings}, null, 2)); };
-let errCause = '';
+const record = (ok, error) => { if (FIXTURES) return; fs.writeFileSync(path.join(ROOT, 'data/last-run.json'), JSON.stringify({time: new Date().toISOString(), ok, error: error || null, cause: error ? String(errCause || '') : null, warnings, summary}, null, 2)); };
+let errCause = '', summary = null;
 main().then(() => record(true)).catch(e => { errCause = e.cause?.code || e.cause?.message || ''; console.error('✖ ' + e.message, errCause); record(false, e.message); process.exit(1); });

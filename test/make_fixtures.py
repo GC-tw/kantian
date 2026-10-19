@@ -62,9 +62,12 @@ for t in towns:
         els['風速'].append({'DataTime': iso(s), 'ElementValue': [{'WindSpeed': str(round(random.uniform(0.5, 9), 1)), 'BeaufortScale': '3'}]})
         els['天氣現象'].append({'StartTime': iso(s), 'EndTime': iso(e), 'ElementValue': [{'Weather': wx(p), 'WeatherCode': '02'}]})
     groups.setdefault(c, []).append({'LocationName': n, 'Latitude': '23.0', 'Longitude': '120.5', 'WeatherElement': [{'ElementName': k, 'Time': v} for k, v in els.items()]})
-json.dump(new_fmt('臺灣各鄉鎮市區預報資料-未來3天天氣預報', groups), open(out+'F-D0047-089.json', 'w'), ensure_ascii=False)
-g2 = {c: [{'LocationName': l['LocationName'], 'Latitude': '23', 'Longitude': '120.5', 'WeatherElement': week_elements(start)} for l in L] for c, L in groups.items()}
-json.dump(new_fmt('臺灣各鄉鎮市區預報資料-未來1週天氣預報', g2), open(out+'F-D0047-091.json', 'w'), ensure_ascii=False)
+# 各縣市一個檔案（與 fetch.mjs 的 TOWN_COUNTY 相同編號）；縣市名稱故意用「台」測試正規化
+CN = {'宜蘭縣':1,'桃園市':5,'新竹縣':9,'苗栗縣':13,'彰化縣':17,'南投縣':21,'雲林縣':25,'嘉義縣':29,'屏東縣':33,'臺東縣':37,'花蓮縣':41,'澎湖縣':45,'基隆市':49,'新竹市':53,'嘉義市':57,'臺北市':61,'高雄市':65,'新北市':69,'臺中市':73,'臺南市':77,'連江縣':81,'金門縣':85}
+for c, L in groups.items():
+    n = CN[c]; label = c.replace('臺', '台')
+    json.dump(new_fmt(c + '未來3天天氣預報', {label: L}), open(out+f'F-D0047-{n:03d}.json', 'w'), ensure_ascii=False)
+    json.dump(new_fmt(c + '未來1週天氣預報', {label: [{'LocationName': l['LocationName'], 'Latitude': '23', 'Longitude': '120.5', 'WeatherElement': week_elements(start)} for l in L]}), open(out+f'F-D0047-{n+2:03d}.json', 'w'), ensure_ascii=False)
 
 # 警特報：舊格式
 hz = lambda ph, sig, h0, h1: {'info': {'language': 'zh-TW', 'phenomena': ph, 'significance': sig}, 'validTime': {'startTime': iso(mid+dt.timedelta(hours=h0)), 'endTime': iso(mid+dt.timedelta(hours=h1))}}
