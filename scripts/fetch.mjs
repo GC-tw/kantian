@@ -141,29 +141,32 @@ function periods12h(locs){                               // 前一天 18 時起�
 
 // ---------- 資料集代碼：自動探查登山預報 ----------
 async function mountainDatasets(){
+  // 氣象署的「育樂區」預報分很多組（登山、森林遊樂區、國家公園…），說明文字都一樣，
+  // 所以逐一下載，看哪一組的地點名稱和我們的山最吻合。結果存在 data/datasets.json，之後直接使用。
+  const names = new Set(MOUNTAINS.filter(m => m.pid).map(m => m.cn));
   let known = fs.existsSync(DATASETS_FILE) ? JSON.parse(fs.readFileSync(DATASETS_FILE, 'utf8')) : {};
-  const want = {h3: /登山.*(三天|3天|72小時).*3小時/, week: /登山.*(一週|1週|七天|7天).*(日夜|12小時)/};
-  const ok = (id, re) => id && known[id] && re.test(known[id]);
-  if (ok(known.mountainH3, want.h3) && ok(known.mountainWeek, want.week)) return known;
+  if (known.mountainH3 && known.mountainWeek && known.version === 2) return known;
   console.log('探查登山預報資料集代碼（每個代碼最多等 20 秒）…');
-  known = {};
-  // 已知「登山三天3小時」是 F-B0053-035，先找附近的代碼，再找其他
-  const near = [35,36,33,34,37,38,39,40,41,42,31,32,29,30,43,44,45,46,47,48];
-  const order = [...near, ...Array.from({length: 90}, (_, i) => i+1).filter(n => !near.includes(n))];
-  const deadline = Date.now() + 8*60e3;
-  for (const n of order){
-    if (Date.now() > deadline){ warn('探查超過 8 分鐘，先停止'); break; }
+  known = {version: 2, probes: {}, errors: {}};
+  const want = {h3: /(三天|3天|72小時)/, week: /(一週|1週|七天|7天).*(12小時|日夜)/};
+  const best = {h3: null, week: null};
+  const deadline = Date.now() + 10*60e3;
+  for (let n = 1; n <= 90; n++){
+    if (Date.now() > deadline){ warn('探查超過 10 分鐘，先停止'); break; }
     const id = 'F-B0053-' + String(n).padStart(3, '0');
     try{
-      const d = describe(await getDataset(id, {}, {tries: 1, timeout: 20000}));
-      known[id] = d; console.log(`  ${id}：${d || '（沒有說明）'}`);
-    }catch(e){ const m = e.message.replace(id + ' 連線失敗：', ''); (known.errors ||= {})[id] = m; console.log(`  ${id}：${m}`); }
-    if (!known.mountainH3 && want.h3.test(known[id] || '')) known.mountainH3 = id;
-    if (!known.mountainWeek && want.week.test(known[id] || '')) known.mountainWeek = id;
-    if (known.mountainH3 && known.mountainWeek) break;
+      const j = await getDataset(id, {}, {tries: 1, timeout: 20000});
+      const d = describe(j), locs = locations(j);
+      const match = locs.filter(l => names.has(l.name)).length;
+      known.probes[id] = {description: d, locations: locs.length, match, examples: locs.slice(0, 3).map(l => l.name)};
+      console.log(`  ${id}：${d}（${locs.length} 個地點，吻合 ${match}）`);
+      for (const k of ['h3', 'week']) if (want[k].test(d) && match > 0 && (!best[k] || match > best[k].match)) best[k] = {id, match};
+    }catch(e){ const m = e.message.replace(id + ' 連線失敗：', ''); known.errors[id] = m; console.log(`  ${id}：${m}`); }
   }
+  known.mountainH3 = best.h3?.id; known.mountainWeek = best.week?.id;
   if (!FIXTURES) fs.writeFileSync(DATASETS_FILE, JSON.stringify(known, null, 2));   // 失敗也存下來，方便檢查
   if (!known.mountainH3 || !known.mountainWeek) throw new Error('找不到登山預報資料集，探查結果已存在 data/datasets.json');
+  console.log(`登山預報：3 天 ${known.mountainH3}（吻合 ${best.h3.match}）、一週 ${known.mountainWeek}（吻合 ${best.week.match}）`);
   return known;
 }
 

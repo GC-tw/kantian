@@ -26,7 +26,7 @@ for n in names:
         els['WS'].append({'startTime': iso(s), 'endTime': iso(e), 'elementValue': [{'value': str(ws), 'measures': '公尺/秒'}, {'value': '5', 'measures': '蒲福風級'}]})
         els['Wx'].append({'startTime': iso(s), 'endTime': iso(e), 'elementValue': [{'value': wx(p), 'measures': '自定義 Wx 文字'}, {'value': '07', 'measures': '自定義 Wx 單位'}]})
     locs.append({'locationName': n, 'geocode': '0', 'lat': '24.1', 'lon': '121.2', 'weatherElement': [{'elementName': k, 'time': v} for k, v in els.items()]})
-json.dump({'success': 'true', 'records': {'locations': [{'datasetDescription': '登山三天3小時天氣預報', 'locationsName': '臺灣', 'location': locs}]}}, open(out+'F-B0053-035.json', 'w'), ensure_ascii=False)
+json.dump({'success': 'true', 'records': {'locations': [{'datasetDescription': '臺灣各育樂區未來3天天氣預報', 'locationsName': '臺灣', 'location': locs}]}}, open(out+'F-B0053-035.json', 'w'), ensure_ascii=False)
 
 # 新格式工具
 def new_fmt(desc, groups):
@@ -46,7 +46,7 @@ def week_elements(start):
 
 # 登山一週日夜：新格式
 start = mid + dt.timedelta(hours=6) if now.hour < 18 else mid + dt.timedelta(hours=18)
-json.dump(new_fmt('登山一週日夜天氣預報', {'臺灣': [{'LocationName': n, 'Latitude': '24.1', 'Longitude': '121.2', 'WeatherElement': week_elements(start)} for n in names]}), open(out+'F-B0053-041.json', 'w'), ensure_ascii=False)
+json.dump(new_fmt('臺灣各育樂區未來1週逐12小時天氣預報', {'臺灣': [{'LocationName': n, 'Latitude': '24.1', 'Longitude': '121.2', 'WeatherElement': week_elements(start)} for n in names]}), open(out+'F-B0053-041.json', 'w'), ensure_ascii=False)
 
 # 鄉鎮 3 天逐 3 小時：新格式（中文 ElementName）
 groups = {}
