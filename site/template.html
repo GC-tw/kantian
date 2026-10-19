@@ -26,7 +26,18 @@ body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:1
   background-image:repeating-radial-gradient(circle at 85% -10%, transparent 0 38px, var(--contour) 38px 39px);
   background-attachment:fixed}
 .wrap{max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px;display:flex;flex-direction:column;gap:18px}
-header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:10px 24px}
+header.top{display:grid;grid-template-columns:1fr auto;grid-template-areas:"t tools" "t is";align-items:end;gap:6px 24px}
+header.top h1{grid-area:t}
+header.top .issued{grid-area:is;text-align:right}
+.tools{grid-area:tools;display:flex;gap:8px;align-items:center}
+.search{position:relative;width:320px;max-width:100%}
+.search svg,.filter-btn svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;flex:none}
+.search svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none}
+.search input{padding:9px 12px 9px 38px;border-radius:999px;background:var(--surface)}
+.filter-btn{display:none;align-items:center;gap:5px;font:inherit;font-weight:500;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:8px 13px;cursor:pointer;position:relative;flex:none}
+.filter-btn .badge{position:absolute;top:-6px;right:-6px;min-width:18px;height:18px;padding:0 4px;border-radius:9px;background:var(--accent);color:var(--accent-ink);font:700 11px/18px var(--f-body);text-align:center}
+.filter-btn .badge:empty{display:none}
+.sheet-head{display:none}
 h1{font-family:var(--f-display);font-weight:800;font-size:clamp(28px,4.4vw,40px);line-height:1.15;margin:0;letter-spacing:.02em;text-wrap:balance}
 h1 small{display:block;font-family:var(--f-body);font-weight:500;font-size:14px;color:var(--muted);letter-spacing:.04em;margin-top:6px}
 h2{font-family:var(--f-display);font-weight:600;font-size:20px;margin:0;text-wrap:balance}
@@ -50,7 +61,7 @@ input:focus-visible,select:focus-visible,button:focus-visible{outline:2px solid 
 .chip.mono{font-family:var(--f-mono);font-size:13px}
 #f-cat{flex-wrap:nowrap;overflow-x:auto}
 #f-cat .chip{white-space:nowrap;flex:none}
-.info{font:600 11px/1 var(--f-mono);width:18px;height:18px;border-radius:50%;border:1.5px solid var(--accent);color:var(--accent);background:transparent;display:inline-grid;place-items:center;cursor:pointer;padding:0;margin-left:4px;font-style:italic}
+.info{font:600 11px/1 var(--f-mono);width:18px;height:18px;border-radius:50%;border:1.5px solid var(--accent);color:var(--accent);background:transparent;display:inline-grid;place-items:center;cursor:pointer;padding:0;margin-left:4px;font-style:normal}
 .info[aria-expanded="true"]{background:var(--accent);color:var(--accent-ink)}
 .info-pop{background:var(--surface);border:1px solid var(--accent);border-radius:8px;padding:12px 14px;font-size:14px;max-width:560px;display:flex;flex-direction:column;gap:6px}
 .info-head{display:flex;justify-content:space-between;align-items:center;gap:12px}
@@ -171,12 +182,31 @@ footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);paddin
   .tabs .full{display:none}
   .tabs .badge{position:absolute;top:5px;left:calc(50% + 8px);min-width:17px;height:17px;padding:0 4px;border-radius:9px;background:var(--stop);color:#fff;font:700 10px/17px var(--f-body);text-align:center}
   .wrap{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
+  /* 手機：標題列固定在頂端，搜尋與篩選放在標題列 */
+  header.top{position:sticky;top:0;z-index:14;grid-template-areas:"t is" "tools tools";gap:8px 12px;align-items:start;
+    margin:-20px -16px 0;padding:calc(10px + env(safe-area-inset-top,0px)) 16px 10px;background:var(--bg);border-bottom:1px solid var(--line)}
+  header.top h1{font-size:22px}
+  header.top h1 small{font-size:11px;margin-top:2px}
+  header.top .issued{font-size:11px;padding-top:4px}
+  .search{flex:1;width:auto}
+  .search input{font-size:16px;padding-top:7px;padding-bottom:7px}
+  .filter-btn{display:inline-flex}
+  /* 手機：篩選收進底部面板，點「篩選」才打開 */
+  #q:not(.open){display:none}
+  #q.open{position:fixed;left:0;right:0;bottom:0;z-index:23;max-height:80vh;overflow-y:auto;border-radius:16px 16px 0 0;border-bottom:0;
+    padding:14px 16px calc(18px + env(safe-area-inset-bottom,0px));box-shadow:0 -8px 24px rgba(0,0,0,.18)}
+  #q .sheet-head{display:flex;justify-content:space-between;align-items:center;grid-column:1/-1;font-size:17px}
+  #f-scrim{z-index:22}
 }
 </style>
 
 <div class="wrap">
   <header class="top">
     <h1>看天爬山<small>看天氣，找出適合造訪的山</small></h1>
+    <div class="tools">
+      <div class="search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></svg><input id="f-name" type="search" autocomplete="off" aria-label="搜尋山名或別名" placeholder="搜尋山名或別名"></div>
+      <button type="button" class="filter-btn" id="filter-btn" aria-expanded="false" aria-controls="q"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M7 12h10M10 18h4"/></svg>篩選<span id="filter-n" class="badge"></span></button>
+    </div>
     <div class="issued" id="issued"></div>
   </header>
 
@@ -201,14 +231,14 @@ footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);paddin
   </div>
 
   <main id="view-find" style="display:flex;flex-direction:column;gap:18px">
-    <form class="panel-search" id="q" autocomplete="off">
+    <form class="panel-search" id="q" autocomplete="off" aria-label="篩選">
+      <div class="sheet-head"><b>篩選</b><button type="button" class="btn" id="filter-done">完成</button></div>
       <div class="field wide"><span class="lab">山岳類別（可多選，未選＝全部）</span><div class="chips" id="f-cat">
         <button type="button" class="chip reset" id="cat-all" aria-pressed="true">全部</button>
         <button type="button" class="chip" aria-pressed="false" data-c="百岳">百岳</button>
         <button type="button" class="chip" aria-pressed="false" data-c="小百岳">小百岳</button>
         <button type="button" class="chip" aria-pressed="false" data-c="其他山岳">其他山岳</button></div></div>
       <div class="field wide"><span class="lab">縣市（可多選，未選＝全部）</span><div class="chips" id="f-county"></div></div>
-      <div class="field"><label for="f-name">山名</label><input id="f-name" type="search" placeholder="例如：合歡山、鳶山"></div>
     </form>
 
     <section style="display:flex;flex-direction:column;gap:10px" aria-labelledby="h-picks">
@@ -224,7 +254,7 @@ footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);paddin
     <section style="display:flex;flex-direction:column;gap:10px" aria-labelledby="h-matrix">
       <div class="sec-head"><h2 id="h-matrix">所有山岳燈號</h2>
         <div class="legend">
-          <span><i class="lamp sm g">○</i>適合</span><span><i class="lamp sm y">△</i>注意</span><span><i class="lamp sm r">✕</i>不建議</span><span><i class="lamp sm na">—</i>無資料</span><span id="lg-ref" class="lg-ref"><i class="lamp sm g ref">○</i>虛線＝第 4–7 天，僅供參考<button type="button" class="info" id="info-btn" aria-expanded="false" aria-controls="info-ref" aria-label="為什麼第 4–7 天只供參考">i</button></span><span id="lg-past" class="lg-past"><i class="lamp sm g past">○</i>淡色＝已過時段</span>
+          <span><i class="lamp sm g">○</i>適合</span><span><i class="lamp sm y">△</i>注意</span><span><i class="lamp sm r">✕</i>不建議</span><span><i class="lamp sm na">—</i>時間已過或無資料</span><span id="lg-ref" class="lg-ref"><i class="lamp sm g ref">○</i>虛線＝第 4–7 天，僅供參考<button type="button" class="info" id="info-btn" aria-expanded="false" aria-controls="info-ref" aria-label="為什麼第 4–7 天只供參考">i</button></span><span id="lg-past" class="lg-past"><i class="lamp sm g past">○</i>淡色＝已過時段</span>
         </div></div>
       <div class="info-pop" id="info-ref" hidden>
         <div class="info-head"><b>為什麼第 4–7 天只供參考？</b><button type="button" class="info-x" id="info-x" aria-label="關閉說明">×</button></div>
@@ -243,7 +273,7 @@ footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);paddin
 
   <main id="view-fav" hidden style="display:flex;flex-direction:column;gap:10px">
     <div class="sec-head"><h2 id="h-favs">我的收藏</h2><p id="fav-count"></p></div>
-    <div class="legend"><span><i class="lamp sm g">○</i>適合</span><span><i class="lamp sm y">△</i>注意</span><span><i class="lamp sm r">✕</i>不建議</span><span><i class="lamp sm na">—</i>無資料</span><span class="lg-ref"><i class="lamp sm g ref">○</i>虛線＝第 4–7 天，僅供參考</span><span class="lg-past"><i class="lamp sm g past">○</i>淡色＝已過時段</span></div>
+    <div class="legend"><span><i class="lamp sm g">○</i>適合</span><span><i class="lamp sm y">△</i>注意</span><span><i class="lamp sm r">✕</i>不建議</span><span><i class="lamp sm na">—</i>時間已過或無資料</span><span class="lg-ref"><i class="lamp sm g ref">○</i>虛線＝第 4–7 天，僅供參考</span><span class="lg-past"><i class="lamp sm g past">○</i>淡色＝已過時段</span></div>
     <div class="matrix-box" id="fav-box"><table class="matrix" id="fav-matrix"><thead></thead><tbody></tbody></table></div>
     <div class="fav-empty" id="fav-empty">還沒有收藏。到「找山」點山名旁的 ♡，就能把山加到這裡，快速查看它們的天氣。</div>
   </main>
@@ -287,6 +317,7 @@ footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);paddin
 </div>
 
 <div class="scrim" id="scrim" hidden></div>
+<div class="scrim" id="f-scrim" hidden></div>
 <aside class="drawer" id="drawer" hidden aria-labelledby="d-title"></aside>
 
 <script>

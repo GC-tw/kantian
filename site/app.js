@@ -8,7 +8,7 @@ const SLOTS = [0,3,6,9,12,15,18,21];                       // 每段 3 小時的
 const MODES = {today:{di:0,name:'今天'}, tmr:{di:1,name:'明天'}, d2:{di:2,name:'後天'}, week:{name:'一週'}};
 const COUNTY_ORDER = ['基隆市','臺北市','新北市','桃園市','新竹市','新竹縣','苗栗縣','臺中市','彰化縣','南投縣','雲林縣','嘉義市','嘉義縣','臺南市','高雄市','屏東縣','宜蘭縣','花蓮縣','臺東縣','澎湖縣','金門縣','連江縣'];
 const BF = [0,0.3,1.6,3.4,5.5,8.0,10.8,13.9,17.2,20.8,24.5];  // 蒲福風級下限（公尺／秒）
-const SYM = ['○','△','✕','—'], CLS = ['g','y','r','na'], WORD = ['適合','注意','不建議','無資料'];
+const SYM = ['○','△','✕','—'], CLS = ['g','y','r','na'], WORD = ['適合','注意','不建議','時間已過或無資料'];
 const LV = lv => lv < 0 ? 3 : lv;                                // 燈號等級 -1 代表沒有資料
 const PAGE = 10;                                           // 山岳列表一次顯示幾座
 const H = 3600e3, STALE = 9*H;                              // 超過 9 小時沒更新就提醒
@@ -185,6 +185,7 @@ function render(){
     || `<div class="empty">${rows.length ? '這段期間沒有燈號為「適合」的山，可以參考下方列表。' : '沒有符合條件的山，請放寬類別或縣市。'}</div>`;
   const head = headRow();
   $('fav-tab-n').textContent = favRows.length || '';
+  $('filter-n').textContent = (state.cats.size + state.counties.size) || '';   // 手機「篩選」按鈕上顯示已選幾項
   $('fav-count').innerHTML = favRows.length ? `${title}・${favRows.length} 座，依燈號排序` : '';
   $('fav-box').hidden = !favRows.length; $('fav-empty').hidden = !!favRows.length;
   $('fav-matrix').tHead.innerHTML = head;
@@ -292,7 +293,11 @@ function chipGroup(box, attr, set, {allId, parse = v => v, keepOne, onChange}){
   seg.forEach(b => b.onclick = () => { state.mode = b.dataset.mode; state.shown = PAGE; syncSeg(); store.set('mode', state.mode); refresh(); });
   syncSeg();
 
-  $('f-name').oninput = e => { state.name = e.target.value; refilter(); };
+  $('f-name').oninput = e => { state.name = e.target.value; if ($('view-find').hidden) $('tab-find').click(); refilter(); };
+  const setFilter = open => { $('q').classList.toggle('open', open); $('f-scrim').hidden = !open; $('filter-btn').setAttribute('aria-expanded', open); };
+  $('filter-btn').onclick = () => { if ($('view-find').hidden) $('tab-find').click(); setFilter(true); };
+  $('filter-done').onclick = $('f-scrim').onclick = () => setFilter(false);
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') setFilter(false); });
   $('q').onsubmit = e => e.preventDefault();
   $('more').onclick = () => { state.shown += PAGE; if (!fresh()) evaluate(); render(); };
   $('info-btn').onclick = () => setInfo($('info-ref').hidden);
