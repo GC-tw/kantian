@@ -1,0 +1,54 @@
+{
+  "success": "true",
+  "result": {
+    "resource_id": "W-C0033-001",
+    "fields": [
+      {
+        "id": "locationName",
+        "type": "String"
+      },
+      {
+        "id": "geocode",
+        "type": "Double"
+      },
+      {
+        "id": "language",
+        "type": "String"
+      },
+      {
+        "id": "phenomena",
+        "type": "String"
+      },
+      {
+        "id": "significance",
+        "type": "String"
+      },
+      {
+        "id": "startTime",
+        "type": "Timestamp"
+      },
+      {
+        "id": "endTime",
+        "type": "Timestamp"
+      }
+    ]
+  },
+  "records": {
+    "location": [
+      {
+        "locationName": "花蓮縣",
+        "geocode": 10015,
+        "hazardConditions": {
+          "hazards": []
+        }
+      },
+      {
+        "locationName": "彰化縣",
+        "geocode": 10007,
+        "hazardConditions": {
+          "hazards": []
+        }
+      }
+    ]
+  }
+}
