@@ -8,7 +8,10 @@ on:
     - cron: '7 4 * * *'    # 台灣 12:07
     - cron: '7 10 * * *'   # 台灣 18:07
     - cron: '7 16 * * *'   # 台灣 00:07
-  workflow_dispatch: {}    # 也可以在 GitHub 上手動按「Run workflow」
+  workflow_dispatch: {}    # 也可以在 GitHub 上手動按「Run workflow」（會重新抓資料）
+  push:                    # 只改網頁時：沿用網站上最新的天氣資料，不重新抓氣象署（較快）
+    branches: [main]
+    paths: ['site/**', 'scripts/build.mjs']
 
 permissions:
   contents: write          # 存回資料集代碼與格式樣本
@@ -31,14 +34,27 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+      - name: 沿用最新天氣資料（只在修改網頁時）
+        id: reuse
+        if: github.event_name == 'push'
+        run: |
+          mkdir -p dist
+          url="https://$(echo '${{ github.repository_owner }}' | tr 'A-Z' 'a-z').github.io/${{ github.event.repository.name }}/forecast.json"
+          # 下載成功且資料在 9 小時內才沿用，否則改為重新抓取
+          if curl -fsSL "$url" -o dist/forecast.json && node -e "const f=require('./dist/forecast.json'); process.exit(Date.now()-Date.parse(f.fetchedAt) < 9*3600e3 ? 0 : 1)"; then
+            echo "ok=true" >> "$GITHUB_OUTPUT"; echo "沿用 $url"
+          else
+            echo "ok=false" >> "$GITHUB_OUTPUT"; echo "無法沿用，改為重新抓取"
+          fi
       - name: 抓取氣象署資料
+        if: steps.reuse.outputs.ok != 'true'
         env:
           CWA_API_KEY: ${{ secrets.CWA_API_KEY }}
         run: node scripts/fetch.mjs --out dist/forecast.json
       - name: 產生網頁
         run: node scripts/build.mjs
       - name: 存回資料集代碼與格式樣本（只在有變動時，抓取失敗也會存）
-        if: always()
+        if: always() && steps.reuse.outputs.ok != 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
