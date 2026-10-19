@@ -210,6 +210,8 @@ async function main(){
       p[kind] = kind === 'h3' ? slots3h(l) : periods12h(l);
     }
   }
+  // 預報點座標存一份，用來核對每座山的縣市（只在有變動時才會存回 GitHub）
+  if (!FIXTURES) fs.writeFileSync(path.join(ROOT, 'data/stations.json'), JSON.stringify(Object.fromEntries(Object.entries(result.points).sort().map(([k, p]) => [k, {name: p.name, lat: p.lat, lon: p.lon}])), null, 1));
   const missingPid = [...nameToPid.values()].filter(pid => !result.points[pid]);
   if (missingPid.length) warn('登山預報缺少以下預報點：' + missingPid.join('、'));
 
