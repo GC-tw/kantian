@@ -155,17 +155,20 @@ function scoreCell(r){
 }
 const headRow = () => `<tr><th class="mt">山岳</th>${cols.map(c=>`<th class="${c.ref?'ref ':''}${c.peak?'peak':''}"><span class="dt">${c.label}</span>${c.sub}</th>`).join('')}<th>${state.mode==='week'?'適合天數':'適合時段'}</th></tr>`;
 const bodyRow = r => `<tr data-k="${r.k}" tabindex="0"><th class="mt" scope="row"><span class="nm">${star(r.k)}${esc(r.m.n)}</span><span class="sub">${sub(r.m)}</span></th>${r.cells.map(c=>`<td>${lamp(c)}</td>`).join('')}<td class="cnt">${scoreCell(r)}</td></tr>`;
-const pickCard = (r, i) => `<div class="pick" data-k="${r.k}" tabindex="0" role="button"><span class="rank">第 ${i+1} 名・${score(r)}</span><span class="nm">${esc(r.m.n)}${star(r.k)}</span><span class="meta">${sub(r.m)}</span><span class="lights">${r.cells.map(c=>lamp(c,true)).join('')}</span></div>`;
+const pickCard = r => `<div class="pick" data-k="${r.k}" tabindex="0" role="button"><span class="rank">${score(r)}</span><span class="nm">${esc(r.m.n)}${star(r.k)}</span><span class="meta">${sub(r.m)}</span><span class="lights">${r.cells.map(c=>lamp(c,true)).join('')}</span></div>`;
 
 function render(){
   const week = state.mode === 'week', d0 = cols[0].date;
   const title = week ? `一週 ${fmt(dayAt(0))} – ${fmt(dayAt(6))}` : `${MODES[state.mode].name} ${fmt(d0)} 逐 3 小時`;
-  $('h-picks').textContent = (week ? '這週' : MODES[state.mode].name) + '最推薦';
+  $('h-picks').textContent = (week ? '這週' : MODES[state.mode].name) + '推薦';
   $('range-text').textContent = `${title}・共 ${rows.length} 座`;
   document.querySelectorAll('.lg-ref').forEach(e => e.hidden = !week);
   document.querySelectorAll('.lg-past').forEach(e => e.hidden = state.mode !== 'today');
   if (!week) setInfo(false);
-  $('picks').innerHTML = rows.slice(0,3).map(pickCard).join('') || '<div class="empty">沒有符合條件的山，請放寬類別或縣市。</div>';
+  // 推薦：依燈號排序，只列有「適合」時段（或天數）的山，最多 6 座，不標名次
+  const good = r => (week || peaksLeft() ? r.k1 : r.k2) > 0;
+  $('picks').innerHTML = rows.filter(good).slice(0, 6).map(pickCard).join('')
+    || `<div class="empty">${rows.length ? '這段期間沒有燈號為「適合」的山，可以參考下方列表。' : '沒有符合條件的山，請放寬類別或縣市。'}</div>`;
   const head = headRow();
   $('fav-tab-n').textContent = favRows.length || '';
   $('fav-count').textContent = favRows.length ? `${title}・${favRows.length} 座，依燈號排序` : '';
