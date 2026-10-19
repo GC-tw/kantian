@@ -65,6 +65,9 @@ function judge(fc, lowHill, alert, noPop){
   const wx = fc.wx || '';
   if (wx.includes('雷')) up(2, '有雷');
   if (/大雨|豪雨/.test(wx)) up(2, '大雨');
+  if (/下雪|積冰|暴風雪/.test(wx)) up(2, wx);             // 雪：下雪、積冰、暴風雪不建議；「雨或雪」等其他有「雪」的描述為注意
+  else if (wx.includes('雪')) up(1, wx);
+  if (wx.includes('霧')) up(1, '有霧');
   if (!noPop && fc.pop != null){ if (fc.pop>=60) up(2, '降雨機率 '+fc.pop+'%'); else if (fc.pop>=30) up(1, '降雨機率 '+fc.pop+'%'); }
   else if (wx.includes('雨')){                            // 沒有降雨機率（第 4–7 天）：寫出原始天氣描述，「短暫」以外的雨另外標記，排序時往後
     up(1, noPop ? wx + '（第 4–7 天無降雨機率）' : '可能下雨');
