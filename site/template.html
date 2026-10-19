@@ -35,6 +35,10 @@ h2{font-family:var(--f-display);font-weight:600;font-size:20px;margin:0;text-wra
 .tabs{display:flex;gap:4px;border-bottom:1px solid var(--line)}
 .tabs button{font:inherit;background:none;border:0;border-bottom:3px solid transparent;color:var(--muted);padding:8px 12px;cursor:pointer;font-weight:500}
 .tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+.tabs button{display:inline-flex;align-items:center;gap:6px;position:relative}
+.tabs svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linejoin:round;stroke-linecap:round;flex:none}
+.tabs button[aria-selected="true"] svg{stroke-width:2.2}
+.tabs .badge:empty{display:none}
 .panel-search{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:16px;display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px 18px;align-items:end}
 .field{display:flex;flex-direction:column;gap:6px;min-width:0}
 .field>label,.field>.lab{font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.08em}
@@ -157,6 +161,16 @@ footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);paddin
   .matrix tbody tr:hover{background:var(--accent-soft)}
   .matrix tbody tr:hover td,.matrix tbody tr:hover th{background:none}
   .matrix .lamp{width:min(30px,100%)}
+  /* 手機：像 APP 一樣，分頁固定在畫面底部 */
+  .tabs{position:fixed;left:0;right:0;bottom:0;z-index:15;display:grid;grid-template-columns:repeat(3,1fr);gap:0;
+    background:var(--surface);border-bottom:0;border-top:1px solid var(--line);box-shadow:0 -4px 14px rgba(0,0,0,.06);
+    padding:0 env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px)}
+  .tabs button{flex-direction:column;justify-content:center;gap:2px;font-size:11px;padding:8px 4px 7px;border-bottom:0;min-height:56px}
+  .tabs button[aria-selected="true"]{color:var(--ink);font-weight:700}
+  .tabs svg{width:24px;height:24px}
+  .tabs .full{display:none}
+  .tabs .badge{position:absolute;top:5px;left:calc(50% + 8px);min-width:17px;height:17px;padding:0 4px;border-radius:9px;background:var(--stop);color:#fff;font:700 10px/17px var(--f-body);text-align:center}
+  .wrap{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
 }
 </style>
 
@@ -169,9 +183,9 @@ footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);paddin
   <div class="notice" id="status" role="status" hidden></div>
 
   <nav class="tabs" role="tablist">
-    <button role="tab" id="tab-find" aria-selected="true" data-view="find">找山</button>
-    <button role="tab" id="tab-fav" aria-selected="false" data-view="fav">我的收藏 <span id="fav-tab-n" class="cnt"></span></button>
-    <button role="tab" id="tab-rules" aria-selected="false" data-view="rules">排序規則與說明</button>
+    <button role="tab" id="tab-find" aria-selected="true" data-view="find"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 19 9.5 8l3.5 6 2.5-4L21 19z"/><path d="m8 10.6 1.5 1.4 1.6-1.6"/></svg><span>找山</span></button>
+    <button role="tab" id="tab-fav" aria-selected="false" data-view="fav"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7.5-4.6-7.5-10.1A4.2 4.2 0 0 1 12 7.6a4.2 4.2 0 0 1 7.5 2.3C19.5 15.4 12 20 12 20z"/></svg><span>我的收藏</span><span id="fav-tab-n" class="cnt badge"></span></button>
+    <button role="tab" id="tab-rules" aria-selected="false" data-view="rules"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v16H5z"/><path d="M9 9h6M9 13h6M9 17h3"/></svg><span>排序規則<span class="full">與說明</span></span></button>
   </nav>
 
   <div id="shared" style="display:flex;flex-direction:column;gap:14px">

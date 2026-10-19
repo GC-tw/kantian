@@ -29,7 +29,7 @@ let fails = 0; const ok = (c, m) => { console.log((c ? '✓ ' : '✗ ') + m); if
   ok(/資料更新/.test(d.getElementById('issued').textContent), '顯示資料更新時間');
   for (const m of ['today', 'tmr', 'd2', 'week']){
     click(w, d.querySelector(`#seg [data-mode="${m}"]`));
-    for (let i = 0; i < 8; i++) click(w, d.getElementById('more'));
+    for (let i = 0; i < 30; i++) click(w, d.getElementById('more'));
     const body = d.body.innerHTML.replace(/<script>[\s\S]*<\/script>/, '');
     const L = lamps(), cnt = k => L.filter(x => x === k).length;
     ok(d.querySelectorAll('#matrix tbody tr').length === 235, `${m}：235 座都列出`);
@@ -38,7 +38,7 @@ let fails = 0; const ok = (c, m) => { console.log((c ? '✓ ' : '✗ ') + m); if
     ok(!info.hidden && /比較標準/.test(info.textContent) && /排序/.test(info.textContent) && (m === 'week' ? /適合」的天數/ : /登頂時段中「適合」的段數/).test(info.textContent) && /推薦$/.test(d.getElementById('h-picks-t').textContent), `${m}：推薦旁的 i 顯示對應的比較標準與排序`);
     click(w, d.getElementById('pick-info-x'));
     const picks = [...d.querySelectorAll('#picks .pick')];
-    ok(picks.length >= 1 && picks.length <= 6 && picks.every(p => p.querySelector('.lamp.g')), `${m}：推薦 ${picks.length} 座（最多 6 座，都有「適合」）`);
+    ok(picks.length >= 1 && picks.length <= 3 && picks.every(p => p.querySelector('.lamp.g')), `${m}：推薦 ${picks.length} 座（最多 3 座，都有「適合」）`);
     ok(!/第\s*\d+\s*名|最推薦/.test(d.getElementById('picks').textContent + d.getElementById('h-picks').textContent), `${m}：推薦不顯示名次與「最推薦」`);
     ok(!/undefined|NaN|\[object/.test(body), `${m}：畫面沒有空值或錯誤數字`);
     ok(cnt('g') + cnt('y') + cnt('r') > 0, `${m}：有實際燈號（適合 ${cnt('g')}、注意 ${cnt('y')}、不建議 ${cnt('r')}、無資料 ${cnt('na')}）`);
