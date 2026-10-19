@@ -92,18 +92,20 @@ input:focus-visible,select:focus-visible,button:focus-visible{outline:2px solid 
 .star[aria-pressed="true"]{color:var(--stop)}
 .star:hover{color:var(--stop)}
 .matrix .mt .nm .star{font-size:16px;padding:0 4px 0 0}
-.pick .nm{display:flex;justify-content:space-between;align-items:center;gap:8px}
 .fav-empty{background:var(--surface);border:1px dashed var(--line);border-radius:8px;padding:16px;text-align:left}
 .d-head h2 .star{font-size:22px;margin-left:6px}
 .chip.reset{border-style:dashed;color:var(--muted)}
 .chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
-.picks{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
-.pick{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:12px 14px;display:flex;flex-direction:column;gap:4px;cursor:pointer;text-align:left;font:inherit;color:inherit}
+.picks{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:8px}
+.pick{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 10px 8px 12px;display:flex;flex-direction:column;gap:5px;cursor:pointer;text-align:left;font:inherit;color:inherit}
 .pick:hover{border-color:var(--accent)}
+.pick .p1{display:flex;align-items:baseline;gap:8px;min-width:0}
+.pick .nm{font-family:var(--f-display);font-weight:800;font-size:18px;line-height:1.3;flex:none}
+.pick .meta{font-size:12px;color:var(--muted);flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pick .p1 .star{align-self:center;margin-left:auto;font-size:18px}
+.pick .p2{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px}
+.pick .lights{display:flex;gap:3px}
 .pick .rank{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
-.pick .nm{font-family:var(--f-display);font-weight:800;font-size:20px}
-.pick .meta{font-size:13px;color:var(--muted)}
-.pick .lights{display:flex;gap:3px;margin-top:4px}
 .sec-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:6px 16px}
 .sec-head p{margin:0;color:var(--muted);font-size:13px}
 .legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;color:var(--muted);align-items:center}

@@ -162,8 +162,8 @@ const sub = m => `${m.c} ${m.no}・${m.h ? m.h.toLocaleString()+' m' : '標高�
 const peaksLeft = () => cols.filter(c => c.peak && !c.past).length;
 function score(r){
   if (state.mode === 'week') return `適合 ${r.k1} 天`;
-  if (!peaksLeft()) return `登頂時段已過・剩餘時段適合 ${r.k2} 段`;
-  return cols.map((c,i) => c.peak ? `${c.label} ${c.past?'已過':WORD[LV(r.cells[i].lv)]}` : null).filter(Boolean).join('・');
+  if (!peaksLeft()) return `剩餘時段適合 ${r.k2} 段`;          // 推薦卡空間有限，只寫段數；各時段燈號看左邊的小燈
+  return `登頂時段適合 ${r.k1}/${peaksLeft()} 段`;
 }
 function scoreCell(r){
   if (state.mode === 'week') return `${r.k1} / 7`;
@@ -172,7 +172,8 @@ function scoreCell(r){
 }
 const headRow = () => `<tr><th class="mt">山岳</th>${cols.map(c=>`<th class="${c.ref?'ref ':''}${c.peak?'peak ':''}${c.wkd?'we':''}"><span class="dt">${c.head||c.label}</span>${c.sub}</th>`).join('')}<th class="cnt-h">${state.mode==='week'?'適合天數':'適合時段'}</th></tr>`;
 const bodyRow = r => `<tr data-k="${r.k}" tabindex="0"><th class="mt" scope="row"><span class="nm">${star(r.k)}${esc(r.m.n)}</span><span class="sub">${sub(r.m)}</span></th>${r.cells.map(c=>`<td>${lamp(c)}</td>`).join('')}<td class="cnt">${scoreCell(r)}</td></tr>`;
-const pickCard = r => `<div class="pick" data-k="${r.k}" tabindex="0" role="button"><span class="rank">${score(r)}</span><span class="nm">${esc(r.m.n)}${star(r.k)}</span><span class="meta">${sub(r.m)}</span><span class="lights">${r.cells.map(c=>lamp(c,true)).join('')}</span></div>`;
+// 推薦卡（精簡兩列）：山名＋資訊＋收藏／燈號＋比較結果
+const pickCard = r => `<div class="pick" data-k="${r.k}" tabindex="0" role="button"><div class="p1"><span class="nm">${esc(r.m.n)}</span><span class="meta">${sub(r.m)}</span>${star(r.k)}</div><div class="p2"><span class="lights">${r.cells.map(c=>lamp(c,true)).join('')}</span><span class="rank">${score(r)}</span></div></div>`;
 
 function render(){
   const week = state.mode === 'week', d0 = cols[0].date;
