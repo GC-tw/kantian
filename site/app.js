@@ -181,7 +181,9 @@ function render(){
   if (!week) setInfo(false);
   // 推薦：依燈號排序，只列有「適合」時段（或天數）的山，最多 3 座，不標名次
   const ph = pickHead(), pk = choosePicks(week);
-  $('reroll').hidden = !pk.more;
+  const rb = $('reroll');                                  // 有推薦就顯示；沒有同分的山可換時變灰色、不能按
+  rb.hidden = !pk.list.length; rb.disabled = !pk.more;
+  rb.title = pk.more ? '換一批推薦' : '目前沒有同分的山可以換';
   $('picks').innerHTML = pk.list.map(r => pickCard(r, ph)).join('')
     || `<div class="empty">${rows.length ? '這段期間沒有燈號為「適合」的山，可以參考下方列表。' : '沒有符合條件的山，請放寬類別或縣市。'}</div>`;
   const head = headRow();
@@ -240,7 +242,7 @@ function openDetail(k){
 }
 function closeDetail(){ $('drawer').hidden = true; $('scrim').hidden = true; }
 // 推薦旁的 i：依目前模式說明比較標準與排序
-const REROLL = '排序相同的山超過名額時，推薦標題旁會出現 ↻ 按鈕，按一下可以換成其他同分的山。';
+const REROLL = '推薦標題旁的 ↻ 按鈕：排序相同的山超過名額時，按一下可以換成其他同分的山；沒有同分的山時按鈕是灰色的。';
 function pickInfo(week){
   const slots = sortedSlots().map(slotLabel).join('、');
   const base = '<li>燈號依氣象署預報判定：降雨機率、天氣描述（雷、大雨、豪雨）、平均風速、天氣特報；標高 1,000 公尺以下另看高溫。各項取最差的結果。</li><li>跨多個鄉鎮的山，取最差的鄉鎮。</li>';

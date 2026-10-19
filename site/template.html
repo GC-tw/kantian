@@ -105,8 +105,9 @@ input:focus-visible,select:focus-visible,button:focus-visible{outline:2px solid 
 .cards{display:none;flex-direction:column;gap:8px}
 .cards .empty{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:12px}
 .reroll[hidden]{display:none}
+.reroll:disabled{opacity:.35;cursor:default}
 .reroll{width:30px;height:30px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--ink);display:inline-grid;place-items:center;padding:0;margin-left:8px;cursor:pointer;vertical-align:middle}
-.reroll:hover{border-color:var(--accent)}
+.reroll:not(:disabled):hover{border-color:var(--accent)}
 .pick .p2{display:flex;align-items:flex-end;gap:10px}
 .pick .lights{flex:1;min-width:0;display:grid;grid-template-columns:repeat(var(--n,8),minmax(0,1fr));gap:3px}
 .pick .lights .lamp.sm{width:auto;height:24px;font-size:12px}
