@@ -1,6 +1,6 @@
 // 看天爬山：從氣象署開放資料抓取預報，整理成網站使用的 forecast.json
 // 執行：CWA_API_KEY=xxxx node scripts/fetch.mjs [--out dist/forecast.json] [--fixtures test/fixtures]
-// 不需要安裝任何套件（Node 20 以上）。
+// 不需要安裝任何套件（Node 22 以上）。
 import fs from 'node:fs';
 import path from 'node:path';
 
@@ -261,6 +261,27 @@ async function main(){
   summary = {wxWeekDay1to3: wxCount(x => x.s < d4), wxWeekDay4to7: wxCount(x => x.s >= d4), points: n.length, h3: n.filter(p => p.h3?.length).length, week: n.filter(p => p.week?.length).length, alerts: result.alerts, datasets: result.datasets, issued: result.issued,
     example: Object.fromEntries(Object.entries(result.points).slice(0, 2).map(([k, p]) => [k, {name: p.name, h3: p.h3?.slice(0, 3), week: p.week?.slice(0, 2)}]))};
   if (!n.some(p => p.h3?.length)) throw new Error('沒有任何可用的預報資料，停止更新網站');
+  try{ logWx(n, result.alerts); }catch(e){ warn('天氣用語紀錄失敗：' + e.message); }
+}
+// 天氣用語紀錄 data/wx-log.json：累積每次執行出現的天氣描述，搭配當時有效的特報，
+// 用來觀察颱風、豪雨期間的用語，再決定「大雨、豪雨、霧、雪」的燈號規則（只紀錄，不影響燈號）
+function logWx(points, alerts){
+  if (FIXTURES) return;
+  const file = path.join(ROOT, 'data/wx-log.json'), now = Date.now(), day = new Date(now + TZ).toISOString().slice(0, 10);
+  let log = {}; try{ log = JSON.parse(fs.readFileSync(file, 'utf8')); }catch{}
+  log.terms ||= {}; log.runs ||= [];
+  const wx = {};
+  for (const p of points) for (const x of [...(p.h3 || []), ...(p.week || [])]) if (x.wx) wx[x.wx] = (wx[x.wx] || 0) + 1;
+  const active = [...new Set(alerts.filter(a => !(a.end < now)).map(a => a.type))];
+  for (const [w, c] of Object.entries(wx)){
+    const t = log.terms[w] ||= {n: 0, first: day, withAlerts: []};
+    t.n += c; t.last = day;
+    for (const a of active) if (!t.withAlerts.includes(a)) t.withAlerts.push(a);
+  }
+  log.runs.push({time: new Date(now).toISOString(), alerts: active, wx: Object.fromEntries(Object.entries(wx).sort((a, b) => b[1] - a[1]))});
+  log.runs = log.runs.slice(-120);                         // 約 30 天（每天 4 次）
+  log.watch = Object.keys(log.terms).filter(w => /大雨|豪雨|霧|雪|冰|雷/.test(w)).sort();
+  fs.writeFileSync(file, JSON.stringify(log, null, 1));
 }
 // 每次執行結果寫進 data/last-run.json（會存回 GitHub），方便從專案直接看到成功或失敗原因
 const record = (ok, error) => { if (FIXTURES) return; fs.writeFileSync(path.join(ROOT, 'data/last-run.json'), JSON.stringify({time: new Date().toISOString(), ok, error: error || null, cause: error ? String(errCause || '') : null, warnings, summary}, null, 2)); };
