@@ -99,7 +99,7 @@ const MOUNTAINS = M.map(m => {
 const state = {
   mode: MODES[store.get('mode')] ? store.get('mode') : 'today',
   slots: new Set((a => Array.isArray(a) && a.length ? a : [6,9])(store.get('slots'))),
-  cats: new Set(), counties: new Set(), name: '', shown: PAGE, turn: 0   // turn：按「換一批」的次數
+  cats: new Set(), counties: new Set(), name: '', shown: PAGE, turn: 0   // turn：按「換一批」圖示的次數
 };
 const favs = new Set((a => Array.isArray(a) ? a : [])(store.get('favs')));
 let cols = [], all = [], rows = [], favRows = [], byKey = new Map();
@@ -201,7 +201,7 @@ function render(){
   $('more-box').hidden = rows.length <= state.shown;
   $('more').textContent = `顯示更多（還有 ${rows.length-state.shown} 座）`;
 }
-// 推薦：只列有「適合」時段（或天數）的山，最多 3 座。名額邊界上分數相同的山超過剩餘名額時，「換一批」依當天順序輪流換成其他同分的山
+// 推薦：只列有「適合」時段（或天數）的山，最多 3 座。名額邊界上分數相同的山超過剩餘名額時，「換一批」圖示依當天順序輪流換成其他同分的山
 function choosePicks(week){
   const good = r => (week || peaksLeft() ? r.k1 : r.k2) > 0;
   const cand = rows.filter(good);
@@ -241,7 +241,7 @@ function openDetail(k){
 }
 function closeDetail(){ $('drawer').hidden = true; $('scrim').hidden = true; }
 // 推薦旁的 i：依目前模式說明比較標準與排序
-const REROLL = '排序相同的山超過名額時，旁邊會出現「換一批」，可以換成其他同分的山。';
+const REROLL = '排序相同的山超過名額時，推薦標題旁會出現 ↻ 按鈕，按一下可以換成其他同分的山。';
 function pickInfo(week){
   const slots = sortedSlots().map(slotLabel).join('、');
   const base = '<li>燈號依氣象署預報判定：降雨機率、天氣描述（雷、大雨、豪雨）、平均風速、天氣特報；標高 1,000 公尺以下另看高溫。各項取最差的結果。</li><li>跨多個鄉鎮的山，取最差的鄉鎮。</li>';

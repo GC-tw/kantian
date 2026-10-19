@@ -104,7 +104,8 @@ input:focus-visible,select:focus-visible,button:focus-visible{outline:2px solid 
 .pick .p1 .star{align-self:center;margin-left:auto;font-size:18px}
 .cards{display:none;flex-direction:column;gap:8px}
 .cards .empty{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:12px}
-.reroll{font:inherit;font-family:var(--f-body);font-size:13px;font-weight:500;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:3px 11px;margin-left:8px;cursor:pointer;vertical-align:3px;white-space:nowrap}
+.reroll[hidden]{display:none}
+.reroll{width:30px;height:30px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--ink);display:inline-grid;place-items:center;padding:0;margin-left:8px;cursor:pointer;vertical-align:middle}
 .reroll:hover{border-color:var(--accent)}
 .pick .p2{display:flex;align-items:flex-end;gap:10px}
 .pick .lights{flex:1;min-width:0;display:grid;grid-template-columns:repeat(var(--n,8),minmax(0,1fr));gap:3px}
@@ -286,7 +287,7 @@ footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);paddin
     </div>
 
     <section style="display:flex;flex-direction:column;gap:10px" aria-labelledby="h-picks">
-      <div class="sec-head"><h2 id="h-picks"><span id="h-picks-t">推薦</span><button type="button" class="info" id="pick-info-btn" aria-expanded="false" aria-controls="pick-info" aria-label="推薦怎麼比較與排序">i</button><button type="button" class="reroll" id="reroll" hidden aria-label="換一批推薦（同分的山）">↻ 換一批</button></h2><p id="range-text"></p></div>
+      <div class="sec-head"><h2 id="h-picks"><span id="h-picks-t">推薦</span><button type="button" class="info" id="pick-info-btn" aria-expanded="false" aria-controls="pick-info" aria-label="推薦怎麼比較與排序">i</button><button type="button" class="reroll" id="reroll" hidden aria-label="換一批推薦（同分的山）" title="換一批推薦"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v5h-5"/></svg></button></h2><p id="range-text"></p></div>
       <div class="info-pop" id="pick-info" hidden>
         <div class="info-head"><b id="pick-info-t">推薦怎麼比較與排序？</b><button type="button" class="info-x" id="pick-info-x" aria-label="關閉說明">×</button></div>
         <div id="pick-info-body"></div>
