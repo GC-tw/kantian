@@ -11,7 +11,7 @@ names.remove('鹿山')                                     # 故意缺一個，�
 towns = sorted({t for m in M for t in m['tw']})
 issue = mid + dt.timedelta(hours=5, minutes=30)
 def wx(p): return '短暫雷陣雨' if p >= 80 else '陰短暫雨' if p >= 60 else '多雲短暫陣雨' if p >= 30 else '多雲時晴'
-out = 'test/fixtures/'
+out = 'test/fixtures/'; os.makedirs(out, exist_ok=True)
 
 # 登山 3 天逐 3 小時：舊格式（代碼 + value/measures）
 locs = []

@@ -22,7 +22,7 @@ const TOWN_COUNTY = {'宜蘭縣':1,'桃園市':5,'新竹縣':9,'苗栗縣':13,'�
 const ALERT_ID = 'W-C0033-001';   // 天氣警特報：各縣市目前生效中的特報
 
 // ---------- 連線 ----------
-async function getDataset(id, params = {}){
+async function getDataset(id, params = {}, {tries = 3, timeout = 60000} = {}){
   if (FIXTURES){
     const f = path.join(FIXTURES, id + '.json');
     if (!fs.existsSync(f)) throw new Error('沒有測試檔 ' + id);
@@ -30,15 +30,15 @@ async function getDataset(id, params = {}){
   }
   if (!KEY) throw new Error('缺少 CWA_API_KEY（請在 GitHub 的 Secrets 設定氣象署授權碼）');
   const url = API + id + '?' + new URLSearchParams({Authorization: KEY, format: 'JSON', ...params});
-  for (let i = 1; i <= 3; i++){
+  for (let i = 1; i <= tries; i++){
     try{
-      const r = await fetch(url, {signal: AbortSignal.timeout(60000)});
+      const r = await fetch(url, {signal: AbortSignal.timeout(timeout)});
       if (!r.ok) throw new Error('HTTP ' + r.status);
       const j = await r.json();
       if (j.success === 'false' || j.success === false) throw new Error('氣象署回應失敗：' + JSON.stringify(j.result || j).slice(0, 200));
       return j;
     }catch(e){
-      if (i === 3) throw new Error(id + ' 連線失敗：' + e.message);
+      if (i === tries) throw new Error(id + ' 連線失敗：' + e.message);
       await new Promise(r => setTimeout(r, 3000 * i));
     }
   }
@@ -127,20 +127,28 @@ function periods12h(locs){                               // 前一天 18 時起�
 // ---------- 資料集代碼：自動探查登山預報 ----------
 async function mountainDatasets(){
   let known = fs.existsSync(DATASETS_FILE) ? JSON.parse(fs.readFileSync(DATASETS_FILE, 'utf8')) : {};
+  const want = {h3: /登山.*(三天|3天|72小時).*3小時/, week: /登山.*(一週|1週|七天|7天).*(日夜|12小時)/};
   const ok = (id, re) => id && known[id] && re.test(known[id]);
-  const want = {h3: /登山.*(三天|3天).*3小時/, week: /登山.*一週.*日夜/};
   if (ok(known.mountainH3, want.h3) && ok(known.mountainWeek, want.week)) return known;
-  console.log('探查登山預報資料集代碼…');
+  console.log('探查登山預報資料集代碼（每個代碼最多等 20 秒）…');
   known = {};
-  for (let n = 1; n <= 90; n++){
+  // 已知「登山三天3小時」是 F-B0053-035，先找附近的代碼，再找其他
+  const near = [35,36,33,34,37,38,39,40,41,42,31,32,29,30,43,44,45,46,47,48];
+  const order = [...near, ...Array.from({length: 90}, (_, i) => i+1).filter(n => !near.includes(n))];
+  const deadline = Date.now() + 8*60e3;
+  for (const n of order){
+    if (Date.now() > deadline){ warn('探查超過 8 分鐘，先停止'); break; }
     const id = 'F-B0053-' + String(n).padStart(3, '0');
-    try{ const d = describe(await getDataset(id)); if (d) known[id] = d; }catch(e){ /* 不存在的代碼略過 */ }
+    try{
+      const d = describe(await getDataset(id, {}, {tries: 1, timeout: 20000}));
+      known[id] = d; console.log(`  ${id}：${d || '（沒有說明）'}`);
+    }catch(e){ console.log(`  ${id}：${e.message.replace(id + ' 連線失敗：', '')}`); }
     if (!known.mountainH3 && want.h3.test(known[id] || '')) known.mountainH3 = id;
     if (!known.mountainWeek && want.week.test(known[id] || '')) known.mountainWeek = id;
     if (known.mountainH3 && known.mountainWeek) break;
   }
-  if (!known.mountainH3 || !known.mountainWeek) throw new Error('找不到登山預報資料集，探查結果：' + JSON.stringify(known));
-  if (!FIXTURES) fs.writeFileSync(DATASETS_FILE, JSON.stringify(known, null, 2));
+  if (!FIXTURES) fs.writeFileSync(DATASETS_FILE, JSON.stringify(known, null, 2));   // 失敗也存下來，方便檢查
+  if (!known.mountainH3 || !known.mountainWeek) throw new Error('找不到登山預報資料集，探查結果已存在 data/datasets.json');
   return known;
 }
 
@@ -160,6 +168,12 @@ async function main(){
   const result = {version: 1, fetchedAt: new Date().toISOString(), datasets: {}, issued: null, points: {}, alerts: [], warnings};
   const nameToPid = new Map(MOUNTAINS.filter(m => m.pid).map(m => [m.cn, m.pid]));
   const townsNeeded = new Set(MOUNTAINS.flatMap(m => m.tw || []));
+
+  // 0. 先確認授權碼可以用（36 小時縣市預報，資料量小）
+  if (!FIXTURES){
+    try{ await getDataset('F-C0032-001', {}, {tries: 2, timeout: 30000}); }
+    catch(e){ throw new Error('無法用授權碼取得氣象署資料（' + e.message + '）。請確認 GitHub Secrets 裡的 CWA_API_KEY 是否正確。'); }
+  }
 
   // 1. 登山預報
   const ds = await mountainDatasets();

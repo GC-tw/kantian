@@ -22,6 +22,7 @@ concurrency:
 jobs:
   update:
     runs-on: ubuntu-latest
+    timeout-minutes: 20       # 最多 20 分鐘，避免卡住
     environment:
       name: github-pages
       url: ${{ steps.deploy.outputs.page_url }}
@@ -36,7 +37,8 @@ jobs:
         run: node scripts/fetch.mjs --out dist/forecast.json
       - name: 產生網頁
         run: node scripts/build.mjs
-      - name: 存回資料集代碼與格式樣本（只在有變動時）
+      - name: 存回資料集代碼與格式樣本（只在有變動時，抓取失敗也會存）
+        if: always()
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
