@@ -33,6 +33,10 @@ let fails = 0; const ok = (c, m) => { console.log((c ? '✓ ' : '✗ ') + m); if
     const body = d.body.innerHTML.replace(/<script>[\s\S]*<\/script>/, '');
     const L = lamps(), cnt = k => L.filter(x => x === k).length;
     ok(d.querySelectorAll('#matrix tbody tr').length === 235, `${m}：235 座都列出`);
+    click(w, d.getElementById('pick-info-btn'));
+    const info = d.getElementById('pick-info');
+    ok(!info.hidden && /比較標準/.test(info.textContent) && /排序/.test(info.textContent) && (m === 'week' ? /適合」的天數/ : /登頂時段中「適合」的段數/).test(info.textContent) && /推薦$/.test(d.getElementById('h-picks-t').textContent), `${m}：推薦旁的 i 顯示對應的比較標準與排序`);
+    click(w, d.getElementById('pick-info-x'));
     const picks = [...d.querySelectorAll('#picks .pick')];
     ok(picks.length >= 1 && picks.length <= 6 && picks.every(p => p.querySelector('.lamp.g')), `${m}：推薦 ${picks.length} 座（最多 6 座，都有「適合」）`);
     ok(!/第\s*\d+\s*名|最推薦/.test(d.getElementById('picks').textContent + d.getElementById('h-picks').textContent), `${m}：推薦不顯示名次與「最推薦」`);

@@ -166,7 +166,8 @@ const pickCard = r => `<div class="pick" data-k="${r.k}" tabindex="0" role="butt
 function render(){
   const week = state.mode === 'week', d0 = cols[0].date;
   const title = week ? `一週 ${fmt(dayAt(0))} – ${fmt(dayAt(6))}` : `${MODES[state.mode].name} ${fmt(d0)} 逐 3 小時`;
-  $('h-picks').textContent = (week ? '這週' : MODES[state.mode].name) + '推薦';
+  $('h-picks-t').textContent = (week ? '這週' : MODES[state.mode].name) + '推薦';
+  $('pick-info-body').innerHTML = pickInfo(week);
   $('range-text').textContent = `${title}・共 ${rows.length} 座`;
   document.querySelectorAll('.lg-ref').forEach(e => e.hidden = !week);
   document.querySelectorAll('.lg-past').forEach(e => e.hidden = state.mode !== 'today');
@@ -214,6 +215,20 @@ function openDetail(k){
   $('d-close').focus();
 }
 function closeDetail(){ $('drawer').hidden = true; $('scrim').hidden = true; }
+// 推薦旁的 i：依目前模式說明比較標準與排序
+function pickInfo(week){
+  const slots = sortedSlots().map(slotLabel).join('、');
+  const base = '<li>燈號依氣象署預報判定：降雨機率、天氣描述（雷、大雨、豪雨）、平均風速、天氣特報；標高 1,000 公尺以下另看高溫。各項取最差的結果。</li><li>跨多個鄉鎮的山，取最差的鄉鎮。</li>';
+  const li = a => '<ul>' + a.map(x => '<li>' + x + '</li>').join('') + '</ul>';
+  if (week) return '<h4>比較標準</h4><ul>' + base + `<li>每天以你選的登頂時段（${esc(slots)}）中最差的情況作為當天燈號。</li><li>第 4–7 天氣象署沒有降雨機率，燈號最多只會到「注意」，僅供參考。</li></ul>`
+    + '<h4>推薦條件</h4>' + li(['7 天中至少 1 天「適合」的山才會列入，最多 6 座，不標名次。'])
+    + '<h4>排序</h4>' + li(['「適合」的天數多者在前', '再比「注意」的天數', '再比「注意」裡天氣描述為「陣雨」（非「短暫陣雨」）的天數，少者在前', '以上都相同時，順序每天輪換一次，不代表哪座比較好']);
+  const today = state.mode === 'today';
+  return '<h4>比較標準</h4><ul>' + base + `<li>逐 3 小時判定，每個時段一個燈號。</li>${today ? '<li>今天已過的時段不列入比較。</li>' : ''}</ul>`
+    + '<h4>推薦條件</h4>' + li([`你選的登頂時段（${esc(slots)}）至少有 1 段「適合」的山才會列入，最多 6 座，不標名次。` + (today ? '登頂時段都已過時，改看今天剩餘的時段。' : '')])
+    + '<h4>排序</h4>' + li(['登頂時段中「適合」的段數多者在前', '再比當天所有時段「適合」的段數', '以上都相同時，順序每天輪換一次，不代表哪座比較好']);
+}
+function setPickInfo(v){ $('pick-info').hidden = !v; $('pick-info-btn').setAttribute('aria-expanded', v); }
 function setInfo(v){ $('info-ref').hidden = !v; $('info-btn').setAttribute('aria-expanded', v); }
 
 // 讀取預報資料；失敗時保留已有資料並提示
@@ -275,6 +290,9 @@ function chipGroup(box, attr, set, {allId, parse = v => v, keepOne, onChange}){
   $('more').onclick = () => { state.shown += PAGE; if (!fresh()) evaluate(); render(); };
   $('info-btn').onclick = () => setInfo($('info-ref').hidden);
   $('info-x').onclick = () => { setInfo(false); $('info-btn').focus(); };
+  $('pick-info-btn').onclick = () => setPickInfo($('pick-info').hidden);
+  $('pick-info-x').onclick = () => { setPickInfo(false); $('pick-info-btn').focus(); };
+  $('pick-info-more').onclick = () => { setPickInfo(false); $('tab-rules').click(); window.scrollTo(0, 0); };
   $('scrim').onclick = closeDetail;
   const tabs = document.querySelectorAll('.tabs button');
   tabs.forEach(b => b.onclick = () => {

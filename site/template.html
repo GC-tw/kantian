@@ -51,6 +51,9 @@ input:focus-visible,select:focus-visible,button:focus-visible{outline:2px solid 
 .info-pop{background:var(--surface);border:1px solid var(--accent);border-radius:8px;padding:12px 14px;font-size:14px;max-width:560px;display:flex;flex-direction:column;gap:6px}
 .info-head{display:flex;justify-content:space-between;align-items:center;gap:12px}
 .info-pop ul{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:3px}
+.info-pop b+ul,.info-pop p{margin:0}
+.info-pop h4{margin:4px 0 0;font-size:13px;color:var(--muted)}
+.linkbtn{align-self:flex-start;font:inherit;font-size:13px;background:none;border:0;color:var(--accent);cursor:pointer;padding:2px 0;text-decoration:underline}
 .info-x{font:inherit;font-size:18px;line-height:1;background:none;border:0;color:var(--muted);cursor:pointer;padding:2px 6px}
 .star{font:inherit;font-size:18px;line-height:1;background:none;border:0;color:var(--muted);cursor:pointer;padding:2px 4px;vertical-align:1px}
 .star[aria-pressed="true"]{color:var(--stop)}
@@ -171,7 +174,12 @@ footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);paddin
     </form>
 
     <section style="display:flex;flex-direction:column;gap:10px" aria-labelledby="h-picks">
-      <div class="sec-head"><h2 id="h-picks">推薦</h2><p id="range-text"></p></div>
+      <div class="sec-head"><h2 id="h-picks"><span id="h-picks-t">推薦</span><button type="button" class="info" id="pick-info-btn" aria-expanded="false" aria-controls="pick-info" aria-label="推薦怎麼比較與排序">i</button></h2><p id="range-text"></p></div>
+      <div class="info-pop" id="pick-info" hidden>
+        <div class="info-head"><b id="pick-info-t">推薦怎麼比較與排序？</b><button type="button" class="info-x" id="pick-info-x" aria-label="關閉說明">×</button></div>
+        <div id="pick-info-body"></div>
+        <button type="button" class="linkbtn" id="pick-info-more">看完整規則 →</button>
+      </div>
       <div class="picks" id="picks"></div>
     </section>
 
