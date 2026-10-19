@@ -32,22 +32,28 @@ body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:1
   background-image:repeating-radial-gradient(circle at 85% -10%, transparent 0 38px, var(--contour) 38px 39px);
   background-attachment:fixed}
 .wrap{max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px;display:flex;flex-direction:column;gap:18px}
-header.top{display:grid;grid-template-columns:1fr auto;grid-template-areas:"t tools" "t is" "rg rg";align-items:end;gap:6px 24px}
+header.top{display:grid;grid-template-columns:1fr auto;grid-template-areas:"t is" "ctrl ctrl";align-items:end;gap:8px 24px}
 header.top h1{grid-area:t}
 h1 .brand{display:inline-flex;align-items:center;gap:.28em}
 h1 .logo{width:1.05em;height:1.05em;flex:none}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) h1 .logo rect{stroke:#4a535b;stroke-width:12}}
 header.top .issued{grid-area:is;text-align:right}
-.tools{grid-area:tools;display:flex;gap:8px;align-items:center}
-.search{position:relative;width:320px;max-width:100%}
+/* 標題列第二排：搜尋（放大鏡，點了才展開）→ 地區 → 進階篩選 */
+.ctrl{grid-area:ctrl;display:flex;align-items:center;gap:6px;position:relative;min-width:0}
+.search{flex:none;display:flex;align-items:center;gap:6px}
+.s-btn{width:34px;height:34px;flex:none;display:grid;place-items:center;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;padding:0}
+.s-btn.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.search input,.s-x{display:none}
+.search input::-webkit-search-cancel-button{-webkit-appearance:none;display:none}
+.search.open{position:absolute;inset:0;z-index:3;background:var(--bg)}
+.search.open input{display:block;flex:1;border-radius:999px;background:var(--surface);padding:6px 12px}
+.search.open .s-x{display:grid;place-items:center;width:34px;height:34px;flex:none;font-size:20px;line-height:1;border:0;background:none;color:var(--muted);cursor:pointer}
 .search svg,.filter-btn svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;flex:none}
-.search svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none}
-.search input{padding:9px 12px 9px 38px;border-radius:999px;background:var(--surface)}
 .filter-btn{display:none;align-items:center;gap:5px;font:inherit;font-weight:500;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:8px 13px;cursor:pointer;position:relative;flex:none}
 .filter-btn .badge{position:absolute;top:-6px;right:-6px;min-width:18px;height:18px;padding:0 4px;border-radius:9px;background:var(--accent);color:var(--accent-ink);font:700 11px/18px var(--f-body);text-align:center}
 .filter-btn .badge:empty{display:none}
 .sheet-head{display:none}
-.chips.regions{grid-area:rg;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;padding:2px 0}
+.chips.regions{flex:0 1 auto;min-width:0;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;padding:2px 0}
 .regions::-webkit-scrollbar{display:none}
 .regions .chip{flex:none;white-space:nowrap}
 h1{font-family:var(--f-display);font-weight:800;font-size:clamp(34px,5vw,48px);line-height:1.15;margin:0;letter-spacing:.02em;text-wrap:balance}
@@ -195,16 +201,18 @@ footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);paddin
   .tabs .badge{position:absolute;top:5px;left:calc(50% + 8px);min-width:17px;height:17px;padding:0 4px;border-radius:9px;background:var(--stop);color:#fff;font:700 10px/17px var(--f-body);text-align:center}
   .wrap{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
   /* 手機：標題列固定在頂端，搜尋與篩選放在標題列 */
-  header.top{position:sticky;top:0;z-index:14;grid-template-areas:"t is" "tools tools" "rg rg";gap:8px 12px;align-items:start;
+  header.top{position:sticky;top:0;z-index:14;gap:8px 12px;align-items:start;
     margin:-20px -16px 0;padding:calc(10px + env(safe-area-inset-top,0px)) 16px 10px;background:var(--bg);border-bottom:1px solid var(--line)}
   header.top h1{font-size:30px}
   header.top h1 small{font-size:11px;margin-top:2px}
   header.top .issued{font-size:11px;padding-top:4px}
-  .search{flex:1;width:auto}
-  .search input{font-size:16px;padding-top:7px;padding-bottom:7px}
-  .filter-btn{display:inline-flex}
-  .chips.regions{gap:5px}
-  .regions .chip{padding:4px 10px}
+  .search.open input{font-size:16px}
+  /* 手機寬度放不下文字：進階篩選只留圖示，地區按鈕縮小，整排不需左右滑動 */
+  .filter-btn{display:inline-grid;place-items:center;margin-left:auto;width:34px;height:34px;padding:0}
+  .filter-btn .fb-t{display:none}
+  .ctrl{gap:4px}
+  .chips.regions{gap:3px}
+  .regions .chip{padding:4px 6px;font-size:13px}
   .seg button{padding:8px 2px}
   .seg button small{white-space:nowrap;font-size:clamp(10px,3vw,12px);letter-spacing:-.03em}
   /* 手機：篩選收進底部面板，點「篩選」才打開 */
@@ -214,18 +222,19 @@ footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);paddin
   #q .sheet-head{display:flex;justify-content:space-between;align-items:center;grid-column:1/-1;font-size:17px}
   #f-scrim{z-index:22}
 }
+@media (max-width:374px){.regions .chip{padding:4px 5px}.chips.regions{gap:2px}}
 </style>
 
 <div class="wrap">
   <header class="top">
     <!-- 圖示為暫定示意（方向 A），之後再重新設計 -->
     <h1><span class="brand"><svg class="logo" viewBox="0 0 512 512" aria-hidden="true"><rect width="512" height="512" rx="112" fill="#2f363d"/><circle cx="352" cy="168" r="56" fill="#f2b544"/><path d="M40 412 196 176l70 104 44-58 162 190z" fill="#8f99a3"/><path d="M40 412 196 176l116 236z" fill="#f4f5f6"/></svg>看天爬山</span><small>看天氣，找出適合造訪的山</small></h1>
-    <div class="tools">
-      <div class="search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></svg><input id="f-name" type="search" autocomplete="off" aria-label="搜尋山名或別名" placeholder="搜尋山名或別名"></div>
-      <button type="button" class="filter-btn" id="filter-btn" aria-expanded="false" aria-controls="q"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M7 12h10M10 18h4"/></svg>進階篩選<span id="filter-n" class="badge"></span></button>
-    </div>
     <div class="issued" id="issued"></div>
-    <div class="chips regions" id="f-region" role="group" aria-label="地區"></div>
+    <div class="ctrl">
+      <div class="search" id="search"><button type="button" class="s-btn" id="s-btn" aria-label="搜尋山名或別名" aria-expanded="false" aria-controls="f-name"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></svg></button><input id="f-name" type="search" autocomplete="off" aria-label="搜尋山名或別名" placeholder="搜尋山名或別名"><button type="button" class="s-x" id="s-x" aria-label="清除並關閉搜尋">×</button></div>
+      <div class="chips regions" id="f-region" role="group" aria-label="地區"></div>
+      <button type="button" class="filter-btn" id="filter-btn" aria-expanded="false" aria-controls="q" aria-label="進階篩選" title="進階篩選"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M7 12h10M10 18h4"/></svg><span class="fb-t">進階篩選</span><span id="filter-n" class="badge"></span></button>
+    </div>
   </header>
 
   <div class="notice" id="status" role="status" hidden></div>

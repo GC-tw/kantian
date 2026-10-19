@@ -312,11 +312,15 @@ const regionNow = () => REGIONS.find(([, cs]) => sameSet(state.counties, cs));  
   seg.forEach(b => b.onclick = () => { state.mode = b.dataset.mode; state.shown = PAGE; syncSeg(); store.set('mode', state.mode); refresh(); });
   syncSeg();
 
-  $('f-name').oninput = e => { state.name = e.target.value; if ($('view-find').hidden) $('tab-find').click(); refilter(); };
+  $('f-name').oninput = e => { state.name = e.target.value; $('s-btn').classList.toggle('on', !!state.name.trim()); if ($('view-find').hidden) $('tab-find').click(); refilter(); };
+  const setSearch = open => { $('search').classList.toggle('open', open); $('s-btn').setAttribute('aria-expanded', open); if (open) $('f-name').focus(); };
+  $('s-btn').onclick = () => setSearch(!$('search').classList.contains('open'));
+  $('s-x').onclick = () => { const f = $('f-name'); if (f.value){ f.value = ''; f.dispatchEvent(new Event('input')); } setSearch(false); $('s-btn').focus(); };
+  $('f-name').addEventListener('blur', () => setTimeout(() => { if (!$('search').contains(document.activeElement)) setSearch(false); }, 150));   // 離開搜尋框就收起（已輸入的字保留，放大鏡會變深色）
   const setFilter = open => { $('q').classList.toggle('open', open); $('f-scrim').hidden = !open; $('filter-btn').setAttribute('aria-expanded', open); };
   $('filter-btn').onclick = () => { if ($('view-find').hidden) $('tab-find').click(); setFilter(true); };
   $('filter-done').onclick = $('f-scrim').onclick = () => setFilter(false);
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') setFilter(false); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape'){ setFilter(false); setSearch(false); } });
   $('q').onsubmit = e => e.preventDefault();
   $('more').onclick = () => { state.shown += PAGE; if (!fresh()) evaluate(); render(); };
   $('info-btn').onclick = () => setInfo($('info-ref').hidden);
