@@ -1,0 +1,7 @@
+{
+  "time": "2026-10-19T06:41:00.360Z",
+  "ok": false,
+  "error": "找不到登山預報資料集，探查結果已存在 data/datasets.json",
+  "cause": "",
+  "warnings": []
+}
