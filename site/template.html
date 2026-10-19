@@ -106,7 +106,9 @@ input:focus-visible,select:focus-visible,button:focus-visible{outline:2px solid 
 .cards .empty{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:12px}
 .reroll[hidden]{display:none}
 .reroll:disabled{opacity:.35;cursor:default}
-.reroll{width:30px;height:30px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--ink);display:inline-grid;place-items:center;padding:0;margin-left:8px;cursor:pointer;vertical-align:middle}
+.reroll{flex:none;display:inline-flex;align-items:center;gap:5px;font:inherit;font-size:13px;font-weight:500;height:32px;padding:0 12px 0 10px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;white-space:nowrap}
+.picks-head{flex-wrap:nowrap;align-items:center}
+.picks-head .ph-l{flex:1;min-width:0;display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 16px}
 .reroll:not(:disabled):hover{border-color:var(--accent)}
 .pick .p2{display:flex;align-items:flex-end;gap:10px}
 .pick .lights{flex:1;min-width:0;display:grid;grid-template-columns:repeat(var(--n,8),minmax(0,1fr));gap:3px}
@@ -288,7 +290,7 @@ footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);paddin
     </div>
 
     <section style="display:flex;flex-direction:column;gap:10px" aria-labelledby="h-picks">
-      <div class="sec-head"><h2 id="h-picks"><span id="h-picks-t">推薦</span><button type="button" class="info" id="pick-info-btn" aria-expanded="false" aria-controls="pick-info" aria-label="推薦怎麼比較與排序">i</button><button type="button" class="reroll" id="reroll" hidden aria-label="換一批推薦（同分的山）" title="換一批推薦"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v5h-5"/></svg></button></h2><p id="range-text"></p></div>
+      <div class="sec-head picks-head"><div class="ph-l"><h2 id="h-picks"><span id="h-picks-t">推薦</span><button type="button" class="info" id="pick-info-btn" aria-expanded="false" aria-controls="pick-info" aria-label="推薦怎麼比較與排序">i</button></h2><p id="range-text"></p></div><button type="button" class="reroll" id="reroll" hidden aria-label="換一批推薦（同分的山）"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v5h-5"/></svg><span>換一批</span></button></div>
       <div class="info-pop" id="pick-info" hidden>
         <div class="info-head"><b id="pick-info-t">推薦怎麼比較與排序？</b><button type="button" class="info-x" id="pick-info-x" aria-label="關閉說明">×</button></div>
         <div id="pick-info-body"></div>
