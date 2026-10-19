@@ -173,7 +173,9 @@ function scoreCell(r){
 const headRow = () => `<tr><th class="mt">山岳</th>${cols.map(c=>`<th class="${c.ref?'ref ':''}${c.peak?'peak ':''}${c.wkd?'we':''}"><span class="dt"><span class="lg">${c.head||c.label}</span><span class="st">${c.short}</span></span>${c.sub}</th>`).join('')}<th class="cnt-h">${state.mode==='week'?'適合天數':'適合時段'}</th></tr>`;
 const bodyRow = r => `<tr data-k="${r.k}" tabindex="0"><th class="mt" scope="row"><div class="mt-in"><span class="nm">${esc(r.m.n)}</span><span class="sub">${sub(r.m)}</span>${star(r.k)}</div></th>${r.cells.map(c=>`<td>${lamp(c)}</td>`).join('')}<td class="cnt"><span class="cn-s">${scoreCell(r)}</span><span class="cn-l">${score(r)}</span></td></tr>`;
 // 推薦卡（精簡兩列）：山名＋資訊＋收藏／燈號＋比較結果
-const pickCard = r => `<div class="pick" data-k="${r.k}" tabindex="0" role="button"><div class="p1"><span class="nm">${esc(r.m.n)}</span><span class="meta">${sub(r.m)}</span>${star(r.k)}</div><div class="p2"><span class="lights">${r.cells.map(c=>lamp(c,true)).join('')}</span><span class="rank">${score(r)}</span></div></div>`;
+// 小燈上方標出時段（逐 3 小時寫開始時刻，一週寫日期＋星期），和下方列表一樣；登頂時段加底色、週末紅色
+const pickHead = () => cols.map(c => `<span class="ph${c.peak?' peak':''}${c.wkd?' we':''}${c.ref?' ref':''}" aria-hidden="true">${c.short}</span>`).join('');
+const pickCard = (r, head) => `<div class="pick" data-k="${r.k}" tabindex="0" role="button"><div class="p1"><span class="nm">${esc(r.m.n)}</span><span class="meta">${sub(r.m)}</span>${star(r.k)}</div><div class="p2"><span class="lights" style="--n:${cols.length}">${head}${r.cells.map(c=>lamp(c,true)).join('')}</span><span class="rank">${score(r)}</span></div></div>`;
 
 function render(){
   const week = state.mode === 'week', d0 = cols[0].date;
@@ -188,7 +190,8 @@ function render(){
   if (!week) setInfo(false);
   // 推薦：依燈號排序，只列有「適合」時段（或天數）的山，最多 3 座，不標名次
   const good = r => (week || peaksLeft() ? r.k1 : r.k2) > 0;
-  $('picks').innerHTML = rows.filter(good).slice(0, 3).map(pickCard).join('')
+  const ph = pickHead();
+  $('picks').innerHTML = rows.filter(good).slice(0, 3).map(r => pickCard(r, ph)).join('')
     || `<div class="empty">${rows.length ? '這段期間沒有燈號為「適合」的山，可以參考下方列表。' : '沒有符合條件的山，請放寬類別或縣市。'}</div>`;
   const head = headRow();
   $('fav-tab-n').textContent = favRows.length || '';

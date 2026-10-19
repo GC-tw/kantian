@@ -102,9 +102,14 @@ input:focus-visible,select:focus-visible,button:focus-visible{outline:2px solid 
 .pick .nm{font-family:var(--f-display);font-weight:800;font-size:18px;line-height:1.3;flex:none}
 .pick .meta{font-size:12px;color:var(--muted);flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pick .p1 .star{align-self:center;margin-left:auto;font-size:18px}
-.pick .p2{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px}
-.pick .lights{display:flex;gap:3px}
-.pick .rank{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+.pick .p2{display:flex;flex-wrap:wrap;align-items:flex-end;gap:4px 10px}
+.pick .lights{display:grid;grid-template-columns:repeat(var(--n,8),20px);gap:3px}
+.pick .ph{font-family:var(--f-mono);font-size:11px;line-height:1.2;color:var(--ink);text-align:center;padding:2px 0;border-radius:3px}
+.pick .ph .wd{display:block;font-family:var(--f-body);font-size:10px}
+.pick .ph.peak{background:var(--accent-soft)}
+.pick .ph.ref{color:var(--muted)}
+.pick .ph.we{color:var(--we)}
+.pick .rank{font-family:var(--f-mono);font-size:12px;line-height:20px;color:var(--muted)}
 .sec-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:6px 16px}
 .sec-head p{margin:0;color:var(--muted);font-size:13px}
 .legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;color:var(--muted);align-items:center}
