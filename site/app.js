@@ -160,29 +160,21 @@ const star = k => { const on = favs.has(k), t = on ? '取消收藏' : '加入收
 const lamp = (c, sm) => `<i class="lamp ${CLS[LV(c.lv)]}${c.ref?' ref':''}${c.past?' past':''}${sm?' sm':''}" title="${WORD[LV(c.lv)]}${c.ref?'（參考）':''}${c.past?'（已過）':''}">${SYM[LV(c.lv)]}</i>`;
 const sub = m => `${m.c} ${m.no}・${m.h ? m.h.toLocaleString()+' m' : '標高待補'}・${esc(m.co)}`;
 const peaksLeft = () => cols.filter(c => c.peak && !c.past).length;
-function score(r){
-  if (state.mode === 'week') return `適合 ${r.k1} 天`;
-  if (!peaksLeft()) return `剩餘時段適合 ${r.k2} 段`;          // 推薦卡空間有限，只寫段數；各時段燈號看左邊的小燈
-  return `登頂時段適合 ${r.k1}/${peaksLeft()} 段`;
-}
-function scoreCell(r){
-  if (state.mode === 'week') return `${r.k1} / 7`;
-  const pk = peaksLeft();
-  return pk ? `${r.k1} / ${pk}` : `${r.k2} / ${cols.filter(c=>!c.past).length}`;
-}
-const headRow = () => `<tr><th class="mt">山岳</th>${cols.map(c=>`<th class="${c.ref?'ref ':''}${c.peak?'peak ':''}${c.wkd?'we':''}"><span class="dt"><span class="lg">${c.head||c.label}</span><span class="st">${c.short}</span></span>${c.sub}</th>`).join('')}<th class="cnt-h">${state.mode==='week'?'適合天數':'適合時段'}</th></tr>`;
-const bodyRow = r => `<tr data-k="${r.k}" tabindex="0"><th class="mt" scope="row"><div class="mt-in"><span class="nm">${esc(r.m.n)}</span><span class="sub">${sub(r.m)}</span>${star(r.k)}</div></th>${r.cells.map(c=>`<td>${lamp(c)}</td>`).join('')}<td class="cnt"><span class="cn-s">${scoreCell(r)}</span><span class="cn-l">${score(r)}</span></td></tr>`;
+// 比較結果只在一週模式顯示（適合天數）；逐 3 小時模式不顯示段數（使用者認為難懂），排序仍照規則
+const isWeek = () => state.mode === 'week';
+const headRow = () => `<tr><th class="mt">山岳</th>${cols.map(c=>`<th class="${c.ref?'ref ':''}${c.peak?'peak ':''}${c.wkd?'we':''}"><span class="dt"><span class="lg">${c.head||c.label}</span><span class="st">${c.short}</span></span>${c.sub}</th>`).join('')}${isWeek()?'<th class="cnt-h">適合天數</th>':''}</tr>`;
+const bodyRow = r => `<tr data-k="${r.k}" tabindex="0"><th class="mt" scope="row"><div class="mt-in"><span class="nm">${esc(r.m.n)}</span><span class="sub">${sub(r.m)}</span>${star(r.k)}</div></th>${r.cells.map(c=>`<td>${lamp(c)}</td>`).join('')}${isWeek()?`<td class="cnt"><span class="cn-s">${r.k1} / 7</span><span class="cn-l">適合 ${r.k1} 天</span></td>`:''}</tr>`;
 // 推薦卡（精簡兩列）：山名＋資訊＋收藏／燈號＋比較結果
 // 小燈上方標出時段（逐 3 小時寫開始時刻，一週寫日期＋星期），和下方列表一樣；登頂時段加底色、週末紅色
 const pickHead = () => cols.map(c => `<span class="ph${c.peak?' peak':''}${c.wkd?' we':''}${c.ref?' ref':''}" aria-hidden="true">${c.short}</span>`).join('');
-const pickCard = (r, head) => `<div class="pick" data-k="${r.k}" tabindex="0" role="button"><div class="p1"><span class="nm">${esc(r.m.n)}</span><span class="meta">${sub(r.m)}</span>${star(r.k)}</div><div class="p2"><span class="lights" style="--n:${cols.length}">${head}${r.cells.map(c=>lamp(c,true)).join('')}</span><span class="rank">${score(r)}</span></div></div>`;
+const pickCard = (r, head) => `<div class="pick" data-k="${r.k}" tabindex="0" role="button"><div class="p1"><span class="nm">${esc(r.m.n)}</span><span class="meta">${sub(r.m)}</span>${star(r.k)}</div><div class="p2"><span class="lights" style="--n:${cols.length}">${head}${r.cells.map(c=>lamp(c,true)).join('')}</span>${isWeek()?`<span class="rank">適合 ${r.k1} 天</span>`:''}</div></div>`;
 
 function render(){
   const week = state.mode === 'week', d0 = cols[0].date;
-  const title = week ? `一週 ${fmtH(dayAt(0))} – ${fmtH(dayAt(6))}` : `${MODES[state.mode].name} ${fmtH(d0)} 逐 3 小時`;
+  const title = week ? `一週 ${fmtH(dayAt(0))} – ${fmtH(dayAt(6))}` : `${MODES[state.mode].name} ${fmtH(d0)} 逐 3 小時預報`;
   $('h-picks-t').textContent = (week ? '這週' : MODES[state.mode].name) + '推薦';
   $('pick-info-body').innerHTML = pickInfo(week);
-  $('range-text').innerHTML = `${title}・${regionNow()?.[0] || state.counties.size + ' 個縣市'}・共 ${rows.length} 座`;
+  $('range-text').innerHTML = `${title}・${regionNow()?.[0] || state.counties.size + ' 個縣市'}`;
   document.querySelectorAll('#seg .sd').forEach((e, i) => { const d = dayAt(i); e.textContent = fmt(d); e.classList.toggle('we', isWE(d)); });
   ['matrix','fav-matrix'].forEach(id => $(id).style.setProperty('--n', cols.length));
   document.querySelectorAll('.lg-ref').forEach(e => e.hidden = !week);
@@ -203,7 +195,7 @@ function render(){
   $('fav-matrix').tHead.innerHTML = head;
   $('fav-matrix').tBodies[0].innerHTML = favRows.map(bodyRow).join('');
   $('matrix').tHead.innerHTML = head;
-  $('matrix').tBodies[0].innerHTML = rows.slice(0,state.shown).map(bodyRow).join('') || `<tr><td class="empty" colspan="${cols.length+2}">沒有符合條件的山。</td></tr>`;
+  $('matrix').tBodies[0].innerHTML = rows.slice(0,state.shown).map(bodyRow).join('') || `<tr><td class="empty" colspan="${cols.length+(week?2:1)}">沒有符合條件的山。</td></tr>`;
   $('more-box').hidden = rows.length <= state.shown;
   $('more').textContent = `顯示更多（還有 ${rows.length-state.shown} 座）`;
 }
@@ -216,7 +208,7 @@ function openDetail(k){
   const week = state.mode === 'week', pts = r.pts;
   const alerts = [...new Map(r.cells.flatMap(c => c.per.filter(x=>x.al).map(x=>[x.al.county+x.al.type, x.al]))).values()];
   const v = (x, f) => x == null ? '—' : f(x);
-  const table = (p, k) => `<div class="pt"><h3>${esc(p.label)}・${week ? '一週逐日' : MODES[state.mode].name+'逐 3 小時'}</h3><div class="vt-box"><table class="vt"><thead><tr><th>${week?'日期':'時段'}</th><th>燈號</th><th>天氣現象</th><th>降雨機率</th><th>風速</th><th>氣溫</th><th>體感</th><th>原因</th></tr></thead><tbody>
+  const table = (p, k) => `<div class="pt"><h3>${esc(p.label)}・${week ? '一週逐日' : MODES[state.mode].name+'逐 3 小時預報'}</h3><div class="vt-box"><table class="vt"><thead><tr><th>${week?'日期':'時段'}</th><th>燈號</th><th>天氣現象</th><th>降雨機率</th><th>風速</th><th>氣溫</th><th>體感</th><th>原因</th></tr></thead><tbody>
       ${r.cells.map((c,j) => { const x = c.per[k], col = cols[j];
         return `<tr class="${c.ref||c.past?'ref':''}"><td>${week?fmtH(col.date):col.label}</td><td>${lamp({lv:x.j.lv,ref:c.ref,past:c.past},true)}</td><td>${v(x.fc?.wx, esc)}</td><td class="num">${v(x.fc?.pop, n=>n+'%')}</td><td class="num">${v(x.fc?.ws, n=>`${n} m/s（${x.fc.bf} 級）`)}</td><td class="num">${v(x.fc?.t, n=>n+'°C')}</td><td class="num">${v(x.fc?.at, n=>n+'°C')}</td><td class="why">${esc(x.j.why.join('、')||'—')}</td></tr>`; }).join('')}
       </tbody></table></div></div>`;
