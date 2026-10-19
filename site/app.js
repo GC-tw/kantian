@@ -88,7 +88,7 @@ const state = {
   cats: new Set(), counties: new Set(), name: '', shown: PAGE
 };
 const favs = new Set((a => Array.isArray(a) ? a : [])(store.get('favs')));
-let cols = [], all = [], rows = [], favRows = [], byKey = new Map(), fbKey = '';
+let cols = [], all = [], rows = [], favRows = [], byKey = new Map();
 let evalStamp = '', dataStamp = '';
 // 燈號會隨時間改變的兩個時機：跨過 3 小時時段（今天的「已過」時段）與載入新的預報資料
 const timeStamp = () => { const n = new Date(); return isoDate(n) + '|' + Math.floor(n.getHours()/3); };
@@ -184,8 +184,6 @@ const refilter = () => { state.shown = PAGE; fresh() ? applyFilters() : evaluate
 function openDetail(k){
   const r = byKey.get(k); if (!r) return;
   const week = state.mode === 'week', pts = r.pts;
-  fbKey = 'fb-'+r.k;
-  const fbv = store.raw(fbKey) || '';
   const alerts = [...new Map(r.cells.flatMap(c => c.per.filter(x=>x.al).map(x=>[x.al.county+x.al.type, x.al]))).values()];
   const v = (x, f) => x == null ? '—' : f(x);
   const table = (p, k) => `<div class="pt"><h3>${esc(p.label)}・${week ? '一週逐日' : MODES[state.mode].name+'逐 3 小時'}</h3><div class="vt-box"><table class="vt"><thead><tr><th>${week?'日期':'時段'}</th><th>燈號</th><th>天氣現象</th><th>降雨機率</th><th>風速</th><th>氣溫</th><th>體感</th><th>原因</th></tr></thead><tbody>
@@ -202,8 +200,7 @@ function openDetail(k){
     ${r.m.al?.length?`<div class="note">別名：${esc(r.m.al.join('、'))}</div>`:''}
     ${r.m.note?`<div class="note">備註：${esc(r.m.note)}</div>`:''}
     ${pts.map(table).join('')}
-    <div class="note">${week ? '一週預報以你選的登頂時段（'+sortedSlots().map(slotLabel).join('、')+'）判定，取最差情況；第 4–7 天氣象署未提供降雨機率，以「—」表示，燈號僅供參考。' : '逐 3 小時預報；底色時段是你選的登頂時段，排序以此為準。'}</div>
-    <div class="fb"><span>去過了嗎？實際天氣如何：</span>${['晴','陰','雨'].map(v=>`<button type="button" class="chip" data-fb="${v}" aria-pressed="${fbv===v}">${v}</button>`).join('')}<span id="fb-msg" class="note"></span></div>`;
+    <div class="note">${week ? '一週預報以你選的登頂時段（'+sortedSlots().map(slotLabel).join('、')+'）判定，取最差情況；第 4–7 天氣象署未提供降雨機率，以「—」表示，燈號僅供參考。' : '逐 3 小時預報；底色時段是你選的登頂時段，排序以此為準。'}</div>`;
   dr.hidden = false; $('scrim').hidden = false;
   $('d-close').focus();
 }
@@ -288,13 +285,6 @@ function chipGroup(box, attr, set, {allId, parse = v => v, keepOne, onChange}){
       fresh() ? applyFilters() : evaluate(); render();
       const ds = dr.querySelector('[data-fav]');
       if (!dr.hidden && ds) ds.outerHTML = star(k);
-      return;
-    }
-    const fb = e.target.closest('#drawer [data-fb]');
-    if (fb){                                                // 實際天氣回報
-      dr.querySelectorAll('[data-fb]').forEach(o => o.setAttribute('aria-pressed', o === fb));
-      store.set(fbKey, fb.dataset.fb);
-      $('fb-msg').textContent = '已記錄（原型僅存在你的瀏覽器）';
       return;
     }
     if (e.target.closest('#d-close')) return closeDetail();
