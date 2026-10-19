@@ -14,6 +14,7 @@
 :root{
   --bg:#f0f1f2; --surface:#fcfcfc; --ink:#1c2126; --muted:#5f666d; --line:#d3d6da; --contour:#e3e5e8;
   --accent:#3a4149; --accent-ink:#ffffff; --accent-soft:#e2e5e9; --we:#d23a2e;
+  --bar:#2f363d; --bar-ink:#f4f5f6; --bar-muted:#b4bcc4;   /* 手機標題列與底部分頁列 */
   --go:#2f8a55; --go-soft:#d9efe1; --warn:#c48a12; --warn-soft:#f6ead0; --stop:#c0463a; --stop-soft:#f5dcd8;
   --f-display:"Noto Serif TC","Songti TC","PMingLiU",serif;
   --f-body:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
@@ -21,11 +22,11 @@
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --bg:#141618; --surface:#1c1f22; --ink:#e6e8ea; --muted:#9ba1a7; --line:#33383d; --contour:#1f2225;
-  --accent:#c9ced4; --accent-ink:#15181b; --accent-soft:#2b3036; --we:#f27a6d;
+  --accent:#c9ced4; --accent-ink:#15181b; --accent-soft:#2b3036; --we:#f27a6d; --bar:#2a3036; --bar-ink:#eef0f2; --bar-muted:#a3abb3;
   --go:#5cc287; --go-soft:#173826; --warn:#e3b24a; --warn-soft:#3a2f14; --stop:#ec7a6c; --stop-soft:#43221e; color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#141618; --surface:#1c1f22; --ink:#e6e8ea; --muted:#9ba1a7; --line:#33383d; --contour:#1f2225;
-  --accent:#c9ced4; --accent-ink:#15181b; --accent-soft:#2b3036; --we:#f27a6d;
+  --accent:#c9ced4; --accent-ink:#15181b; --accent-soft:#2b3036; --we:#f27a6d; --bar:#2a3036; --bar-ink:#eef0f2; --bar-muted:#a3abb3;
   --go:#5cc287; --go-soft:#173826; --warn:#e3b24a; --warn-soft:#3a2f14; --stop:#ec7a6c; --stop-soft:#43221e; color-scheme:dark}
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.6;
@@ -197,17 +198,24 @@ footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);paddin
   .matrix-box .cards{display:flex}
   /* 手機：像 APP 一樣，分頁固定在畫面底部 */
   .tabs{position:fixed;left:0;right:0;bottom:0;z-index:15;display:grid;grid-template-columns:repeat(3,1fr);gap:0;
-    background:var(--surface);border-bottom:0;border-top:1px solid var(--line);box-shadow:0 -4px 14px rgba(0,0,0,.06);
+    background:var(--bar);border-bottom:0;border-top:0;box-shadow:0 -4px 14px rgba(0,0,0,.12);
     padding:0 env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px)}
   .tabs button{flex-direction:column;justify-content:center;gap:2px;font-size:11px;padding:8px 4px 7px;border-bottom:0;min-height:56px}
-  .tabs button[aria-selected="true"]{color:var(--ink);font-weight:700}
+  .tabs button{color:var(--bar-muted)}
+  .tabs button[aria-selected="true"]{color:var(--bar-ink);font-weight:700}
   .tabs svg{width:24px;height:24px}
   .tabs .full{display:none}
   .tabs .badge{position:absolute;top:5px;left:calc(50% + 8px);min-width:17px;height:17px;padding:0 4px;border-radius:9px;background:var(--stop);color:#fff;font:700 10px/17px var(--f-body);text-align:center}
   .wrap{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
   /* 手機：標題列固定在頂端，搜尋與篩選放在標題列 */
   header.top{position:sticky;top:0;z-index:14;gap:8px 12px;align-items:start;
-    margin:-20px -16px 0;padding:calc(10px + env(safe-area-inset-top,0px)) 16px 10px;background:var(--bg);border-bottom:1px solid var(--line)}
+    margin:-20px -16px 0;padding:calc(10px + env(safe-area-inset-top,0px)) 16px 10px;background:var(--bar);color:var(--bar-ink);border-bottom:0}
+  header.top h1 small,header.top .issued{color:var(--bar-muted)}
+  header.top .chip,header.top .s-btn,header.top .filter-btn{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.2);color:var(--bar-ink)}
+  header.top .chip[aria-pressed="true"],header.top .s-btn.on{background:var(--bar-ink);border-color:var(--bar-ink);color:var(--bar)}
+  header.top .filter-btn .badge{background:var(--bar-ink);color:var(--bar)}
+  header.top .search.open{background:var(--bar)}
+  header.top .search.open .s-x{color:var(--bar-muted)}
   header.top h1{font-size:30px}
   header.top h1 small{font-size:11px;margin-top:2px}
   header.top .issued{font-size:11px;padding-top:4px}
