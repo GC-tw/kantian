@@ -257,7 +257,8 @@ async function main(){
   fs.writeFileSync(OUT, JSON.stringify(result));
   const n = Object.values(result.points);
   console.log(`完成：${n.length} 個預報點（3 小時資料 ${n.filter(p=>p.h3?.length).length}、一週資料 ${n.filter(p=>p.week?.length).length}），特報 ${result.alerts.length} 則，警告 ${warnings.length} 則`);
-  summary = {points: n.length, h3: n.filter(p => p.h3?.length).length, week: n.filter(p => p.week?.length).length, alerts: result.alerts, datasets: result.datasets, issued: result.issued,
+  const d4 = twMidnight(Date.now()) + 3*24*H, wxCount = (pick) => Object.fromEntries(Object.entries(n.flatMap(p => (p.week || []).filter(pick).map(x => x.wx)).reduce((m, w) => (m[w] = (m[w] || 0) + 1, m), {})).sort((a, b) => b[1] - a[1]));
+  summary = {wxWeekDay1to3: wxCount(x => x.s < d4), wxWeekDay4to7: wxCount(x => x.s >= d4), points: n.length, h3: n.filter(p => p.h3?.length).length, week: n.filter(p => p.week?.length).length, alerts: result.alerts, datasets: result.datasets, issued: result.issued,
     example: Object.fromEntries(Object.entries(result.points).slice(0, 2).map(([k, p]) => [k, {name: p.name, h3: p.h3?.slice(0, 3), week: p.week?.slice(0, 2)}]))};
   if (!n.some(p => p.h3?.length)) throw new Error('沒有任何可用的預報資料，停止更新網站');
 }
