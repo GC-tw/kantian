@@ -1,9 +1,9 @@
 {
   "cwaopendata": {
     "@xmlns": "urn:cwa:gov:tw:cwacommon:0.1",
-    "Identifier": "dd7fac42-f8b7-4bcd-af24-71ab42c2bd02",
+    "Identifier": "12f7846a-d4ea-4917-8259-6e0058840187",
     "Sender": "weather@cwa.gov.tw",
-    "Sent": "2026-10-19T16:46:59+08:00",
+    "Sent": "2026-10-19T18:16:48+08:00",
     "Status": "Actual",
     "Scope": "Public",
     "MsgType": "Issue",
@@ -100,7 +100,7 @@
           "StartTime": "2026-10-19T18:00:00+08:00",
           "EndTime": "2026-10-27T06:00:00+08:00"
         },
-        "Update": "2026-10-19T16:46:59+08:00"
+        "Update": "2026-10-19T18:16:48+08:00"
       },
       "Locations": {
         "LocationsName": [
@@ -1311,7 +1311,7 @@
                     "StartTime": "2026-10-21T18:00:00+08:00",
                     "EndTime": "2026-10-22T06:00:00+08:00",
                     "ElementValue": {
-                      "WindDirection": "偏北風"
+                      "WindDirection": "東北風"
                     }
                   },
                   {
@@ -1374,7 +1374,7 @@
                     "StartTime": "2026-10-26T06:00:00+08:00",
                     "EndTime": "2026-10-26T18:00:00+08:00",
                     "ElementValue": {
-                      "WindDirection": "偏東風"
+                      "WindDirection": "東南風"
                     }
                   },
                   {
@@ -1717,7 +1717,7 @@
                     "StartTime": "2026-10-21T18:00:00+08:00",
                     "EndTime": "2026-10-22T06:00:00+08:00",
                     "ElementValue": {
-                      "WeatherDescription": "陰時多雲短暫陣雨。降雨機率20%。溫度攝氏7至8度。非常寒冷。偏北風 風速2級(每秒3公尺)。相對濕度76%。"
+                      "WeatherDescription": "陰時多雲短暫陣雨。降雨機率20%。溫度攝氏7至8度。非常寒冷。東北風 風速2級(每秒3公尺)。相對濕度76%。"
                     }
                   },
                   {
@@ -1780,7 +1780,7 @@
                     "StartTime": "2026-10-26T06:00:00+08:00",
                     "EndTime": "2026-10-26T18:00:00+08:00",
                     "ElementValue": {
-                      "WeatherDescription": "多雲短暫陣雨。溫度攝氏7至16度。非常寒冷至稍有寒意。偏東風 風速2級(每秒2公尺)。相對濕度56%。"
+                      "WeatherDescription": "多雲短暫陣雨。溫度攝氏7至16度。非常寒冷至稍有寒意。東南風 風速2級(每秒2公尺)。相對濕度56%。"
                     }
                   },
                   {
@@ -2979,7 +2979,7 @@
                     "StartTime": "2026-10-21T06:00:00+08:00",
                     "EndTime": "2026-10-21T18:00:00+08:00",
                     "ElementValue": {
-                      "WindDirection": "偏東風"
+                      "WindDirection": "東北風"
                     }
                   },
                   {
@@ -3049,7 +3049,7 @@
                     "StartTime": "2026-10-26T06:00:00+08:00",
                     "EndTime": "2026-10-26T18:00:00+08:00",
                     "ElementValue": {
-                      "WindDirection": "偏東風"
+                      "WindDirection": "東南風"
                     }
                   },
                   {
@@ -3385,7 +3385,7 @@
                     "StartTime": "2026-10-21T06:00:00+08:00",
                     "EndTime": "2026-10-21T18:00:00+08:00",
                     "ElementValue": {
-                      "WeatherDescription": "晴時多雲。降雨機率20%。溫度攝氏9至17度。非常寒冷至稍有寒意。偏東風 風速2級(每秒3公尺)。相對濕度59%。"
+                      "WeatherDescription": "晴時多雲。降雨機率20%。溫度攝氏9至17度。非常寒冷至稍有寒意。東北風 風速2級(每秒3公尺)。相對濕度59%。"
                     }
                   },
                   {
@@ -3455,7 +3455,7 @@
                     "StartTime": "2026-10-26T06:00:00+08:00",
                     "EndTime": "2026-10-26T18:00:00+08:00",
                     "ElementValue": {
-                      "WeatherDescription": "多雲短暫陣雨。溫度攝氏9至18度。非常寒冷至稍有寒意。偏東風 風速2級(每秒2公尺)。相對濕度61%。"
+                      "WeatherDescription": "多雲短暫陣雨。溫度攝氏9至18度。非常寒冷至稍有寒意。東南風 風速2級(每秒2公尺)。相對濕度61%。"
                     }
                   },
                   {
