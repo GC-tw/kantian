@@ -19,6 +19,8 @@ const pad = h => String(h).padStart(2,'0');
 const slotLabel = h => `${pad(h)}–${pad(h+3)}`;
 const isoDate = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
 const fmt = d => `${d.getMonth()+1}/${d.getDate()}（${WD[d.getDay()]}）`;
+const isWE = d => d.getDay() % 6 === 0;                      // 週六、週日
+const fmtH = d => isWE(d) ? `<span class="we">${fmt(d)}</span>` : fmt(d);   // 週末上紅色（放進 innerHTML 用）
 const dayAt = i => { const d = new Date(); d.setHours(0,0,0,0); d.setDate(d.getDate()+i); return d; };
 const beaufort = ws => BF.reduce((b, v, i) => ws >= v ? i : b, 0);
 const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));  // 外部資料（氣象署文字）放進畫面前先轉義
@@ -103,13 +105,13 @@ const timeStamp = () => { const n = new Date(); return isoDate(n) + '|' + Math.f
 function buildCols(){
   if (state.mode === 'week') return [0,1,2,3,4,5,6].map(di => {
     const d = dayAt(di);
-    return {di, date:d, ws:d.getTime(), we:d.getTime()+24*H, ref:di>=3, label:`${d.getMonth()+1}/${d.getDate()}`, sub:'週'+WD[d.getDay()]+(di>=3?'・參考':'')};
+    return {di, date:d, ws:d.getTime(), we:d.getTime()+24*H, ref:di>=3, we:isWE(d), label:`${d.getMonth()+1}/${d.getDate()}`, sub:'週'+WD[d.getDay()]+(di>=3?'<span class="refx">・參考</span>':'')};
   });
   const di = MODES[state.mode].di, date = dayAt(di), now = new Date();
   return SLOTS.map(h => {
     const end = dayAt(di); end.setHours(h+3);
     const peak = state.slots.has(h);
-    return {di, hr:h, date, ws:date.getTime()+h*H, we:date.getTime()+(h+3)*H, past: di===0 && end<=now, peak, label:slotLabel(h), sub: peak?'登頂時段':''};
+    return {di, hr:h, date, ws:date.getTime()+h*H, we:date.getTime()+(h+3)*H, past: di===0 && end<=now, peak, label:slotLabel(h), head:`${pad(h)}<span class="hr-to">–${pad(h+3)}</span>`, sub: peak?'<span class="pk-sub">登頂時段</span>':''};
   });
 }
 const hash = t => { let h = 2166136261; for (const ch of t){ h ^= ch.codePointAt(0); h = Math.imul(h, 16777619); } return h >>> 0; };
@@ -162,16 +164,18 @@ function scoreCell(r){
   const pk = peaksLeft();
   return pk ? `${r.k1} / ${pk}` : `${r.k2} / ${cols.filter(c=>!c.past).length}`;
 }
-const headRow = () => `<tr><th class="mt">山岳</th>${cols.map(c=>`<th class="${c.ref?'ref ':''}${c.peak?'peak':''}"><span class="dt">${c.label}</span>${c.sub}</th>`).join('')}<th>${state.mode==='week'?'適合天數':'適合時段'}</th></tr>`;
+const headRow = () => `<tr><th class="mt">山岳</th>${cols.map(c=>`<th class="${c.ref?'ref ':''}${c.peak?'peak ':''}${c.we?'we':''}"><span class="dt">${c.head||c.label}</span>${c.sub}</th>`).join('')}<th class="cnt-h">${state.mode==='week'?'適合天數':'適合時段'}</th></tr>`;
 const bodyRow = r => `<tr data-k="${r.k}" tabindex="0"><th class="mt" scope="row"><span class="nm">${star(r.k)}${esc(r.m.n)}</span><span class="sub">${sub(r.m)}</span></th>${r.cells.map(c=>`<td>${lamp(c)}</td>`).join('')}<td class="cnt">${scoreCell(r)}</td></tr>`;
 const pickCard = r => `<div class="pick" data-k="${r.k}" tabindex="0" role="button"><span class="rank">${score(r)}</span><span class="nm">${esc(r.m.n)}${star(r.k)}</span><span class="meta">${sub(r.m)}</span><span class="lights">${r.cells.map(c=>lamp(c,true)).join('')}</span></div>`;
 
 function render(){
   const week = state.mode === 'week', d0 = cols[0].date;
-  const title = week ? `一週 ${fmt(dayAt(0))} – ${fmt(dayAt(6))}` : `${MODES[state.mode].name} ${fmt(d0)} 逐 3 小時`;
+  const title = week ? `一週 ${fmtH(dayAt(0))} – ${fmtH(dayAt(6))}` : `${MODES[state.mode].name} ${fmtH(d0)} 逐 3 小時`;
   $('h-picks-t').textContent = (week ? '這週' : MODES[state.mode].name) + '推薦';
   $('pick-info-body').innerHTML = pickInfo(week);
-  $('range-text').textContent = `${title}・共 ${rows.length} 座`;
+  $('range-text').innerHTML = `${title}・共 ${rows.length} 座`;
+  document.querySelectorAll('#seg .sd').forEach((e, i) => { const d = dayAt(i); e.textContent = fmt(d); e.classList.toggle('we', isWE(d)); });
+  ['matrix','fav-matrix'].forEach(id => $(id).style.setProperty('--n', cols.length));
   document.querySelectorAll('.lg-ref').forEach(e => e.hidden = !week);
   document.querySelectorAll('.lg-past').forEach(e => e.hidden = state.mode !== 'today');
   if (!week) setInfo(false);
@@ -181,7 +185,7 @@ function render(){
     || `<div class="empty">${rows.length ? '這段期間沒有燈號為「適合」的山，可以參考下方列表。' : '沒有符合條件的山，請放寬類別或縣市。'}</div>`;
   const head = headRow();
   $('fav-tab-n').textContent = favRows.length || '';
-  $('fav-count').textContent = favRows.length ? `${title}・${favRows.length} 座，依燈號排序` : '';
+  $('fav-count').innerHTML = favRows.length ? `${title}・${favRows.length} 座，依燈號排序` : '';
   $('fav-box').hidden = !favRows.length; $('fav-empty').hidden = !!favRows.length;
   $('fav-matrix').tHead.innerHTML = head;
   $('fav-matrix').tBodies[0].innerHTML = favRows.map(bodyRow).join('');
@@ -201,7 +205,7 @@ function openDetail(k){
   const v = (x, f) => x == null ? '—' : f(x);
   const table = (p, k) => `<div class="pt"><h3>${esc(p.label)}・${week ? '一週逐日' : MODES[state.mode].name+'逐 3 小時'}</h3><div class="vt-box"><table class="vt"><thead><tr><th>${week?'日期':'時段'}</th><th>燈號</th><th>天氣現象</th><th>降雨機率</th><th>風速</th><th>氣溫</th><th>體感</th><th>原因</th></tr></thead><tbody>
       ${r.cells.map((c,j) => { const x = c.per[k], col = cols[j];
-        return `<tr class="${c.ref||c.past?'ref':''}"><td>${week?fmt(col.date):col.label}</td><td>${lamp({lv:x.j.lv,ref:c.ref,past:c.past},true)}</td><td>${v(x.fc?.wx, esc)}</td><td class="num">${v(x.fc?.pop, n=>n+'%')}</td><td class="num">${v(x.fc?.ws, n=>`${n} m/s（${x.fc.bf} 級）`)}</td><td class="num">${v(x.fc?.t, n=>n+'°C')}</td><td class="num">${v(x.fc?.at, n=>n+'°C')}</td><td class="why">${esc(x.j.why.join('、')||'—')}</td></tr>`; }).join('')}
+        return `<tr class="${c.ref||c.past?'ref':''}"><td>${week?fmtH(col.date):col.label}</td><td>${lamp({lv:x.j.lv,ref:c.ref,past:c.past},true)}</td><td>${v(x.fc?.wx, esc)}</td><td class="num">${v(x.fc?.pop, n=>n+'%')}</td><td class="num">${v(x.fc?.ws, n=>`${n} m/s（${x.fc.bf} 級）`)}</td><td class="num">${v(x.fc?.t, n=>n+'°C')}</td><td class="num">${v(x.fc?.at, n=>n+'°C')}</td><td class="why">${esc(x.j.why.join('、')||'—')}</td></tr>`; }).join('')}
       </tbody></table></div></div>`;
   const dr = $('drawer');
   dr.innerHTML = `
