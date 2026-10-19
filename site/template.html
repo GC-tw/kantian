@@ -6,28 +6,27 @@
 <style>
 /* Layout: 地形圖紙面 — 上方查詢列，下方「山 × 日期」燈號矩陣，點山名開右側詳情面板 */
 :root{
-  --bg:#edf3ea; --surface:#fbfdf9; --ink:#17261c; --muted:#56685b; --line:#cad8c9; --contour:#dce8d8;
-  --accent:#2e7d43; --accent-ink:#ffffff; --accent-soft:#dcedd8; --we:#d23a2e;
+  --bg:#f0f1f2; --surface:#fcfcfc; --ink:#1c2126; --muted:#5f666d; --line:#d3d6da; --contour:#e3e5e8;
+  --accent:#3a4149; --accent-ink:#ffffff; --accent-soft:#e2e5e9; --we:#d23a2e;
   --go:#2f8a55; --go-soft:#d9efe1; --warn:#c48a12; --warn-soft:#f6ead0; --stop:#c0463a; --stop-soft:#f5dcd8;
   --f-display:"Noto Serif TC","Songti TC","PMingLiU",serif;
   --f-body:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
   --f-mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --bg:#111a14; --surface:#18241b; --ink:#e3ede4; --muted:#98ab9c; --line:#2c3d30; --contour:#1b281e;
-  --accent:#7cc98f; --accent-ink:#0b1d10; --accent-soft:#1d3a24; --we:#f27a6d;
+  --bg:#141618; --surface:#1c1f22; --ink:#e6e8ea; --muted:#9ba1a7; --line:#33383d; --contour:#1f2225;
+  --accent:#c9ced4; --accent-ink:#15181b; --accent-soft:#2b3036; --we:#f27a6d;
   --go:#5cc287; --go-soft:#173826; --warn:#e3b24a; --warn-soft:#3a2f14; --stop:#ec7a6c; --stop-soft:#43221e; color-scheme:dark}}
 :root[data-theme="dark"]{
-  --bg:#111a14; --surface:#18241b; --ink:#e3ede4; --muted:#98ab9c; --line:#2c3d30; --contour:#1b281e;
-  --accent:#7cc98f; --accent-ink:#0b1d10; --accent-soft:#1d3a24; --we:#f27a6d;
+  --bg:#141618; --surface:#1c1f22; --ink:#e6e8ea; --muted:#9ba1a7; --line:#33383d; --contour:#1f2225;
+  --accent:#c9ced4; --accent-ink:#15181b; --accent-soft:#2b3036; --we:#f27a6d;
   --go:#5cc287; --go-soft:#173826; --warn:#e3b24a; --warn-soft:#3a2f14; --stop:#ec7a6c; --stop-soft:#43221e; color-scheme:dark}
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.6;
   background-image:repeating-radial-gradient(circle at 85% -10%, transparent 0 38px, var(--contour) 38px 39px);
   background-attachment:fixed}
 .wrap{max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px;display:flex;flex-direction:column;gap:18px}
-header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:10px 24px;background:var(--accent);color:var(--accent-ink);border-radius:10px;padding:16px 20px}
-header.top h1 small,header.top .issued{color:var(--accent-ink);opacity:.85}
+header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:10px 24px}
 h1{font-family:var(--f-display);font-weight:800;font-size:clamp(28px,4.4vw,40px);line-height:1.15;margin:0;letter-spacing:.02em;text-wrap:balance}
 h1 small{display:block;font-family:var(--f-body);font-weight:500;font-size:14px;color:var(--muted);letter-spacing:.04em;margin-top:6px}
 h2{font-family:var(--f-display);font-weight:600;font-size:20px;margin:0;text-wrap:balance}
@@ -157,7 +156,6 @@ footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);paddin
   .matrix tbody tr:hover{background:var(--accent-soft)}
   .matrix tbody tr:hover td,.matrix tbody tr:hover th{background:none}
   .matrix .lamp{width:min(30px,100%)}
-  header.top{padding:14px 16px}
 }
 </style>
 
