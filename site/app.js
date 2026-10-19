@@ -78,7 +78,7 @@ const MOUNTAINS = M.map(m => {
   const pts = m.pid
     ? [{key:m.pid, label:'氣象署登山預報點「'+(m.pt||m.n)+'」', code:m.pid, county:counties[0], counties}]
     : m.tw.map(t => ({key:t, label:t+' 鄉鎮預報', code:'', county:t.slice(0,3), counties:[t.slice(0,3)]}));
-  return {m, k:m.c+m.no, pts, counties, low: m.h!=null && m.h<1000, search: m.n+'\n'+(m.note||'')};
+  return {m, k:m.c+m.no, pts, counties, low: m.h!=null && m.h<1000, search: [m.n, ...(m.al||[]), m.note||''].join('\n')};
 });
 
 // ---------- 狀態 ----------
@@ -199,6 +199,7 @@ function openDetail(k){
       <span>${pts.length>1?'跨多個鄉鎮，各自列出；燈號取最差的鄉鎮。':''}${r.low?'標高 1,000 公尺以下，另判斷高溫。':''}</span>
       <span class="issued">資料來源：交通部中央氣象署・本站更新 ${FC ? fmtTime(Date.parse(FC.fetchedAt)) : '—'}</span></div>
     ${alerts.map(a=>`<div class="alert"><b>${esc(a.type)}・${WORD[a.lv]}</b>　${esc(a.county)}${a.end?`，有效至 ${fmtTime(a.end)}`:''}</div>`).join('')}
+    ${r.m.al?.length?`<div class="note">別名：${esc(r.m.al.join('、'))}</div>`:''}
     ${r.m.note?`<div class="note">備註：${esc(r.m.note)}</div>`:''}
     ${pts.map(table).join('')}
     <div class="note">${week ? '一週預報以你選的登頂時段（'+sortedSlots().map(slotLabel).join('、')+'）判定，取最差情況；第 4–7 天氣象署未提供降雨機率，以「—」表示，燈號僅供參考。' : '逐 3 小時預報；底色時段是你選的登頂時段，排序以此為準。'}</div>

@@ -50,6 +50,14 @@ let fails = 0; const ok = (c, m) => { console.log((c ? '✓ ' : '✗ ') + m); if
   inp.value = '南湖北山'; inp.dispatchEvent(new w.Event('input', {bubbles: true}));
   click(w, d.querySelector('#matrix tbody tr td'));
   ok(/陸上強風特報/.test(d.getElementById('drawer').innerHTML), '跨宜蘭縣的山顯示陸上強風特報');
+  click(w, d.getElementById('d-close'));
+  // 別名：搜「鳶山」找得到福德坑山，詳情顯示別名
+  inp.value = '鳶山'; inp.dispatchEvent(new w.Event('input', {bubbles: true}));
+  const rows = [...d.querySelectorAll('#matrix tbody tr')];
+  ok(rows.length === 1 && /福德坑山/.test(rows[0].textContent), '用別名「鳶山」搜得到福德坑山');
+  click(w, rows[0].querySelector('td'));
+  ok(/別名：鳶山/.test(d.getElementById('drawer').innerHTML), '詳情顯示別名');
+  click(w, d.getElementById('d-close'));
   ok(errors.length === 0, '沒有程式錯誤' + (errors.length ? '：' + errors[0] : ''));
 
   // 2. 資料過舊
