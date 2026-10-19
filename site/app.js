@@ -178,7 +178,6 @@ function render(){
   document.querySelectorAll('#seg .sd').forEach((e, i) => { const d = dayAt(i); e.textContent = fmt(d); e.classList.toggle('we', isWE(d)); });
   ['matrix','fav-matrix'].forEach(id => $(id).style.setProperty('--n', cols.length));
   document.querySelectorAll('.lg-ref').forEach(e => e.hidden = !week);
-  document.querySelectorAll('.lg-past').forEach(e => e.hidden = state.mode !== 'today');
   if (!week) setInfo(false);
   // 推薦：依燈號排序，只列有「適合」時段（或天數）的山，最多 3 座，不標名次
   const ph = pickHead(), pk = choosePicks(week);
