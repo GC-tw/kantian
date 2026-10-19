@@ -91,7 +91,6 @@ input:focus-visible,select:focus-visible,button:focus-visible{outline:2px solid 
 .star{font:inherit;font-size:18px;line-height:1;background:none;border:0;color:var(--muted);cursor:pointer;padding:2px 4px;vertical-align:1px}
 .star[aria-pressed="true"]{color:var(--stop)}
 .star:hover{color:var(--stop)}
-.matrix .mt .nm .star{font-size:16px;padding:0 4px 0 0}
 .fav-empty{background:var(--surface);border:1px dashed var(--line);border-radius:8px;padding:16px;text-align:left}
 .d-head h2 .star{font-size:22px;margin-left:6px}
 .chip.reset{border-style:dashed;color:var(--muted)}
@@ -117,11 +116,14 @@ table.matrix{border-collapse:separate;border-spacing:0;width:100%;font-variant-n
 .matrix thead th.ref{color:var(--muted);font-weight:500}
 .matrix thead .dt{display:block;font-family:var(--f-mono);font-size:13px;color:var(--ink);font-weight:500}
 .matrix thead th.ref .dt{color:var(--muted)}
-.matrix .mt{text-align:left;position:sticky;left:0;background:var(--surface);z-index:1;min-width:170px;padding-left:12px}
+.matrix .mt{text-align:left;position:sticky;left:0;background:var(--surface);z-index:1;min-width:170px;max-width:340px;padding-left:12px}
 .matrix tbody tr{cursor:pointer}
 .matrix tbody tr:hover td,.matrix tbody tr:hover th{background:var(--accent-soft)}
-.mt .nm{font-weight:700;font-size:15px;display:block;line-height:1.3}
-.mt .sub{font-size:12px;color:var(--muted)}
+/* 山名列與推薦卡同一形式：山名＋資訊同一行（太長以「…」省略），收藏在最右 */
+.mt-in{display:flex;align-items:baseline;gap:8px;min-width:0}
+.mt .nm{font-family:var(--f-display);font-weight:800;font-size:16px;line-height:1.3;flex:none}
+.mt .sub{font-size:12px;color:var(--muted);font-weight:400;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mt .star{align-self:center;margin-left:auto;font-size:17px;padding:0 2px}
 .cnt{font-family:var(--f-mono);font-size:13px;color:var(--muted)}
 .lamp{font-style:normal;display:inline-grid;place-items:center;width:30px;height:30px;border-radius:6px;font-size:13px;font-weight:700;border:1.5px solid transparent}
 .lamp.g{background:var(--go-soft);color:var(--go);border-color:var(--go)}
@@ -185,13 +187,13 @@ footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);paddin
   .matrix thead .dt{white-space:nowrap;letter-spacing:-.04em}
   .matrix .hr-to{font-family:var(--f-mono)}
   .matrix .refx,.matrix .pk-sub{display:none}
-  .matrix .mt{grid-column:1/-1;grid-row:1;position:static;min-width:0;padding:8px 70px 0 10px;background:none}
-  .matrix td.cnt{grid-column:1/-1;grid-row:1;justify-self:end;align-self:start;padding:10px 10px 0 0}
-  .matrix tbody td:not(.cnt):not(.empty){grid-row:2;padding-bottom:8px}
+  .matrix .mt{grid-column:1/-1;grid-row:1;position:static;min-width:0;max-width:none;padding:7px 64px 0 10px;background:none}
+  .matrix td.cnt{grid-column:1/-1;grid-row:1;justify-self:end;align-self:start;padding:9px 10px 0 0}
+  .matrix tbody td:not(.cnt):not(.empty){grid-row:2;padding-bottom:7px}
   .matrix td.empty{grid-column:1/-1}
   .matrix tbody tr:hover{background:var(--accent-soft)}
   .matrix tbody tr:hover td,.matrix tbody tr:hover th{background:none}
-  .matrix .lamp{width:min(30px,100%)}
+  .matrix .lamp{width:min(30px,100%);height:26px}
   /* 手機：像 APP 一樣，分頁固定在畫面底部 */
   .tabs{position:fixed;left:0;right:0;bottom:0;z-index:15;display:grid;grid-template-columns:repeat(3,1fr);gap:0;
     background:var(--surface);border-bottom:0;border-top:1px solid var(--line);box-shadow:0 -4px 14px rgba(0,0,0,.06);
