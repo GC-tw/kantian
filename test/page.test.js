@@ -43,6 +43,17 @@ let fails = 0; const ok = (c, m) => { console.log((c ? '✓ ' : '✗ ') + m); if
     d.querySelectorAll('#matrix tbody tr').forEach(tr => { click(w, tr.querySelector('td')); if (/undefined|NaN/.test(d.getElementById('drawer').innerHTML)) bad++; click(w, d.getElementById('d-close')); });
     ok(bad === 0, `${m}：235 座詳情都正常`);
   }
+  // 一週：第 4–7 天沒有降雨機率時，詳情列出原始天氣描述
+  click(w, d.querySelector('#seg [data-mode="week"]'));
+  ok(d.querySelectorAll('#matrix tbody .lamp.ref').length > 0, '一週：第 4–7 天有虛線燈號');
+  let shown = false;
+  for (const tr of [...d.querySelectorAll('#matrix tbody tr')].slice(0, 30)){
+    click(w, tr.querySelector('td'));
+    if (/陣雨（第 4–7 天無降雨機率）/.test(d.getElementById('drawer').innerHTML)) shown = true;
+    click(w, d.getElementById('d-close'));
+    if (shown) break;
+  }
+  ok(shown, '一週：詳情寫出「陰陣雨（第 4–7 天無降雨機率）」這類原因');
   // 缺資料的山（鹿山）應顯示無資料
   click(w, d.querySelector('#seg [data-mode="tmr"]'));
   const inp = d.getElementById('f-name'); inp.value = '鹿山'; inp.dispatchEvent(new w.Event('input', {bubbles: true}));

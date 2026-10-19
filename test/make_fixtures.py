@@ -37,7 +37,8 @@ def week_elements(start):
         s = start + dt.timedelta(hours=12*i); e = s + dt.timedelta(hours=12)
         p = random.choice([0, 20, 40, 70]) if i < 6 else ' '
         tt = lambda k, v: {'StartTime': iso(s), 'EndTime': iso(e), 'ElementValue': [v]}
-        els['天氣現象'].append(tt('', {'Weather': wx(p if p != ' ' else 0), 'WeatherCode': '04'}))
+        w = wx(p) if p != ' ' else random.choice(['陰陣雨', '陰短暫陣雨', '晴時多雲'])   # 第 4 天起沒有降雨機率，用真實資料常見的描述
+        els['天氣現象'].append(tt('', {'Weather': w, 'WeatherCode': '04'}))
         els['12小時降雨機率'].append(tt('', {'ProbabilityOfPrecipitation': str(p)}))
         els['最高溫度'].append(tt('', {'MaxTemperature': str(random.randint(5, 30))}))
         els['最高體感溫度'].append(tt('', {'MaxApparentTemperature': str(random.choice([20, 30, 37]))}))

@@ -58,18 +58,21 @@ function alertFor(p, start, end){                           // 時段內生效�
 
 // ---------- 判定規則（與「排序規則與說明」頁一致）----------
 function judge(fc, lowHill, alert, noPop){
-  const why = []; let lv = 0;
+  const why = []; let lv = 0, heavy = false;
   const up = (n, w) => { if (n > lv) lv = n; if (n > 0 && !why.includes(w)) why.push(w); };
   if (alert) up(alert.lv, alert.type);
-  if (!fc) return alert ? {lv, why} : {lv: -1, why: ['無資料']};
+  if (!fc) return alert ? {lv, why, heavy} : {lv: -1, why: ['無資料'], heavy};
   const wx = fc.wx || '';
   if (wx.includes('雷')) up(2, '有雷');
   if (/大雨|豪雨/.test(wx)) up(2, '大雨');
   if (!noPop && fc.pop != null){ if (fc.pop>=60) up(2, '降雨機率 '+fc.pop+'%'); else if (fc.pop>=30) up(1, '降雨機率 '+fc.pop+'%'); }
-  else if (wx.includes('雨')) up(1, '可能下雨');
+  else if (wx.includes('雨')){                            // 沒有降雨機率（第 4–7 天）：寫出原始天氣描述，「短暫」以外的雨另外標記，排序時往後
+    up(1, noPop ? wx + '（第 4–7 天無降雨機率）' : '可能下雨');
+    heavy = noPop && !/短暫/.test(wx);
+  }
   if (fc.ws != null){ if (fc.ws>=13.9) up(2, '風速 '+fc.ws+' m/s'); else if (fc.ws>=8) up(1, '風速 '+fc.ws+' m/s'); }
   if (lowHill && fc.at != null && fc.at>=36) up(1, '高溫 體感 '+fc.at+'°C');
-  return {lv, why};
+  return {lv, why, heavy};
 }
 
 // ---------- 山岳模型（只在載入時建立一次）----------
@@ -119,13 +122,13 @@ function evaluate(){                                       // 依時段與登頂
       });
       return {lv: Math.max(...per.map(y=>y.j.lv)), per, ref:!!c.ref, past:!!c.past};
     });
-    let k1 = 0, k2 = 0;
+    let k1 = 0, k2 = 0, k3 = 0;                            // k3：「注意」的天數中，天氣描述是陣雨（非短暫）的天數
     cells.forEach((c, i) => {
-      if (week){ if (c.lv===0) k1++; else if (c.lv===1) k2++; }
+      if (week){ if (c.lv===0) k1++; else if (c.lv===1){ k2++; if (c.per.some(y => y.j.heavy)) k3++; } }
       else if (!c.past && c.lv===0){ k2++; if (cols[i].peak) k1++; }
     });
-    return {...x, cells, k1, k2};
-  }).sort((a,b) => b.k1-a.k1 || b.k2-a.k2 || (b.m.h??0)-(a.m.h??0));
+    return {...x, cells, k1, k2, k3};
+  }).sort((a,b) => b.k1-a.k1 || b.k2-a.k2 || a.k3-b.k3 || (b.m.h??0)-(a.m.h??0));
   byKey = new Map(all.map(r => [r.k, r]));
   applyFilters();
 }
@@ -203,7 +206,7 @@ function openDetail(k){
     ${r.m.al?.length?`<div class="note">別名：${esc(r.m.al.join('、'))}</div>`:''}
     ${r.m.note?`<div class="note">備註：${esc(r.m.note)}</div>`:''}
     ${pts.map(table).join('')}
-    <div class="note">${week ? '一週預報以你選的登頂時段（'+sortedSlots().map(slotLabel).join('、')+'）判定，取最差情況；第 4–7 天氣象署未提供降雨機率，以「—」表示，燈號僅供參考。' : '逐 3 小時預報；底色時段是你選的登頂時段，排序以此為準。'}</div>`;
+    <div class="note">${week ? '一週預報以你選的登頂時段（'+sortedSlots().map(slotLabel).join('、')+'）判定，取最差情況；第 4–7 天氣象署未提供降雨機率，以「—」表示，燈號最多只會到「注意」，請在出發前 3 天內再確認。' : '逐 3 小時預報；底色時段是你選的登頂時段，排序以此為準。'}</div>`;
   dr.hidden = false; $('scrim').hidden = false;
   $('d-close').focus();
 }
