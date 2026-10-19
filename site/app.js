@@ -1,4 +1,3 @@
-// 看天爬山網頁程式（由 scripts/build.mjs 組進 dist/index.html）
 /* 看天爬山
    結構：常數 → 工具 → 預報資料（讀取 forecast.json，由 GitHub Actions 在氣象署每次發布後更新）→ 判定規則 → 山岳模型 → 狀態 → 計算 → 畫面 → 事件 */
 

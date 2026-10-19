@@ -46,7 +46,8 @@
 | `scripts/build.mjs` | 組合網頁 `index.html` |
 | `site/` | 網頁本體（版面與程式） |
 | `.github/workflows/update.yml` | 自動排程 |
-| `test/` | 測試資料與網頁測試 |
+| `test/` | 測試資料與網頁測試（`quick.mjs` 快速檢查、`page.test.js` 完整測試） |
+| `docs/HANDOFF.md` | 交接文件：規則、決定、流程與待辦 |
 
 ## 使用的氣象署資料
 - 登山預報：F-B0053-035（3 天逐 3 小時）、F-B0053-033（一週逐 12 小時），從檔案下載介面取得；代碼記在 `data/datasets.json`，刪掉這個檔案就會重新探查
@@ -57,6 +58,9 @@
 資料來源：交通部中央氣象署開放資料，依政府資料開放授權條款使用。本站只依預報數值比對與排序，不是氣象預報。
 
 ## 本機測試（開發用）
+接手開發前請先讀 `docs/HANDOFF.md`。
+
+只改文字或樣式：`node test/quick.mjs`（幾秒）。改到燈號、排序或資料處理：跑下面的完整測試。
 ```bash
 python3 test/make_fixtures.py                                  # 產生測試資料
 node scripts/fetch.mjs --fixtures test/fixtures --out dist/forecast.json
