@@ -1,4 +1,10 @@
 <title>看天爬山</title>
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="icon" href="favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#f0f1f2">
+<meta name="apple-mobile-web-app-title" content="看天爬山">
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -28,6 +34,9 @@ body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:1
 .wrap{max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px;display:flex;flex-direction:column;gap:18px}
 header.top{display:grid;grid-template-columns:1fr auto;grid-template-areas:"t tools" "t is" "rg rg";align-items:end;gap:6px 24px}
 header.top h1{grid-area:t}
+h1 .brand{display:inline-flex;align-items:center;gap:.28em}
+h1 .logo{width:1.05em;height:1.05em;flex:none}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) h1 .logo rect{stroke:#4a535b;stroke-width:12}}
 header.top .issued{grid-area:is;text-align:right}
 .tools{grid-area:tools;display:flex;gap:8px;align-items:center}
 .search{position:relative;width:320px;max-width:100%}
@@ -41,7 +50,7 @@ header.top .issued{grid-area:is;text-align:right}
 .chips.regions{grid-area:rg;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;padding:2px 0}
 .regions::-webkit-scrollbar{display:none}
 .regions .chip{flex:none;white-space:nowrap}
-h1{font-family:var(--f-display);font-weight:800;font-size:clamp(28px,4.4vw,40px);line-height:1.15;margin:0;letter-spacing:.02em;text-wrap:balance}
+h1{font-family:var(--f-display);font-weight:800;font-size:clamp(34px,5vw,48px);line-height:1.15;margin:0;letter-spacing:.02em;text-wrap:balance}
 h1 small{display:block;font-family:var(--f-body);font-weight:500;font-size:14px;color:var(--muted);letter-spacing:.04em;margin-top:6px}
 h2{font-family:var(--f-display);font-weight:600;font-size:20px;margin:0;text-wrap:balance}
 .notice{background:var(--warn-soft);border:1px solid var(--warn);color:var(--ink);border-radius:6px;padding:10px 14px;font-size:14px}
@@ -188,7 +197,7 @@ footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);paddin
   /* 手機：標題列固定在頂端，搜尋與篩選放在標題列 */
   header.top{position:sticky;top:0;z-index:14;grid-template-areas:"t is" "tools tools" "rg rg";gap:8px 12px;align-items:start;
     margin:-20px -16px 0;padding:calc(10px + env(safe-area-inset-top,0px)) 16px 10px;background:var(--bg);border-bottom:1px solid var(--line)}
-  header.top h1{font-size:22px}
+  header.top h1{font-size:30px}
   header.top h1 small{font-size:11px;margin-top:2px}
   header.top .issued{font-size:11px;padding-top:4px}
   .search{flex:1;width:auto}
@@ -209,7 +218,7 @@ footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);paddin
 
 <div class="wrap">
   <header class="top">
-    <h1>看天爬山<small>看天氣，找出適合造訪的山</small></h1>
+    <h1><span class="brand"><svg class="logo" viewBox="0 0 512 512" aria-hidden="true"><rect width="512" height="512" rx="112" fill="#2f363d"/><circle cx="304" cy="150" r="64" fill="#f2b544"/><path d="M322 236h98a44 44 0 0 0 0-88 60 60 0 0 0-114 10 39 39 0 0 0 16 78z" fill="#dfe3e7"/><path d="M44 428 206 176l92 140 42-54 128 166z" fill="#f4f5f6"/><path d="M206 176l-50 78 28-10 22 24 22-26 30 12z" fill="#aab3bb"/></svg>看天爬山</span><small>看天氣，找出適合造訪的山</small></h1>
     <div class="tools">
       <div class="search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></svg><input id="f-name" type="search" autocomplete="off" aria-label="搜尋山名或別名" placeholder="搜尋山名或別名"></div>
       <button type="button" class="filter-btn" id="filter-btn" aria-expanded="false" aria-controls="q"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M7 12h10M10 18h4"/></svg>進階篩選<span id="filter-n" class="badge"></span></button>
