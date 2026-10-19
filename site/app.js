@@ -11,10 +11,10 @@ const BF = [0,0.3,1.6,3.4,5.5,8.0,10.8,13.9,17.2,20.8,24.5];  // 蒲福風級下
 const SYM = ['○','△','✕','—'], CLS = ['g','y','r','na'], WORD = ['適合','注意','不建議','時間已過或無資料'];
 const LV = lv => lv < 0 ? 3 : lv;                                // 燈號等級 -1 代表沒有資料
 const REGIONS = [['全台', []],                              // 標題列的地區快速切換；選了地區＝勾選該地區所有縣市
-  ['北部', ['基隆市','臺北市','新北市','桃園市','新竹市','新竹縣']],
+  ['北部', ['基隆市','臺北市','新北市','桃園市','新竹市','新竹縣','宜蘭縣']],
   ['中部', ['苗栗縣','臺中市','彰化縣','南投縣','雲林縣']],
   ['南部', ['嘉義市','嘉義縣','臺南市','高雄市','屏東縣']],
-  ['東部', ['宜蘭縣','花蓮縣','臺東縣']],
+  ['花東', ['花蓮縣','臺東縣']],
   ['離島', ['澎湖縣','金門縣','連江縣']]];
 const PAGE = 10;                                           // 山岳列表一次顯示幾座
 const H = 3600e3, STALE = 9*H;                              // 超過 9 小時沒更新就提醒
@@ -193,7 +193,7 @@ function render(){
   $('fav-tab-n').textContent = favRows.length || '';
   const rg = regionNow();
   document.querySelectorAll('#f-region [data-rg]').forEach(b => b.setAttribute('aria-pressed', !!rg && REGIONS[+b.dataset.rg] === rg));
-  $('filter-n').textContent = (state.cats.size + (rg ? 0 : state.counties.size)) || '';   // 手機「篩選」按鈕：地區以外另外選了幾項
+  $('filter-n').textContent = (state.cats.size + (rg ? 0 : state.counties.size)) || '';   // 手機「進階篩選」按鈕：地區以外另外選了幾項
   $('fav-count').innerHTML = favRows.length ? `${title}・${favRows.length} 座，依燈號排序` : '';
   $('fav-box').hidden = !favRows.length; $('fav-empty').hidden = !!favRows.length;
   $('fav-matrix').tHead.innerHTML = head;

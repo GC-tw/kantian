@@ -212,7 +212,7 @@ footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);paddin
     <h1>看天爬山<small>看天氣，找出適合造訪的山</small></h1>
     <div class="tools">
       <div class="search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></svg><input id="f-name" type="search" autocomplete="off" aria-label="搜尋山名或別名" placeholder="搜尋山名或別名"></div>
-      <button type="button" class="filter-btn" id="filter-btn" aria-expanded="false" aria-controls="q"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M7 12h10M10 18h4"/></svg>篩選<span id="filter-n" class="badge"></span></button>
+      <button type="button" class="filter-btn" id="filter-btn" aria-expanded="false" aria-controls="q"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M7 12h10M10 18h4"/></svg>進階篩選<span id="filter-n" class="badge"></span></button>
     </div>
     <div class="issued" id="issued"></div>
     <div class="chips regions" id="f-region" role="group" aria-label="地區"></div>
@@ -239,8 +239,8 @@ footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);paddin
   </div>
 
   <main id="view-find" style="display:flex;flex-direction:column;gap:18px">
-    <form class="panel-search" id="q" autocomplete="off" aria-label="篩選">
-      <div class="sheet-head"><b>篩選</b><button type="button" class="btn" id="filter-done">完成</button></div>
+    <form class="panel-search" id="q" autocomplete="off" aria-label="進階篩選">
+      <div class="sheet-head"><b>進階篩選</b><button type="button" class="btn" id="filter-done">完成</button></div>
       <div class="field wide"><span class="lab">山岳類別（可多選，未選＝全部）</span><div class="chips" id="f-cat">
         <button type="button" class="chip reset" id="cat-all" aria-pressed="true">全部</button>
         <button type="button" class="chip" aria-pressed="false" data-c="百岳">百岳</button>
