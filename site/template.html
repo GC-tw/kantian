@@ -285,6 +285,22 @@ footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);paddin
       <div class="field wide"><span class="lab">縣市（可多選，未選＝全部）</span><div class="chips" id="f-county"></div></div>
     </form>
 
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div class="legend">
+          <span><i class="lamp sm g">○</i>適合</span><span><i class="lamp sm y">△</i>注意</span><span><i class="lamp sm r">✕</i>不建議</span><span><i class="lamp sm na">—</i>時間已過或無資料</span><span id="lg-ref" class="lg-ref"><i class="lamp sm g ref">○</i>虛線＝第 4–7 天，僅供參考<button type="button" class="info" id="info-btn" aria-expanded="false" aria-controls="info-ref" aria-label="為什麼第 4–7 天只供參考">i</button></span><span id="lg-past" class="lg-past"><i class="lamp sm g past">○</i>淡色＝已過時段</span>
+        </div>
+      <div class="info-pop" id="info-ref" hidden>
+        <div class="info-head"><b>為什麼第 4–7 天只供參考？</b><button type="button" class="info-x" id="info-x" aria-label="關閉說明">×</button></div>
+        <ul>
+          <li>氣象署的一週預報，只有前 3 天提供「降雨機率」。</li>
+          <li>第 4–7 天少了降雨機率，燈號只能依天氣描述（例如「多雲短暫陣雨」）、風力和氣溫來判斷，比較粗略。</li>
+          <li>因此第 4–7 天的燈號最多只會到「注意」；「注意」也可能是雨勢較大的陣雨，請點開詳情看天氣描述。</li>
+          <li>預報的日子越遠，準確度本來就越低。</li>
+          <li>建議用來初步安排行程，出發前 3 天內再回來確認。</li>
+        </ul>
+      </div>
+    </div>
+
     <section style="display:flex;flex-direction:column;gap:10px" aria-labelledby="h-picks">
       <div class="sec-head"><h2 id="h-picks"><span id="h-picks-t">推薦</span><button type="button" class="info" id="pick-info-btn" aria-expanded="false" aria-controls="pick-info" aria-label="推薦怎麼比較與排序">i</button></h2><p id="range-text"></p></div>
       <div class="info-pop" id="pick-info" hidden>
@@ -296,20 +312,7 @@ footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);paddin
     </section>
 
     <section style="display:flex;flex-direction:column;gap:10px" aria-labelledby="h-matrix">
-      <div class="sec-head"><h2 id="h-matrix">所有山岳燈號</h2>
-        <div class="legend">
-          <span><i class="lamp sm g">○</i>適合</span><span><i class="lamp sm y">△</i>注意</span><span><i class="lamp sm r">✕</i>不建議</span><span><i class="lamp sm na">—</i>時間已過或無資料</span><span id="lg-ref" class="lg-ref"><i class="lamp sm g ref">○</i>虛線＝第 4–7 天，僅供參考<button type="button" class="info" id="info-btn" aria-expanded="false" aria-controls="info-ref" aria-label="為什麼第 4–7 天只供參考">i</button></span><span id="lg-past" class="lg-past"><i class="lamp sm g past">○</i>淡色＝已過時段</span>
-        </div></div>
-      <div class="info-pop" id="info-ref" hidden>
-        <div class="info-head"><b>為什麼第 4–7 天只供參考？</b><button type="button" class="info-x" id="info-x" aria-label="關閉說明">×</button></div>
-        <ul>
-          <li>氣象署的一週預報，只有前 3 天提供「降雨機率」。</li>
-          <li>第 4–7 天少了降雨機率，燈號只能依天氣描述（例如「多雲短暫陣雨」）、風力和氣溫來判斷，比較粗略。</li>
-          <li>因此第 4–7 天的燈號最多只會到「注意」；「注意」也可能是雨勢較大的陣雨，請點開詳情看天氣描述。</li>
-          <li>預報的日子越遠，準確度本來就越低。</li>
-          <li>建議用來初步安排行程，出發前 3 天內再回來確認。</li>
-        </ul>
-      </div>
+      <div class="sec-head"><h2 id="h-matrix">所有山岳燈號</h2></div>
       <div class="matrix-box"><table class="matrix" id="matrix"><thead></thead><tbody></tbody></table></div>
       <div class="more" id="more-box"><button class="btn" id="more" type="button">顯示更多</button></div>
     </section>
