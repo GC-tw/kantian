@@ -1,0 +1,50 @@
+# 看天爬山：每天在氣象署發布後自動抓資料、更新網站
+# 氣象署約在 05:30、11:30、17:30、23:30（台灣時間）發布；以下時間為 UTC（台灣時間減 8 小時），排在發布後約 30 分鐘
+name: 更新天氣資料
+
+on:
+  schedule:
+    - cron: '7 22 * * *'   # 台灣 06:07
+    - cron: '7 4 * * *'    # 台灣 12:07
+    - cron: '7 10 * * *'   # 台灣 18:07
+    - cron: '7 16 * * *'   # 台灣 00:07
+  workflow_dispatch: {}    # 也可以在 GitHub 上手動按「Run workflow」
+
+permissions:
+  contents: write          # 存回資料集代碼與格式樣本
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: 抓取氣象署資料
+        env:
+          CWA_API_KEY: ${{ secrets.CWA_API_KEY }}
+        run: node scripts/fetch.mjs --out dist/forecast.json
+      - name: 產生網頁
+        run: node scripts/build.mjs
+      - name: 存回資料集代碼與格式樣本（只在有變動時）
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/datasets.json data/samples 2>/dev/null || true
+          git diff --cached --quiet || (git commit -m "更新資料集代碼與格式樣本" && git push)
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+      - id: deploy
+        uses: actions/deploy-pages@v4

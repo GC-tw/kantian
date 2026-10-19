@@ -1,0 +1,247 @@
+<title>看天爬山</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600;800&family=Noto+Sans+TC:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: 地形圖紙面 — 上方查詢列，下方「山 × 日期」燈號矩陣，點山名開右側詳情面板 */
+:root{
+  --bg:#eef1ee; --surface:#fbfcfa; --ink:#18262b; --muted:#5b6b6f; --line:#cdd6d2; --contour:#dfe6e1;
+  --accent:#1d5d74; --accent-ink:#ffffff; --accent-soft:#d6e6ec;
+  --go:#2f8a55; --go-soft:#d9efe1; --warn:#c48a12; --warn-soft:#f6ead0; --stop:#c0463a; --stop-soft:#f5dcd8;
+  --f-display:"Noto Serif TC","Songti TC","PMingLiU",serif;
+  --f-body:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#121a1d; --surface:#1a2428; --ink:#e4ece9; --muted:#9aaba9; --line:#2f3d41; --contour:#1d282c;
+  --accent:#7fbcd3; --accent-ink:#0d1d24; --accent-soft:#203a45;
+  --go:#5cc287; --go-soft:#173826; --warn:#e3b24a; --warn-soft:#3a2f14; --stop:#ec7a6c; --stop-soft:#43221e; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#121a1d; --surface:#1a2428; --ink:#e4ece9; --muted:#9aaba9; --line:#2f3d41; --contour:#1d282c;
+  --accent:#7fbcd3; --accent-ink:#0d1d24; --accent-soft:#203a45;
+  --go:#5cc287; --go-soft:#173826; --warn:#e3b24a; --warn-soft:#3a2f14; --stop:#ec7a6c; --stop-soft:#43221e; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.6;
+  background-image:repeating-radial-gradient(circle at 85% -10%, transparent 0 38px, var(--contour) 38px 39px);
+  background-attachment:fixed}
+.wrap{max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px;display:flex;flex-direction:column;gap:18px}
+header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:10px 24px}
+h1{font-family:var(--f-display);font-weight:800;font-size:clamp(28px,4.4vw,40px);line-height:1.15;margin:0;letter-spacing:.02em;text-wrap:balance}
+h1 small{display:block;font-family:var(--f-body);font-weight:500;font-size:14px;color:var(--muted);letter-spacing:.04em;margin-top:6px}
+h2{font-family:var(--f-display);font-weight:600;font-size:20px;margin:0;text-wrap:balance}
+.notice{background:var(--warn-soft);border:1px solid var(--warn);color:var(--ink);border-radius:6px;padding:10px 14px;font-size:14px}
+.lamp.na{background:var(--bg);color:var(--muted);border-color:var(--line)}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line)}
+.tabs button{font:inherit;background:none;border:0;border-bottom:3px solid transparent;color:var(--muted);padding:8px 12px;cursor:pointer;font-weight:500}
+.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+.panel-search{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:16px;display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px 18px;align-items:end}
+.field{display:flex;flex-direction:column;gap:6px;min-width:0}
+.field>label,.field>.lab{font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.08em}
+input,select{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:5px;padding:7px 9px;min-width:0;width:100%}
+input:focus-visible,select:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font:inherit;font-size:14px;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:999px;padding:5px 12px;cursor:pointer}
+.field.wide{grid-column:1/-1}
+.chip.mono{font-family:var(--f-mono);font-size:13px}
+#f-cat{flex-wrap:nowrap;overflow-x:auto}
+#f-cat .chip{white-space:nowrap;flex:none}
+.info{font:600 11px/1 var(--f-mono);width:18px;height:18px;border-radius:50%;border:1.5px solid var(--accent);color:var(--accent);background:transparent;display:inline-grid;place-items:center;cursor:pointer;padding:0;margin-left:4px;font-style:italic}
+.info[aria-expanded="true"]{background:var(--accent);color:var(--accent-ink)}
+.info-pop{background:var(--surface);border:1px solid var(--accent);border-radius:8px;padding:12px 14px;font-size:14px;max-width:560px;display:flex;flex-direction:column;gap:6px}
+.info-head{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.info-pop ul{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:3px}
+.info-x{font:inherit;font-size:18px;line-height:1;background:none;border:0;color:var(--muted);cursor:pointer;padding:2px 6px}
+.star{font:inherit;font-size:18px;line-height:1;background:none;border:0;color:var(--muted);cursor:pointer;padding:2px 4px;vertical-align:1px}
+.star[aria-pressed="true"]{color:var(--stop)}
+.star:hover{color:var(--stop)}
+.matrix .mt .nm .star{font-size:16px;padding:0 4px 0 0}
+.pick .nm{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.fav-empty{background:var(--surface);border:1px dashed var(--line);border-radius:8px;padding:16px;text-align:left}
+.d-head h2 .star{font-size:22px;margin-left:6px}
+.chip.reset{border-style:dashed;color:var(--muted)}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.picks{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.pick{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:12px 14px;display:flex;flex-direction:column;gap:4px;cursor:pointer;text-align:left;font:inherit;color:inherit}
+.pick:hover{border-color:var(--accent)}
+.pick .rank{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+.pick .nm{font-family:var(--f-display);font-weight:800;font-size:20px}
+.pick .meta{font-size:13px;color:var(--muted)}
+.pick .lights{display:flex;gap:3px;margin-top:4px}
+.sec-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:6px 16px}
+.sec-head p{margin:0;color:var(--muted);font-size:13px}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;color:var(--muted);align-items:center}
+.legend span{display:inline-flex;align-items:center;gap:5px}
+.matrix-box{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:8px}
+table.matrix{border-collapse:separate;border-spacing:0;width:100%;font-variant-numeric:tabular-nums}
+.matrix th,.matrix td{padding:6px 6px;border-bottom:1px solid var(--line);text-align:center;white-space:nowrap}
+.matrix thead th{font-size:12px;color:var(--muted);font-weight:700;background:var(--surface);position:sticky;top:0}
+.matrix thead th.ref{color:var(--muted);font-weight:500}
+.matrix thead .dt{display:block;font-family:var(--f-mono);font-size:13px;color:var(--ink);font-weight:500}
+.matrix thead th.ref .dt{color:var(--muted)}
+.matrix .mt{text-align:left;position:sticky;left:0;background:var(--surface);z-index:1;min-width:170px;padding-left:12px}
+.matrix tbody tr{cursor:pointer}
+.matrix tbody tr:hover td,.matrix tbody tr:hover th{background:var(--accent-soft)}
+.mt .nm{font-weight:700;font-size:15px;display:block;line-height:1.3}
+.mt .sub{font-size:12px;color:var(--muted)}
+.cnt{font-family:var(--f-mono);font-size:13px;color:var(--muted)}
+.lamp{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:6px;font-size:13px;font-weight:700;border:1.5px solid transparent}
+.lamp.g{background:var(--go-soft);color:var(--go);border-color:var(--go)}
+.lamp.y{background:var(--warn-soft);color:var(--warn);border-color:var(--warn)}
+.lamp.r{background:var(--stop-soft);color:var(--stop);border-color:var(--stop)}
+.lamp.ref{border-style:dashed;opacity:.85}
+.lamp.past{opacity:.35}
+.seg{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--surface);max-width:720px}
+.seg button{font:inherit;font-weight:700;font-size:16px;background:none;border:0;border-left:1px solid var(--line);color:var(--muted);padding:10px 8px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:0}
+.seg button:first-child{border-left:0}
+.seg button small{font-weight:500;font-size:12px}
+.seg button[aria-selected="true"]{background:var(--accent);color:var(--accent-ink)}
+.matrix th.peak{background:var(--accent-soft)}
+.lamp.sm{width:20px;height:20px;font-size:11px;border-radius:4px}
+.more{display:flex;justify-content:center;padding:10px}
+.btn{font:inherit;font-weight:500;border:1px solid var(--accent);color:var(--accent);background:transparent;border-radius:5px;padding:7px 14px;cursor:pointer}
+.empty{padding:28px;text-align:center;color:var(--muted)}
+/* detail drawer */
+.scrim{position:fixed;inset:0;background:rgba(10,20,24,.38);z-index:20}
+aside.drawer{position:fixed;top:0;right:0;bottom:0;width:min(520px,100%);background:var(--surface);border-left:1px solid var(--line);z-index:21;overflow-y:auto;
+  padding-top:calc(18px + env(safe-area-inset-top,0px));padding-bottom:calc(24px + env(safe-area-inset-bottom,0px));padding-left:20px;padding-right:max(20px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:16px}
+.d-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.d-head h2{font-size:26px;font-weight:800}
+.d-head .sub{color:var(--muted);font-size:13px}
+.close{font:inherit;font-size:20px;line-height:1;background:none;border:1px solid var(--line);color:var(--ink);border-radius:5px;width:36px;height:36px;cursor:pointer;flex:none}
+.src{background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:10px 12px;font-size:13px;display:flex;flex-direction:column;gap:3px}
+.src b{font-weight:700}
+.note{font-size:13px;color:var(--muted)}
+.alert{background:var(--stop-soft);border:1px solid var(--stop);color:var(--ink);border-radius:6px;padding:8px 12px;font-size:13px}
+.alert b{color:var(--stop)}
+.pt h3{font-size:15px;margin:0 0 6px;font-weight:700}
+.vt-box{overflow-x:auto}
+table.vt{border-collapse:collapse;width:100%;font-size:13px;font-variant-numeric:tabular-nums}
+.vt th,.vt td{padding:6px 6px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}
+.vt th{font-size:12px;color:var(--muted);font-weight:700}
+.vt td.num{font-family:var(--f-mono);text-align:right}
+.vt tr.ref td{color:var(--muted)}
+.why{font-size:12px;color:var(--muted);white-space:normal;min-width:130px}
+.fb{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:13px}
+.fb .chip{font-size:13px}
+.issued{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+/* rules page */
+.doc{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:20px;max-width:780px;display:flex;flex-direction:column;gap:14px}
+.doc h3{font-family:var(--f-display);font-size:17px;margin:4px 0 0}
+.doc ul{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:4px}
+.doc p{margin:0}
+.kbd{font-family:var(--f-mono);font-size:13px;background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:0 5px}
+footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);padding-top:12px}
+@media (prefers-reduced-motion:no-preference){aside.drawer{animation:slide .18s ease-out}@keyframes slide{from{transform:translateX(24px);opacity:.6}to{transform:none;opacity:1}}}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <h1>看天爬山<small>看天氣，找出最適合造訪的山</small></h1>
+    <div class="issued" id="issued"></div>
+  </header>
+
+  <div class="notice" id="status" role="status" hidden></div>
+
+  <nav class="tabs" role="tablist">
+    <button role="tab" id="tab-find" aria-selected="true" data-view="find">找山</button>
+    <button role="tab" id="tab-fav" aria-selected="false" data-view="fav">我的收藏 <span id="fav-tab-n" class="cnt"></span></button>
+    <button role="tab" id="tab-rules" aria-selected="false" data-view="rules">排序規則與說明</button>
+  </nav>
+
+  <div id="shared" style="display:flex;flex-direction:column;gap:14px">
+    <div class="seg" role="tablist" aria-label="預報時段" id="seg">
+      <button type="button" role="tab" data-mode="today" aria-selected="true">今天<small>逐 3 小時</small></button>
+      <button type="button" role="tab" data-mode="tmr" aria-selected="false">明天<small>逐 3 小時</small></button>
+      <button type="button" role="tab" data-mode="d2" aria-selected="false">後天<small>逐 3 小時</small></button>
+      <button type="button" role="tab" data-mode="week" aria-selected="false">一週預報<small>逐日</small></button>
+    </div>
+    <div class="panel-search">
+      <div class="field wide"><span class="lab">登頂時段（可多選，預設 06–12，排序依此計算）</span><div class="chips" id="f-slots"></div></div>
+    </div>
+  </div>
+
+  <main id="view-find" style="display:flex;flex-direction:column;gap:18px">
+    <form class="panel-search" id="q" autocomplete="off">
+      <div class="field wide"><span class="lab">山岳類別（可多選，未選＝全部）</span><div class="chips" id="f-cat">
+        <button type="button" class="chip reset" id="cat-all" aria-pressed="true">全部</button>
+        <button type="button" class="chip" aria-pressed="false" data-c="百岳">百岳</button>
+        <button type="button" class="chip" aria-pressed="false" data-c="小百岳">小百岳</button>
+        <button type="button" class="chip" aria-pressed="false" data-c="其他山岳">其他山岳</button></div></div>
+      <div class="field wide"><span class="lab">縣市（可多選，未選＝全部）</span><div class="chips" id="f-county"></div></div>
+      <div class="field"><label for="f-name">山名</label><input id="f-name" type="search" placeholder="例如：合歡山、鳶山"></div>
+    </form>
+
+    <section style="display:flex;flex-direction:column;gap:10px" aria-labelledby="h-picks">
+      <div class="sec-head"><h2 id="h-picks">最推薦</h2><p id="range-text"></p></div>
+      <div class="picks" id="picks"></div>
+    </section>
+
+    <section style="display:flex;flex-direction:column;gap:10px" aria-labelledby="h-matrix">
+      <div class="sec-head"><h2 id="h-matrix">所有山岳燈號</h2>
+        <div class="legend">
+          <span><i class="lamp sm g">○</i>適合</span><span><i class="lamp sm y">△</i>注意</span><span><i class="lamp sm r">✕</i>不建議</span><span><i class="lamp sm na">—</i>無資料</span><span id="lg-ref" class="lg-ref"><i class="lamp sm g ref">○</i>虛線＝第 4–7 天，僅供參考<button type="button" class="info" id="info-btn" aria-expanded="false" aria-controls="info-ref" aria-label="為什麼第 4–7 天只供參考">i</button></span><span id="lg-past" class="lg-past"><i class="lamp sm g past">○</i>淡色＝已過時段</span>
+        </div></div>
+      <div class="info-pop" id="info-ref" hidden>
+        <div class="info-head"><b>為什麼第 4–7 天只供參考？</b><button type="button" class="info-x" id="info-x" aria-label="關閉說明">×</button></div>
+        <ul>
+          <li>氣象署的一週預報，只有前 3 天提供「降雨機率」。</li>
+          <li>第 4–7 天少了降雨機率，燈號只能依天氣描述（例如「多雲短暫陣雨」）、風力和氣溫來判斷，比較粗略。</li>
+          <li>預報的日子越遠，準確度本來就越低。</li>
+          <li>建議用來初步安排行程，出發前 3 天內再回來確認。</li>
+        </ul>
+      </div>
+      <div class="matrix-box"><table class="matrix" id="matrix"><thead></thead><tbody></tbody></table></div>
+      <div class="more" id="more-box"><button class="btn" id="more" type="button">顯示更多</button></div>
+    </section>
+  </main>
+
+  <main id="view-fav" hidden style="display:flex;flex-direction:column;gap:10px">
+    <div class="sec-head"><h2 id="h-favs">我的收藏</h2><p id="fav-count"></p></div>
+    <div class="legend"><span><i class="lamp sm g">○</i>適合</span><span><i class="lamp sm y">△</i>注意</span><span><i class="lamp sm r">✕</i>不建議</span><span><i class="lamp sm na">—</i>無資料</span><span class="lg-ref"><i class="lamp sm g ref">○</i>虛線＝第 4–7 天，僅供參考</span><span class="lg-past"><i class="lamp sm g past">○</i>淡色＝已過時段</span></div>
+    <div class="matrix-box" id="fav-box"><table class="matrix" id="fav-matrix"><thead></thead><tbody></tbody></table></div>
+    <div class="fav-empty" id="fav-empty">還沒有收藏。到「找山」點山名旁的 ♡，就能把山加到這裡，快速查看它們的天氣。</div>
+  </main>
+
+  <main id="view-rules" hidden>
+    <article class="doc">
+      <h2>排序規則與說明</h2>
+      <p>本站只把交通部中央氣象署發布的預報數值做比對與排序，不自行預測天氣。燈號是依下列公開規則換算的結果，每一格都能在詳情裡看到原始數值。</p>
+      <h3>資料來源</h3>
+      <ul>
+        <li>百岳與部分山岳：氣象署「登山」預報點（共 151 點），畫面會標示預報點代號。</li>
+        <li>其他小百岳：氣象署鄉鎮預報。山跨多個鄉鎮時，各鄉鎮並列顯示，燈號取最差的那一個。</li>
+        <li>天氣特報：原文轉載氣象署警特報，依特報種類影響涵蓋縣市內的山（見下方規則）。</li>
+        <li>氣象署每天約 <span class="kbd">05:30</span> <span class="kbd">11:30</span> <span class="kbd">17:30</span> <span class="kbd">23:30</span> 發布，本站每次發布後更新。</li>
+      </ul>
+      <h3>燈號怎麼算</h3>
+      <ul>
+        <li>登頂時段由你從 8 個 3 小時時段中自由多選，預設為 06–12。今天、明天、後天：逐 3 小時判定每個時段。一週預報：取你選的登頂時段中最差的情況作為當天燈號。一週資料為逐 12 小時（白天 06–18、晚上 18–06），會依你選的時段對應到白天或晚上。</li>
+        <li>降雨：降雨機率未滿 30% 適合；30% 以上注意；60% 以上不建議。天氣描述出現「大雨」「豪雨」，不論機率都是不建議。</li>
+        <li>第 4–7 天沒有降雨機率，改看天氣描述：有「雨」為注意，有「大雨」「豪雨」為不建議。這幾天以虛線顯示，僅供參考。</li>
+        <li>風速（平均風速）：未滿每秒 8 公尺（4 級以下）適合；每秒 8.0–13.8 公尺（5–6 級）注意；每秒 13.9 公尺以上（7 級以上）不建議。陣風通常比平均風速強 1.5–3 倍，稜線上請特別小心。</li>
+        <li>雷：天氣描述出現「雷」，不建議。</li>
+        <li>高溫：標高 1,000 公尺以下的山，體感溫度 36°C 以上為注意。</li>
+        <li>天氣特報：颱風警報、豪雨／大雨特報、陸上強風特報，不建議；低溫特報、濃霧特報，注意。</li>
+        <li>低溫不列入燈號，可以靠合適的保暖裝備應對；出發前請依詳情裡的氣溫與體感溫度準備衣物。</li>
+        <li>各項取最差的結果作為該時段的燈號。</li>
+      </ul>
+      <h3>排序方式</h3>
+      <ul><li>今天、明天、後天：先比你選的登頂時段中「適合」的段數（已過的時段不計），再比當天所有時段「適合」的段數（今天已過的時段不計），最後比標高。登頂時段若已全部過去，改依剩餘時段排序。</li><li>一週預報：先比 7 天中「適合」的天數，再比「注意」的天數，最後比標高。</li></ul>
+      <h3>注意事項</h3>
+      <ul>
+        <li>本站不是氣象預報，也不取代氣象署的預報與特報。出發前請再查看氣象署最新資訊與步道開放狀態。</li>
+        <li>門檻值為初版，會依山友回報的實際天氣持續調整。</li>
+      </ul>
+    </article>
+  </main>
+
+  <footer>資料來源：交通部中央氣象署開放資料。山岳清單：氣象署登山預報點、運動部體育署「臺灣小百岳」。</footer>
+</div>
+
+<div class="scrim" id="scrim" hidden></div>
+<aside class="drawer" id="drawer" hidden aria-labelledby="d-title"></aside>
+
+<script>
+__JS__
+</script>
