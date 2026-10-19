@@ -42,7 +42,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/datasets.json data/samples data/last-run.json 2>/dev/null || true
+          git add -A data
           git diff --cached --quiet || (git commit -m "更新執行紀錄、資料集代碼與格式樣本" && git push)
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
