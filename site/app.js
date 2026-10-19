@@ -109,10 +109,13 @@ function buildCols(){
     return {di, hr:h, date, ws:date.getTime()+h*H, we:date.getTime()+(h+3)*H, past: di===0 && end<=now, peak, label:slotLabel(h), sub: peak?'登頂時段':''};
   });
 }
+const hash = t => { let h = 2166136261; for (const ch of t){ h ^= ch.codePointAt(0); h = Math.imul(h, 16777619); } return h >>> 0; };
+const fmtDayKey = () => { const d = new Date(Date.now() + 8*3600e3); return d.toISOString().slice(0, 10); };   // 台灣日期
 function evaluate(){                                       // 依時段與登頂時段計算所有山的燈號並排序
   evalStamp = timeStamp(); dataStamp = FC?.fetchedAt || '';
   cols = buildCols();
   const week = state.mode === 'week', slots = sortedSlots();
+  const day = fmtDayKey();                               // 燈號相同時的順序：每天換一次（同一天內固定），避免永遠是同幾座山在前面
   all = MOUNTAINS.map(x => {
     const cells = cols.map(c => {
       const per = x.pts.map(p => {
@@ -127,8 +130,8 @@ function evaluate(){                                       // 依時段與登頂
       if (week){ if (c.lv===0) k1++; else if (c.lv===1){ k2++; if (c.per.some(y => y.j.heavy)) k3++; } }
       else if (!c.past && c.lv===0){ k2++; if (cols[i].peak) k1++; }
     });
-    return {...x, cells, k1, k2, k3};
-  }).sort((a,b) => b.k1-a.k1 || b.k2-a.k2 || a.k3-b.k3 || (b.m.h??0)-(a.m.h??0));
+    return {...x, cells, k1, k2, k3, mix: hash(day + '|' + x.k)};
+  }).sort((a,b) => b.k1-a.k1 || b.k2-a.k2 || a.k3-b.k3 || a.mix-b.mix);
   byKey = new Map(all.map(r => [r.k, r]));
   applyFilters();
 }
