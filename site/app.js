@@ -99,7 +99,7 @@ const MOUNTAINS = M.map(m => {
 const state = {
   mode: MODES[store.get('mode')] ? store.get('mode') : 'today',
   slots: new Set((a => Array.isArray(a) && a.length ? a : [6,9])(store.get('slots'))),
-  cats: new Set(), counties: new Set(), name: '', shown: PAGE
+  cats: new Set(), counties: new Set(), name: '', shown: PAGE, turn: 0   // turn：按「換一批」的次數
 };
 const favs = new Set((a => Array.isArray(a) ? a : [])(store.get('favs')));
 let cols = [], all = [], rows = [], favRows = [], byKey = new Map();
@@ -181,9 +181,9 @@ function render(){
   document.querySelectorAll('.lg-past').forEach(e => e.hidden = state.mode !== 'today');
   if (!week) setInfo(false);
   // 推薦：依燈號排序，只列有「適合」時段（或天數）的山，最多 3 座，不標名次
-  const good = r => (week || peaksLeft() ? r.k1 : r.k2) > 0;
-  const ph = pickHead();
-  $('picks').innerHTML = rows.filter(good).slice(0, 3).map(r => pickCard(r, ph)).join('')
+  const ph = pickHead(), pk = choosePicks(week);
+  $('reroll').hidden = !pk.more;
+  $('picks').innerHTML = pk.list.map(r => pickCard(r, ph)).join('')
     || `<div class="empty">${rows.length ? '這段期間沒有燈號為「適合」的山，可以參考下方列表。' : '沒有符合條件的山，請放寬類別或縣市。'}</div>`;
   const head = headRow();
   $('fav-tab-n').textContent = favRows.length || '';
@@ -194,10 +194,23 @@ function render(){
   $('fav-box').hidden = !favRows.length; $('fav-empty').hidden = !!favRows.length;
   $('fav-matrix').tHead.innerHTML = head;
   $('fav-matrix').tBodies[0].innerHTML = favRows.map(bodyRow).join('');
+  $('fav-cards').innerHTML = favRows.map(r => pickCard(r, ph)).join('');
   $('matrix').tHead.innerHTML = head;
   $('matrix').tBodies[0].innerHTML = rows.slice(0,state.shown).map(bodyRow).join('') || `<tr><td class="empty" colspan="${cols.length+(week?2:1)}">沒有符合條件的山。</td></tr>`;
+  $('matrix-cards').innerHTML = rows.slice(0,state.shown).map(r => pickCard(r, ph)).join('') || '<div class="empty">沒有符合條件的山。</div>';
   $('more-box').hidden = rows.length <= state.shown;
   $('more').textContent = `顯示更多（還有 ${rows.length-state.shown} 座）`;
+}
+// 推薦：只列有「適合」時段（或天數）的山，最多 3 座。名額邊界上分數相同的山超過剩餘名額時，「換一批」依當天順序輪流換成其他同分的山
+function choosePicks(week){
+  const good = r => (week || peaksLeft() ? r.k1 : r.k2) > 0;
+  const cand = rows.filter(good);
+  if (cand.length <= 3) return {list: cand, more: false};
+  const key = r => r.k1 + '|' + r.k2 + '|' + r.k3, b = key(cand[2]);
+  const fixed = cand.slice(0, 3).filter(r => key(r) !== b), pool = cand.filter(r => key(r) === b), need = 3 - fixed.length;
+  if (pool.length <= need) return {list: cand.slice(0, 3), more: false};
+  const off = (state.turn * need) % pool.length;
+  return {list: [...fixed, ...Array.from({length: need}, (_, i) => pool[(off + i) % pool.length])], more: true};
 }
 const fresh = () => evalStamp === timeStamp() && dataStamp === (FC?.fetchedAt || '');
 const refresh = () => { evaluate(); render(); };                                            // 時段或登頂時段改變：重算燈號
@@ -228,16 +241,17 @@ function openDetail(k){
 }
 function closeDetail(){ $('drawer').hidden = true; $('scrim').hidden = true; }
 // 推薦旁的 i：依目前模式說明比較標準與排序
+const REROLL = '排序相同的山超過名額時，旁邊會出現「換一批」，可以換成其他同分的山。';
 function pickInfo(week){
   const slots = sortedSlots().map(slotLabel).join('、');
   const base = '<li>燈號依氣象署預報判定：降雨機率、天氣描述（雷、大雨、豪雨）、平均風速、天氣特報；標高 1,000 公尺以下另看高溫。各項取最差的結果。</li><li>跨多個鄉鎮的山，取最差的鄉鎮。</li>';
   const li = a => '<ul>' + a.map(x => '<li>' + x + '</li>').join('') + '</ul>';
   if (week) return '<h4>比較標準</h4><ul>' + base + `<li>每天以你選的登頂時段（${esc(slots)}）中最差的情況作為當天燈號。</li><li>第 4–7 天氣象署沒有降雨機率，燈號最多只會到「注意」，僅供參考。</li></ul>`
-    + '<h4>推薦條件</h4>' + li(['7 天中至少 1 天「適合」的山才會列入，最多 3 座，不標名次。'])
+    + '<h4>推薦條件</h4>' + li(['7 天中至少 1 天「適合」的山才會列入，最多 3 座，不標名次。', REROLL])
     + '<h4>排序</h4>' + li(['「適合」的天數多者在前', '再比「注意」的天數', '再比「注意」裡天氣描述為「陣雨」（非「短暫陣雨」）的天數，少者在前', '以上都相同時，順序每天輪換一次，不代表哪座比較好']);
   const today = state.mode === 'today';
   return '<h4>比較標準</h4><ul>' + base + `<li>逐 3 小時判定，每個時段一個燈號。</li>${today ? '<li>今天已過的時段不列入比較。</li>' : ''}</ul>`
-    + '<h4>推薦條件</h4>' + li([`你選的登頂時段（${esc(slots)}）至少有 1 段「適合」的山才會列入，最多 3 座，不標名次。` + (today ? '登頂時段都已過時，改看今天剩餘的時段。' : '')])
+    + '<h4>推薦條件</h4>' + li([`你選的登頂時段（${esc(slots)}）至少有 1 段「適合」的山才會列入，最多 3 座，不標名次。` + (today ? '登頂時段都已過時，改看今天剩餘的時段。' : ''), REROLL])
     + '<h4>排序</h4>' + li(['登頂時段中「適合」的段數多者在前', '再比當天所有時段「適合」的段數', '以上都相同時，順序每天輪換一次，不代表哪座比較好']);
 }
 function setPickInfo(v){ $('pick-info').hidden = !v; $('pick-info-btn').setAttribute('aria-expanded', v); }
@@ -321,6 +335,7 @@ const regionNow = () => REGIONS.find(([, cs]) => sameSet(state.counties, cs));  
   $('more').onclick = () => { state.shown += PAGE; if (!fresh()) evaluate(); render(); };
   $('info-btn').onclick = () => setInfo($('info-ref').hidden);
   $('info-x').onclick = () => { setInfo(false); $('info-btn').focus(); };
+  $('reroll').onclick = () => { state.turn++; render(); };
   $('pick-info-btn').onclick = () => setPickInfo($('pick-info').hidden);
   $('pick-info-x').onclick = () => { setPickInfo(false); $('pick-info-btn').focus(); };
   $('pick-info-more').onclick = () => { setPickInfo(false); $('tab-rules').click(); window.scrollTo(0, 0); };

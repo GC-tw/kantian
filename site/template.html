@@ -102,14 +102,19 @@ input:focus-visible,select:focus-visible,button:focus-visible{outline:2px solid 
 .pick .nm{font-family:var(--f-display);font-weight:800;font-size:18px;line-height:1.3;flex:none}
 .pick .meta{font-size:12px;color:var(--muted);flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pick .p1 .star{align-self:center;margin-left:auto;font-size:18px}
-.pick .p2{display:flex;flex-wrap:wrap;align-items:flex-end;gap:4px 10px}
-.pick .lights{display:grid;grid-template-columns:repeat(var(--n,8),20px);gap:3px}
+.cards{display:none;flex-direction:column;gap:8px}
+.cards .empty{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:12px}
+.reroll{font:inherit;font-family:var(--f-body);font-size:13px;font-weight:500;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:3px 11px;margin-left:8px;cursor:pointer;vertical-align:3px;white-space:nowrap}
+.reroll:hover{border-color:var(--accent)}
+.pick .p2{display:flex;align-items:flex-end;gap:10px}
+.pick .lights{flex:1;min-width:0;display:grid;grid-template-columns:repeat(var(--n,8),minmax(0,1fr));gap:3px}
+.pick .lights .lamp.sm{width:auto;height:24px;font-size:12px}
 .pick .ph{font-family:var(--f-mono);font-size:11px;line-height:1.2;color:var(--ink);text-align:center;padding:2px 0;border-radius:3px}
 .pick .ph .wd{display:block;font-family:var(--f-body);font-size:10px}
 .pick .ph.peak{background:var(--accent-soft)}
 .pick .ph.ref{color:var(--muted)}
 .pick .ph.we{color:var(--we)}
-.pick .rank{font-family:var(--f-mono);font-size:12px;line-height:20px;color:var(--muted)}
+.pick .rank{flex:none;font-family:var(--f-mono);font-size:12px;line-height:24px;color:var(--muted)}
 .sec-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:6px 16px}
 .sec-head p{margin:0;color:var(--muted);font-size:13px}
 .legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;color:var(--muted);align-items:center}
@@ -181,32 +186,11 @@ table.vt{border-collapse:collapse;width:100%;font-size:13px;font-variant-numeric
 .kbd{font-family:var(--f-mono);font-size:13px;background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:0 5px}
 footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);padding-top:12px}
 @media (prefers-reduced-motion:no-preference){aside.drawer{animation:slide .18s ease-out}@keyframes slide{from{transform:translateX(24px);opacity:.6}to{transform:none;opacity:1}}}
-/* 手機：所有山岳燈號與推薦卡同一形式（每座山一張卡：山名列＋小燈號＋比較結果），表頭只留時段開始時刻或日期，和小燈號對齊 */
+/* 手機：所有山岳燈號、我的收藏改用和推薦完全相同的卡片（時段標示在每張卡裡，和小燈號對齊） */
 @media (max-width:640px){
   .matrix-box{overflow-x:visible;background:none;border:0;border-radius:0}
-  table.matrix,.matrix thead,.matrix tbody{display:block}
-  .matrix tr{display:grid;grid-template-columns:repeat(var(--n,8),20px) minmax(0,1fr);column-gap:3px;row-gap:5px;align-items:center}
-  .matrix th,.matrix td{padding:0;border-bottom:0;white-space:normal;min-width:0}
-  .matrix thead tr{padding:0 10px 6px 13px}
-  .matrix thead th.mt,.matrix thead th.cnt-h{display:none}
-  .matrix thead th{position:static;background:none;font-size:0;line-height:1.2;padding:3px 0;border-radius:3px}
-  .matrix thead .dt{font-size:11px;font-weight:500}
-  .matrix thead .lg,.matrix .refx,.matrix .pk-sub,.matrix thead th>:not(.dt){display:none}
-  .matrix thead .st{display:block}
-  .matrix thead .st .wd{display:block;font-family:var(--f-body);font-size:10px;color:inherit}
-  .matrix thead th.we .dt{color:var(--we)}
-  .matrix tbody tr{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 10px 8px 12px;margin-bottom:8px;cursor:pointer}
-  .matrix tbody tr:hover{border-color:var(--accent)}
-  .matrix tbody tr:hover td,.matrix tbody tr:hover th{background:none}
-  .matrix .mt{grid-column:1/-1;grid-row:1;position:static;min-width:0;max-width:none;padding:0;background:none}
-  .matrix .mt .nm{font-size:18px}
-  .matrix .mt .star{font-size:18px}
-  .matrix tbody td:not(.cnt):not(.empty){grid-row:2}
-  .matrix td.cnt{grid-row:2;grid-column:-2/-1;text-align:left;padding-left:7px;font-size:12px;white-space:nowrap}
-  .matrix td.cnt .cn-s{display:none}
-  .matrix td.cnt .cn-l{display:inline}
-  .matrix td.empty{grid-column:1/-1}
-  .matrix .lamp{width:20px;height:20px;font-size:11px;border-radius:4px}
+  .matrix-box table.matrix{display:none}
+  .matrix-box .cards{display:flex}
   /* 手機：像 APP 一樣，分頁固定在畫面底部 */
   .tabs{position:fixed;left:0;right:0;bottom:0;z-index:15;display:grid;grid-template-columns:repeat(3,1fr);gap:0;
     background:var(--surface);border-bottom:0;border-top:1px solid var(--line);box-shadow:0 -4px 14px rgba(0,0,0,.06);
@@ -302,7 +286,7 @@ footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);paddin
     </div>
 
     <section style="display:flex;flex-direction:column;gap:10px" aria-labelledby="h-picks">
-      <div class="sec-head"><h2 id="h-picks"><span id="h-picks-t">推薦</span><button type="button" class="info" id="pick-info-btn" aria-expanded="false" aria-controls="pick-info" aria-label="推薦怎麼比較與排序">i</button></h2><p id="range-text"></p></div>
+      <div class="sec-head"><h2 id="h-picks"><span id="h-picks-t">推薦</span><button type="button" class="info" id="pick-info-btn" aria-expanded="false" aria-controls="pick-info" aria-label="推薦怎麼比較與排序">i</button><button type="button" class="reroll" id="reroll" hidden aria-label="換一批推薦（同分的山）">↻ 換一批</button></h2><p id="range-text"></p></div>
       <div class="info-pop" id="pick-info" hidden>
         <div class="info-head"><b id="pick-info-t">推薦怎麼比較與排序？</b><button type="button" class="info-x" id="pick-info-x" aria-label="關閉說明">×</button></div>
         <div id="pick-info-body"></div>
@@ -313,7 +297,7 @@ footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);paddin
 
     <section style="display:flex;flex-direction:column;gap:10px" aria-labelledby="h-matrix">
       <div class="sec-head"><h2 id="h-matrix">所有山岳燈號</h2></div>
-      <div class="matrix-box"><table class="matrix" id="matrix"><thead></thead><tbody></tbody></table></div>
+      <div class="matrix-box"><table class="matrix" id="matrix"><thead></thead><tbody></tbody></table><div class="cards" id="matrix-cards"></div></div>
       <div class="more" id="more-box"><button class="btn" id="more" type="button">顯示更多</button></div>
     </section>
   </main>
@@ -321,7 +305,7 @@ footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);paddin
   <main id="view-fav" hidden style="display:flex;flex-direction:column;gap:10px">
     <div class="sec-head"><h2 id="h-favs">我的收藏</h2><p id="fav-count"></p></div>
     <div class="legend"><span><i class="lamp sm g">○</i>適合</span><span><i class="lamp sm y">△</i>注意</span><span><i class="lamp sm r">✕</i>不建議</span><span><i class="lamp sm na">—</i>時間已過或無資料</span><span class="lg-ref"><i class="lamp sm g ref">○</i>虛線＝第 4–7 天，僅供參考</span><span class="lg-past"><i class="lamp sm g past">○</i>淡色＝已過時段</span></div>
-    <div class="matrix-box" id="fav-box"><table class="matrix" id="fav-matrix"><thead></thead><tbody></tbody></table></div>
+    <div class="matrix-box" id="fav-box"><table class="matrix" id="fav-matrix"><thead></thead><tbody></tbody></table><div class="cards" id="fav-cards"></div></div>
     <div class="fav-empty" id="fav-empty">還沒有收藏。到「找山」點山名旁的 ♡，就能把山加到這裡，快速查看它們的天氣。</div>
   </main>
 
