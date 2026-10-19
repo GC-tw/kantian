@@ -36,17 +36,29 @@
   "records": {
     "location": [
       {
-        "locationName": "花蓮縣",
-        "geocode": 10015,
+        "locationName": "金門縣",
+        "geocode": 9020,
         "hazardConditions": {
           "hazards": []
         }
       },
       {
-        "locationName": "彰化縣",
-        "geocode": 10007,
+        "locationName": "臺中市",
+        "geocode": 66,
         "hazardConditions": {
-          "hazards": []
+          "hazards": [
+            {
+              "info": {
+                "language": "zh-TW",
+                "phenomena": "陸上強風",
+                "significance": "特報"
+              },
+              "validTime": {
+                "startTime": "2026-10-15 16:23:00",
+                "endTime": "2026-10-15 22:00:00"
+              }
+            }
+          ]
         }
       }
     ]
