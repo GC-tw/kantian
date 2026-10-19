@@ -10,6 +10,7 @@ const OUT = path.resolve(ROOT, args.out || 'dist/forecast.json');
 const FIXTURES = args.fixtures ? path.resolve(ROOT, args.fixtures) : null;   // 測試用：從檔案讀取，不連網
 const KEY = process.env.CWA_API_KEY;
 const API = 'https://opendata.cwa.gov.tw/api/v1/rest/datastore/';
+const FILE_API = 'https://opendata.cwa.gov.tw/fileapi/v1/opendataapi/';   // 部分資料集（例如登山預報）只提供檔案下載
 const DATASETS_FILE = path.join(ROOT, 'data/datasets.json');                  // 自動探查到的資料集代碼
 const SAMPLES_DIR = path.join(ROOT, 'data/samples');                          // 每種資料各存一小段樣本，方便核對格式
 const MOUNTAINS = JSON.parse(fs.readFileSync(path.join(ROOT, 'data/mountains.json'), 'utf8'));
@@ -29,7 +30,15 @@ async function getDataset(id, params = {}, {tries = 3, timeout = 60000} = {}){
     return JSON.parse(fs.readFileSync(f, 'utf8'));
   }
   if (!KEY) throw new Error('缺少 CWA_API_KEY（請在 GitHub 的 Secrets 設定氣象署授權碼）');
-  const url = API + id + '?' + new URLSearchParams({Authorization: KEY, format: 'JSON', ...params});
+  const q = new URLSearchParams({Authorization: KEY, format: 'JSON', ...params});
+  try{ return await getUrl(API + id + '?' + q, id, tries, timeout); }
+  catch(e){
+    if (Object.keys(params).length || !/HTTP 404|回應失敗|resource/i.test(e.message)) throw e;
+    try{ return await getUrl(FILE_API + id + '?' + q, id, tries, timeout); }   // datastore 沒有這個資料集 → 改試檔案下載
+    catch(e2){ throw new Error(e.message + '；檔案下載：' + e2.message.replace(id + ' 連線失敗：', '')); }
+  }
+}
+async function getUrl(url, id, tries, timeout){
   for (let i = 1; i <= tries; i++){
     try{
       const r = await fetch(url, {signal: AbortSignal.timeout(timeout)});
@@ -51,6 +60,11 @@ function findKey(obj, re, depth = 0){                     // 遞迴找第一個�
   for (const [k, v] of Object.entries(obj)){ if (re.test(k) && typeof v !== 'object') return v; }
   for (const v of Object.values(obj)){ const r = findKey(v, re, depth+1); if (r !== undefined) return r; }
 }
+function findNode(obj, re, depth = 0){                    // 遞迴找第一個名稱符合的物件或陣列（相容 datastore 與檔案下載兩種包裝）
+  if (!obj || typeof obj !== 'object' || depth > 5) return undefined;
+  for (const [k, v] of Object.entries(obj)) if (re.test(k) && v && typeof v === 'object') return v;
+  for (const v of Object.values(obj)){ const r = findNode(v, re, depth+1); if (r !== undefined) return r; }
+}
 const describe = j => String(findKey(j, /^datasetDescription$/i) || '');
 const num = v => { if (v == null) return null; const c = String(v).replace(/[^\d.\-]/g, ''); const n = Number(c); return c === '' || c === '-' || Number.isNaN(n) ? null : n; };
 const OLD_CODES = {T:'Temperature', AT:'ApparentTemperature', Td:'DewPoint', RH:'RelativeHumidity', WS:'WindSpeed', WD:'WindDirection', Wx:'Weather', PoP3h:'ProbabilityOfPrecipitation', PoP6h:'ProbabilityOfPrecipitation', PoP12h:'ProbabilityOfPrecipitation', MaxT:'MaxTemperature', MinT:'MinTemperature', MaxAT:'MaxApparentTemperature', MinAT:'MinApparentTemperature', WeatherDescription:'WeatherDescription'};
@@ -58,7 +72,8 @@ const OLD_CODES = {T:'Temperature', AT:'ApparentTemperature', Td:'DewPoint', RH:
 // 把一份資料集攤平成「地點 → 時間段 → 數值」
 function locations(j){
   const out = [];
-  const groups = pick(j.records || j, 'Locations', 'locations') || [];
+  let groups = findNode(j, /^locations$/i);
+  if (!groups){ const l = findNode(j, /^location$/i); groups = l ? [{Location: l}] : []; }
   for (const g of [].concat(groups)){
     const county = pick(g, 'LocationsName', 'locationsName') || '';
     for (const loc of [].concat(pick(g, 'Location', 'location') || [])){
@@ -142,7 +157,7 @@ async function mountainDatasets(){
     try{
       const d = describe(await getDataset(id, {}, {tries: 1, timeout: 20000}));
       known[id] = d; console.log(`  ${id}：${d || '（沒有說明）'}`);
-    }catch(e){ console.log(`  ${id}：${e.message.replace(id + ' 連線失敗：', '')}`); }
+    }catch(e){ const m = e.message.replace(id + ' 連線失敗：', ''); (known.errors ||= {})[id] = m; console.log(`  ${id}：${m}`); }
     if (!known.mountainH3 && want.h3.test(known[id] || '')) known.mountainH3 = id;
     if (!known.mountainWeek && want.week.test(known[id] || '')) known.mountainWeek = id;
     if (known.mountainH3 && known.mountainWeek) break;
@@ -156,10 +171,9 @@ function saveSample(name, j){                            // 只存第一個地�
   if (FIXTURES) return;
   fs.mkdirSync(SAMPLES_DIR, {recursive: true});
   const c = JSON.parse(JSON.stringify(j));
-  const recs = c.records || c;
-  const g = pick(recs, 'Locations', 'locations');
-  if (Array.isArray(g)){ g.splice(1); const l = pick(g[0], 'Location', 'location'); if (Array.isArray(l)) l.splice(1); }
-  const loc = pick(recs, 'location', 'Location'); if (Array.isArray(loc) && !g) loc.splice(2);
+  const g = findNode(c, /^locations$/i);
+  if (Array.isArray(g)) g.splice(1);
+  const loc = findNode(c, /^location$/i); if (Array.isArray(loc)) loc.splice(2);
   fs.writeFileSync(path.join(SAMPLES_DIR, name + '.json'), JSON.stringify(c, null, 2));
 }
 
