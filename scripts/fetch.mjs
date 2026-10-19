@@ -64,6 +64,8 @@ function findNode(obj, re, depth = 0){                    // 遞迴找第一個�
   for (const [k, v] of Object.entries(obj)) if (re.test(k) && v && typeof v === 'object') return v;
   for (const v of Object.values(obj)){ const r = findNode(v, re, depth+1); if (r !== undefined) return r; }
 }
+// 時間字串沒有標時區（例如特報的 "2026-10-15 16:23:00"）時，視為台灣時間
+const twTime = v => { if (!v) return null; const t = String(v).trim(); const n = Date.parse(/(Z|[+-]\d\d:?\d\d)$/i.test(t) ? t : t.replace(' ', 'T') + '+08:00'); return Number.isNaN(n) ? null : n; };
 const describe = j => String(findKey(j, /^datasetDescription$/i) || '');
 const num = v => { if (v == null) return null; const c = String(v).replace(/[^\d.\-]/g, ''); const n = Number(c); return c === '' || c === '-' || Number.isNaN(n) ? null : n; };
 const OLD_CODES = {T:'Temperature', AT:'ApparentTemperature', Td:'DewPoint', RH:'RelativeHumidity', WS:'WindSpeed', WD:'WindDirection', Wx:'Weather', PoP3h:'ProbabilityOfPrecipitation', PoP6h:'ProbabilityOfPrecipitation', PoP12h:'ProbabilityOfPrecipitation', MaxT:'MaxTemperature', MinT:'MinTemperature', MaxAT:'MaxApparentTemperature', MinAT:'MinApparentTemperature', WeatherDescription:'WeatherDescription'};
@@ -90,7 +92,7 @@ function locations(j){
               else if (vals[key] === undefined) vals[key] = ev.value;
             } else Object.assign(vals, ev);                  // 新格式：{Temperature: "20"}
           }
-          recs.push({s: Date.parse(s), e: e ? Date.parse(e) : null, vals});
+          recs.push({s: twTime(s), e: e ? twTime(e) : null, vals});
         }
       }
       const ps = [].concat(pick(pick(loc, 'ParameterSet') || {}, 'Parameter') || []);   // 登山預報點代碼（例如 D001）
@@ -125,6 +127,7 @@ function normalize(v, daily){
   };
   return Object.values(out).every(x => x == null) ? null : out;
 }
+
 
 // ---------- 時間格：台灣時間 ----------
 const TZ = 8 * 3600e3, H = 3600e3;
@@ -243,7 +246,7 @@ async function main(){
         const ph = String(pick(info, 'phenomena', 'Phenomena') || ''), sig = String(pick(info, 'significance', 'Significance') || '');
         const lv = (LV.find(([re]) => re.test(ph)) || [])[1];
         if (!lv) continue;
-        result.alerts.push({county, type: ph + sig, lv, start: Date.parse(pick(vt, 'startTime', 'StartTime')) || null, end: Date.parse(pick(vt, 'endTime', 'EndTime')) || null});
+        result.alerts.push({county, type: ph + sig, lv, start: twTime(pick(vt, 'startTime', 'StartTime')), end: twTime(pick(vt, 'endTime', 'EndTime'))});
       }
     }
   }catch(e){ warn('警特報抓取失敗：' + e.message); }
