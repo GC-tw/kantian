@@ -38,7 +38,7 @@ async function getDataset(id, params = {}, {tries = 3, timeout = 60000} = {}){
       if (j.success === 'false' || j.success === false) throw new Error('氣象署回應失敗：' + JSON.stringify(j.result || j).slice(0, 200));
       return j;
     }catch(e){
-      if (i === tries) throw new Error(id + ' 連線失敗：' + e.message);
+      if (i === tries) throw new Error(id + ' 連線失敗：' + e.message + (e.cause ? '（' + (e.cause.code || e.cause.message) + '）' : ''));
       await new Promise(r => setTimeout(r, 3000 * i));
     }
   }
@@ -240,6 +240,9 @@ async function main(){
   fs.writeFileSync(OUT, JSON.stringify(result));
   const n = Object.values(result.points);
   console.log(`完成：${n.length} 個預報點（3 小時資料 ${n.filter(p=>p.h3?.length).length}、一週資料 ${n.filter(p=>p.week?.length).length}），特報 ${result.alerts.length} 則，警告 ${warnings.length} 則`);
-  if (!n.some(p => p.h3?.length)) { console.error('沒有任何可用的預報資料，停止更新網站'); process.exit(1); }
+  if (!n.some(p => p.h3?.length)) throw new Error('沒有任何可用的預報資料，停止更新網站');
 }
-main().catch(e => { console.error('✖ ' + e.message); process.exit(1); });
+// 每次執行結果寫進 data/last-run.json（會存回 GitHub），方便從專案直接看到成功或失敗原因
+const record = (ok, error) => { if (FIXTURES) return; fs.writeFileSync(path.join(ROOT, 'data/last-run.json'), JSON.stringify({time: new Date().toISOString(), ok, error: error || null, cause: error ? String(errCause || '') : null, warnings}, null, 2)); };
+let errCause = '';
+main().then(() => record(true)).catch(e => { errCause = e.cause?.code || e.cause?.message || ''; console.error('✖ ' + e.message, errCause); record(false, e.message); process.exit(1); });
