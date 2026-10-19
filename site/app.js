@@ -111,13 +111,13 @@ const timeStamp = () => { const n = new Date(); return isoDate(n) + '|' + Math.f
 function buildCols(){
   if (state.mode === 'week') return [0,1,2,3,4,5,6].map(di => {
     const d = dayAt(di);
-    return {di, date:d, ws:d.getTime(), we:d.getTime()+24*H, ref:di>=3, wkd:isWE(d), label:`${d.getMonth()+1}/${d.getDate()}`, sub:'週'+WD[d.getDay()]+(di>=3?'<span class="refx">・參考</span>':'')};
+    return {di, date:d, ws:d.getTime(), we:d.getTime()+24*H, ref:di>=3, wkd:isWE(d), label:`${d.getMonth()+1}/${d.getDate()}`, short:`${d.getDate()}<span class="wd">${WD[d.getDay()]}</span>`, sub:'週'+WD[d.getDay()]+(di>=3?'<span class="refx">・參考</span>':'')};
   });
   const di = MODES[state.mode].di, date = dayAt(di), now = new Date();
   return SLOTS.map(h => {
     const end = dayAt(di); end.setHours(h+3);
     const peak = state.slots.has(h);
-    return {di, hr:h, date, ws:date.getTime()+h*H, we:date.getTime()+(h+3)*H, past: di===0 && end<=now, peak, label:slotLabel(h), head:`${pad(h)}<span class="hr-to">–${pad(h+3)}</span>`, sub: peak?'<span class="pk-sub">登頂時段</span>':''};
+    return {di, hr:h, date, ws:date.getTime()+h*H, we:date.getTime()+(h+3)*H, past: di===0 && end<=now, peak, label:slotLabel(h), short:pad(h), head:`${pad(h)}<span class="hr-to">–${pad(h+3)}</span>`, sub: peak?'<span class="pk-sub">登頂時段</span>':''};
   });
 }
 const hash = t => { let h = 2166136261; for (const ch of t){ h ^= ch.codePointAt(0); h = Math.imul(h, 16777619); } return h >>> 0; };
@@ -170,8 +170,8 @@ function scoreCell(r){
   const pk = peaksLeft();
   return pk ? `${r.k1} / ${pk}` : `${r.k2} / ${cols.filter(c=>!c.past).length}`;
 }
-const headRow = () => `<tr><th class="mt">山岳</th>${cols.map(c=>`<th class="${c.ref?'ref ':''}${c.peak?'peak ':''}${c.wkd?'we':''}"><span class="dt">${c.head||c.label}</span>${c.sub}</th>`).join('')}<th class="cnt-h">${state.mode==='week'?'適合天數':'適合時段'}</th></tr>`;
-const bodyRow = r => `<tr data-k="${r.k}" tabindex="0"><th class="mt" scope="row"><div class="mt-in"><span class="nm">${esc(r.m.n)}</span><span class="sub">${sub(r.m)}</span>${star(r.k)}</div></th>${r.cells.map(c=>`<td>${lamp(c)}</td>`).join('')}<td class="cnt">${scoreCell(r)}</td></tr>`;
+const headRow = () => `<tr><th class="mt">山岳</th>${cols.map(c=>`<th class="${c.ref?'ref ':''}${c.peak?'peak ':''}${c.wkd?'we':''}"><span class="dt"><span class="lg">${c.head||c.label}</span><span class="st">${c.short}</span></span>${c.sub}</th>`).join('')}<th class="cnt-h">${state.mode==='week'?'適合天數':'適合時段'}</th></tr>`;
+const bodyRow = r => `<tr data-k="${r.k}" tabindex="0"><th class="mt" scope="row"><div class="mt-in"><span class="nm">${esc(r.m.n)}</span><span class="sub">${sub(r.m)}</span>${star(r.k)}</div></th>${r.cells.map(c=>`<td>${lamp(c)}</td>`).join('')}<td class="cnt"><span class="cn-s">${scoreCell(r)}</span><span class="cn-l">${score(r)}</span></td></tr>`;
 // 推薦卡（精簡兩列）：山名＋資訊＋收藏／燈號＋比較結果
 const pickCard = r => `<div class="pick" data-k="${r.k}" tabindex="0" role="button"><div class="p1"><span class="nm">${esc(r.m.n)}</span><span class="meta">${sub(r.m)}</span>${star(r.k)}</div><div class="p2"><span class="lights">${r.cells.map(c=>lamp(c,true)).join('')}</span><span class="rank">${score(r)}</span></div></div>`;
 

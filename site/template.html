@@ -125,6 +125,7 @@ table.matrix{border-collapse:separate;border-spacing:0;width:100%;font-variant-n
 .mt .sub{font-size:12px;color:var(--muted);font-weight:400;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .mt .star{align-self:center;margin-left:auto;font-size:17px;padding:0 2px}
 .cnt{font-family:var(--f-mono);font-size:13px;color:var(--muted)}
+.matrix .st,.matrix .cn-l{display:none}
 .lamp{font-style:normal;display:inline-grid;place-items:center;width:30px;height:30px;border-radius:6px;font-size:13px;font-weight:700;border:1.5px solid transparent}
 .lamp.g{background:var(--go-soft);color:var(--go);border-color:var(--go)}
 .lamp.y{background:var(--warn-soft);color:var(--warn);border-color:var(--warn)}
@@ -175,25 +176,32 @@ table.vt{border-collapse:collapse;width:100%;font-size:13px;font-variant-numeric
 .kbd{font-family:var(--f-mono);font-size:13px;background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:0 5px}
 footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);padding-top:12px}
 @media (prefers-reduced-motion:no-preference){aside.drawer{animation:slide .18s ease-out}@keyframes slide{from{transform:translateX(24px);opacity:.6}to{transform:none;opacity:1}}}
-/* 手機：每座山兩列（山名一列、燈號一列），燈號平均分配寬度，不需要左右捲動 */
+/* 手機：所有山岳燈號與推薦卡同一形式（每座山一張卡：山名列＋小燈號＋比較結果），表頭只留時段開始時刻或日期，和小燈號對齊 */
 @media (max-width:640px){
-  .matrix-box{overflow-x:visible}
+  .matrix-box{overflow-x:visible;background:none;border:0;border-radius:0}
   table.matrix,.matrix thead,.matrix tbody{display:block}
-  .matrix tr{display:grid;grid-template-columns:repeat(var(--n,8),minmax(0,1fr));align-items:center;border-bottom:1px solid var(--line)}
-  .matrix th,.matrix td{padding:3px 1px;border-bottom:0;white-space:normal;min-width:0}
+  .matrix tr{display:grid;grid-template-columns:repeat(var(--n,8),20px) minmax(0,1fr);column-gap:3px;row-gap:5px;align-items:center}
+  .matrix th,.matrix td{padding:0;border-bottom:0;white-space:normal;min-width:0}
+  .matrix thead tr{padding:0 10px 6px 13px}
   .matrix thead th.mt,.matrix thead th.cnt-h{display:none}
-  .matrix thead th{position:static;font-size:11px;line-height:1.3;padding:6px 0}
-  .matrix thead .dt{font-size:clamp(10px,3.1vw,12px)}
-  .matrix thead .dt{white-space:nowrap;letter-spacing:-.04em}
-  .matrix .hr-to{font-family:var(--f-mono)}
-  .matrix .refx,.matrix .pk-sub{display:none}
-  .matrix .mt{grid-column:1/-1;grid-row:1;position:static;min-width:0;max-width:none;padding:7px 64px 0 10px;background:none}
-  .matrix td.cnt{grid-column:1/-1;grid-row:1;justify-self:end;align-self:start;padding:9px 10px 0 0}
-  .matrix tbody td:not(.cnt):not(.empty){grid-row:2;padding-bottom:7px}
-  .matrix td.empty{grid-column:1/-1}
-  .matrix tbody tr:hover{background:var(--accent-soft)}
+  .matrix thead th{position:static;background:none;font-size:0;line-height:1.2;padding:3px 0;border-radius:3px}
+  .matrix thead .dt{font-size:11px;font-weight:500}
+  .matrix thead .lg,.matrix .refx,.matrix .pk-sub,.matrix thead th>:not(.dt){display:none}
+  .matrix thead .st{display:block}
+  .matrix thead .st .wd{display:block;font-family:var(--f-body);font-size:10px;color:inherit}
+  .matrix thead th.we .dt{color:var(--we)}
+  .matrix tbody tr{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 10px 8px 12px;margin-bottom:8px;cursor:pointer}
+  .matrix tbody tr:hover{border-color:var(--accent)}
   .matrix tbody tr:hover td,.matrix tbody tr:hover th{background:none}
-  .matrix .lamp{width:min(30px,100%);height:26px}
+  .matrix .mt{grid-column:1/-1;grid-row:1;position:static;min-width:0;max-width:none;padding:0;background:none}
+  .matrix .mt .nm{font-size:18px}
+  .matrix .mt .star{font-size:18px}
+  .matrix tbody td:not(.cnt):not(.empty){grid-row:2}
+  .matrix td.cnt{grid-row:2;grid-column:-2/-1;text-align:left;padding-left:7px;font-size:12px;white-space:nowrap}
+  .matrix td.cnt .cn-s{display:none}
+  .matrix td.cnt .cn-l{display:inline}
+  .matrix td.empty{grid-column:1/-1}
+  .matrix .lamp{width:20px;height:20px;font-size:11px;border-radius:4px}
   /* 手機：像 APP 一樣，分頁固定在畫面底部 */
   .tabs{position:fixed;left:0;right:0;bottom:0;z-index:15;display:grid;grid-template-columns:repeat(3,1fr);gap:0;
     background:var(--surface);border-bottom:0;border-top:1px solid var(--line);box-shadow:0 -4px 14px rgba(0,0,0,.06);
