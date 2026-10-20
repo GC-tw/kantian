@@ -30,7 +30,7 @@ let fails = 0; const ok = (c, m) => { console.log((c ? '✓ ' : '✗ ') + m); if
     ok(!ty.hidden && /強烈颱風測試/.test(ty.textContent) && /最接近臺灣/.test(ty.textContent) && !/遠方/.test(ty.textContent), '颱風接近臺灣時顯示提示（遠方的颱風不顯示）'); }
   ok(/資料更新/.test(d.getElementById('issued').textContent), '顯示資料更新時間');
   let plusTotal = 0;
-  for (const m of ['today', 'tmr', 'd2', 'week']){
+  for (const m of ['today', 'tmr', 'd2', 'd3', 'week']){
     click(w, d.querySelector(`#seg [data-mode="${m}"]`));
     for (let i = 0; i < 30; i++) click(w, d.getElementById('more'));
     const body = d.body.innerHTML.replace(/<script>[\s\S]*<\/script>/, '');

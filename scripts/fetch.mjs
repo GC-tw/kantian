@@ -132,9 +132,9 @@ function normalize(v, daily){
 // ---------- 時間格：台灣時間 ----------
 const TZ = 8 * 3600e3, H = 3600e3;
 const twMidnight = ms => Math.floor((ms + TZ) / (24*H)) * 24*H - TZ;
-function slots3h(locs){                                  // 今天 00 時起 3 天，每 3 小時
+function slots3h(locs){                                  // 今天 00 時起 4 天（到大後天），每 3 小時；氣象署實際約提供 96 小時
   const start = twMidnight(Date.now()), out = [];
-  for (let i = 0; i < 24; i++){ const S = start + i*3*H; const v = normalize(merge(locs.recs, S, 3*H), false); if (v) out.push({s: S, ...v}); }
+  for (let i = 0; i < 32; i++){ const S = start + i*3*H; const v = normalize(merge(locs.recs, S, 3*H), false); if (v) out.push({s: S, ...v}); }
   return out;
 }
 function periods12h(locs){                               // 前一天 18 時起，每 12 小時（白天 06–18、晚上 18–06），共 8 天

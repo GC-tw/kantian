@@ -17,7 +17,7 @@ out = 'test/fixtures/'; os.makedirs(out, exist_ok=True)
 locs = []
 for n in names:
     els = {'T': [], 'AT': [], 'PoP3h': [], 'WS': [], 'Wx': []}
-    for i in range(24):
+    for i in range(32):
         s = mid + dt.timedelta(hours=6 + 3*i); e = s + dt.timedelta(hours=3)
         p = random.choice([0, 10, 20, 30, 40, 60, 80]); ws = round(random.uniform(1, 16), 1); t = random.randint(-2, 24)
         els['T'].append({'dataTime': iso(s), 'elementValue': [{'value': str(t), 'measures': '攝氏度'}]})
@@ -54,7 +54,7 @@ groups = {}
 for t in towns:
     c, n = t[:3], t[3:]
     els = {'溫度': [], '體感溫度': [], '3小時降雨機率': [], '風速': [], '天氣現象': []}
-    for i in range(24):
+    for i in range(32):
         s = mid + dt.timedelta(hours=6 + 3*i); e = s + dt.timedelta(hours=3)
         p = random.choice([0, 10, 30, 60]); tv = random.randint(18, 37)
         els['溫度'].append({'DataTime': iso(s), 'ElementValue': [{'Temperature': str(tv)}]})

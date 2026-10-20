@@ -169,7 +169,7 @@ table.matrix{border-collapse:separate;border-spacing:0;width:100%;font-variant-n
 .lamp.r{background:var(--stop-soft);color:var(--stop);border-color:var(--stop)}
 .lamp.ref{border-style:dashed;opacity:.85}
 .lamp.past{opacity:.35}
-.seg{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--surface);max-width:720px}
+.seg{display:grid;grid-template-columns:repeat(5,1fr);gap:0;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--surface);max-width:720px}
 .seg button{font:inherit;font-weight:700;font-size:16px;background:none;border:0;border-left:1px solid var(--line);color:var(--muted);padding:10px 8px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:0}
 .seg button:first-child{border-left:0}
 .seg button small{font-weight:500;font-size:12px}
@@ -253,7 +253,7 @@ footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);paddin
   /* 手機：8 個登頂時段排成兩列 */
   #f-slots{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
   #f-slots .chip{padding:6px 0;text-align:center}
-  .seg button{padding:5px 2px;font-size:15px}
+  .seg button{padding:5px 2px;font-size:clamp(13.5px,3.9vw,15px)}
   .seg button small{white-space:nowrap;font-size:clamp(9.5px,2.9vw,12px);letter-spacing:-.04em}
   /* 手機：篩選收進底部面板，點「篩選」才打開 */
   #q.open{position:fixed;left:0;right:0;bottom:0;z-index:23;max-height:80vh;overflow-y:auto;border-radius:16px 16px 0 0;border-bottom:0;
@@ -307,6 +307,7 @@ footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);paddin
     <button type="button" role="tab" data-mode="today" aria-selected="true">今天<small class="sd">逐 3 小時預報</small></button>
     <button type="button" role="tab" data-mode="tmr" aria-selected="false">明天<small class="sd">逐 3 小時預報</small></button>
     <button type="button" role="tab" data-mode="d2" aria-selected="false">後天<small class="sd">逐 3 小時預報</small></button>
+    <button type="button" role="tab" data-mode="d3" aria-selected="false">大後天<small class="sd">逐 3 小時預報</small></button>
     <button type="button" role="tab" data-mode="week" aria-selected="false">一週預報<small id="seg-week">7 天</small></button>
   </div>
 
@@ -383,7 +384,7 @@ footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);paddin
       <h3>排序方式</h3>
       <ul>
         <li><b>計分：</b>A+ 3 分、A 2 分、B 1 分、C 0 分。已過的時段和無資料不計分。分數只用來排序，網頁上不顯示。<ul><li>例：「A+、A」共 5 分，排在「A、A」共 4 分前面。</li></ul></li>
-        <li><b>今天／明天／後天</b>（每 3 小時一格），依序比較：<ol><li>登頂時段的總分，高的在前</li><li>登頂時段中 A+ 的數量，多的在前</li><li>登頂時段中 C 的數量，少的在前</li><li>當天所有時段的總分，高的在前</li></ol><ul><li>登頂時段都過了，就改看當天剩下的時段。</li></ul></li>
+        <li><b>今天／明天／後天／大後天</b>（每 3 小時一格），依序比較：<ol><li>登頂時段的總分，高的在前</li><li>登頂時段中 A+ 的數量，多的在前</li><li>登頂時段中 C 的數量，少的在前</li><li>當天所有時段的總分，高的在前</li></ol><ul><li>登頂時段都過了，就改看當天剩下的時段。</li></ul></li>
         <li><b>一週預報</b>（每天一格），依序比較：<ol><li>7 天的總分，高的在前</li><li>A+ 的天數，多的在前</li><li>C 的天數，少的在前</li></ol></li>
         <li><b>完全沒有資料的山：</b>排在最後。</li>
         <li><b>以上所有條件都相同時：</b>每天隨機排序一次同條件山岳。</li>
