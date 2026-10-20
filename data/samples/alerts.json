@@ -36,8 +36,8 @@
   "records": {
     "location": [
       {
-        "locationName": "新北市",
-        "geocode": 65,
+        "locationName": "彰化縣",
+        "geocode": 10007,
         "hazardConditions": {
           "hazards": [
             {

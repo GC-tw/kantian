@@ -118,54 +118,6 @@
                 "ElementName": "溫度",
                 "Time": [
                   {
-                    "DataTime": "2026-10-20T12:00:00+08:00",
-                    "ElementValue": [
-                      {
-                        "Temperature": "31"
-                      }
-                    ]
-                  },
-                  {
-                    "DataTime": "2026-10-20T13:00:00+08:00",
-                    "ElementValue": [
-                      {
-                        "Temperature": "31"
-                      }
-                    ]
-                  },
-                  {
-                    "DataTime": "2026-10-20T14:00:00+08:00",
-                    "ElementValue": [
-                      {
-                        "Temperature": "31"
-                      }
-                    ]
-                  },
-                  {
-                    "DataTime": "2026-10-20T15:00:00+08:00",
-                    "ElementValue": [
-                      {
-                        "Temperature": "30"
-                      }
-                    ]
-                  },
-                  {
-                    "DataTime": "2026-10-20T16:00:00+08:00",
-                    "ElementValue": [
-                      {
-                        "Temperature": "29"
-                      }
-                    ]
-                  },
-                  {
-                    "DataTime": "2026-10-20T17:00:00+08:00",
-                    "ElementValue": [
-                      {
-                        "Temperature": "28"
-                      }
-                    ]
-                  },
-                  {
                     "DataTime": "2026-10-20T18:00:00+08:00",
                     "ElementValue": [
                       {
@@ -289,7 +241,7 @@
                     "DataTime": "2026-10-21T09:00:00+08:00",
                     "ElementValue": [
                       {
-                        "Temperature": "26"
+                        "Temperature": "27"
                       }
                     ]
                   },
@@ -297,7 +249,7 @@
                     "DataTime": "2026-10-21T10:00:00+08:00",
                     "ElementValue": [
                       {
-                        "Temperature": "27"
+                        "Temperature": "28"
                       }
                     ]
                   },
@@ -313,7 +265,7 @@
                     "DataTime": "2026-10-21T12:00:00+08:00",
                     "ElementValue": [
                       {
-                        "Temperature": "28"
+                        "Temperature": "29"
                       }
                     ]
                   },
@@ -329,7 +281,7 @@
                     "DataTime": "2026-10-21T14:00:00+08:00",
                     "ElementValue": [
                       {
-                        "Temperature": "28"
+                        "Temperature": "29"
                       }
                     ]
                   },
@@ -345,7 +297,7 @@
                     "DataTime": "2026-10-21T16:00:00+08:00",
                     "ElementValue": [
                       {
-                        "Temperature": "27"
+                        "Temperature": "28"
                       }
                     ]
                   },
@@ -353,7 +305,7 @@
                     "DataTime": "2026-10-21T17:00:00+08:00",
                     "ElementValue": [
                       {
-                        "Temperature": "26"
+                        "Temperature": "27"
                       }
                     ]
                   },
@@ -361,7 +313,7 @@
                     "DataTime": "2026-10-21T18:00:00+08:00",
                     "ElementValue": [
                       {
-                        "Temperature": "25"
+                        "Temperature": "26"
                       }
                     ]
                   },
@@ -393,7 +345,7 @@
                     "DataTime": "2026-10-21T22:00:00+08:00",
                     "ElementValue": [
                       {
-                        "Temperature": "23"
+                        "Temperature": "24"
                       }
                     ]
                   },
@@ -414,10 +366,42 @@
                     ]
                   },
                   {
+                    "DataTime": "2026-10-22T01:00:00+08:00",
+                    "ElementValue": [
+                      {
+                        "Temperature": "23"
+                      }
+                    ]
+                  },
+                  {
+                    "DataTime": "2026-10-22T02:00:00+08:00",
+                    "ElementValue": [
+                      {
+                        "Temperature": "23"
+                      }
+                    ]
+                  },
+                  {
                     "DataTime": "2026-10-22T03:00:00+08:00",
                     "ElementValue": [
                       {
                         "Temperature": "23"
+                      }
+                    ]
+                  },
+                  {
+                    "DataTime": "2026-10-22T04:00:00+08:00",
+                    "ElementValue": [
+                      {
+                        "Temperature": "22"
+                      }
+                    ]
+                  },
+                  {
+                    "DataTime": "2026-10-22T05:00:00+08:00",
+                    "ElementValue": [
+                      {
+                        "Temperature": "22"
                       }
                     ]
                   },
@@ -441,7 +425,7 @@
                     "DataTime": "2026-10-22T12:00:00+08:00",
                     "ElementValue": [
                       {
-                        "Temperature": "23"
+                        "Temperature": "24"
                       }
                     ]
                   },
@@ -449,7 +433,7 @@
                     "DataTime": "2026-10-22T15:00:00+08:00",
                     "ElementValue": [
                       {
-                        "Temperature": "23"
+                        "Temperature": "24"
                       }
                     ]
                   },
@@ -562,6 +546,22 @@
                     "ElementValue": [
                       {
                         "Temperature": "27"
+                      }
+                    ]
+                  },
+                  {
+                    "DataTime": "2026-10-24T12:00:00+08:00",
+                    "ElementValue": [
+                      {
+                        "Temperature": "29"
+                      }
+                    ]
+                  },
+                  {
+                    "DataTime": "2026-10-24T15:00:00+08:00",
+                    "ElementValue": [
+                      {
+                        "Temperature": "29"
                       }
                     ]
                   }
@@ -571,54 +571,6 @@
                 "ElementName": "露點溫度",
                 "Time": [
                   {
-                    "DataTime": "2026-10-20T12:00:00+08:00",
-                    "ElementValue": [
-                      {
-                        "DewPoint": "26"
-                      }
-                    ]
-                  },
-                  {
-                    "DataTime": "2026-10-20T13:00:00+08:00",
-                    "ElementValue": [
-                      {
-                        "DewPoint": "26"
-                      }
-                    ]
-                  },
-                  {
-                    "DataTime": "2026-10-20T14:00:00+08:00",
-                    "ElementValue": [
-                      {
-                        "DewPoint": "26"
-                      }
-                    ]
-                  },
-                  {
-                    "DataTime": "2026-10-20T15:00:00+08:00",
-                    "ElementValue": [
-                      {
-                        "DewPoint": "26"
-                      }
-                    ]
-                  },
-                  {
-                    "DataTime": "2026-10-20T16:00:00+08:00",
-                    "ElementValue": [
-                      {
-                        "DewPoint": "26"
-                      }
-                    ]
-                  },
-                  {
-                    "DataTime": "2026-10-20T17:00:00+08:00",
-                    "ElementValue": [
-                      {
-                        "DewPoint": "25"
-                      }
-                    ]
-                  },
-                  {
                     "DataTime": "2026-10-20T18:00:00+08:00",
                     "ElementValue": [
                       {
@@ -750,7 +702,7 @@
                     "DataTime": "2026-10-21T10:00:00+08:00",
                     "ElementValue": [
                       {
-                        "DewPoint": "23"
+                        "DewPoint": "24"
                       }
                     ]
                   },
@@ -774,7 +726,7 @@
                     "DataTime": "2026-10-21T13:00:00+08:00",
                     "ElementValue": [
                       {
-                        "DewPoint": "23"
+                        "DewPoint": "24"
                       }
                     ]
                   },
@@ -790,7 +742,7 @@
                     "DataTime": "2026-10-21T15:00:00+08:00",
                     "ElementValue": [
                       {
-                        "DewPoint": "23"
+                        "DewPoint": "24"
                       }
                     ]
                   },
@@ -798,7 +750,7 @@
                     "DataTime": "2026-10-21T16:00:00+08:00",
                     "ElementValue": [
                       {
-                        "DewPoint": "23"
+                        "DewPoint": "24"
                       }
                     ]
                   },
@@ -806,7 +758,7 @@
                     "DataTime": "2026-10-21T17:00:00+08:00",
                     "ElementValue": [
                       {
-                        "DewPoint": "23"
+                        "DewPoint": "24"
                       }
                     ]
                   },
@@ -830,7 +782,7 @@
                     "DataTime": "2026-10-21T20:00:00+08:00",
                     "ElementValue": [
                       {
-                        "DewPoint": "22"
+                        "DewPoint": "23"
                       }
                     ]
                   },
@@ -867,7 +819,39 @@
                     ]
                   },
                   {
+                    "DataTime": "2026-10-22T01:00:00+08:00",
+                    "ElementValue": [
+                      {
+                        "DewPoint": "22"
+                      }
+                    ]
+                  },
+                  {
+                    "DataTime": "2026-10-22T02:00:00+08:00",
+                    "ElementValue": [
+                      {
+                        "DewPoint": "21"
+                      }
+                    ]
+                  },
+                  {
                     "DataTime": "2026-10-22T03:00:00+08:00",
+                    "ElementValue": [
+                      {
+                        "DewPoint": "21"
+                      }
+                    ]
+                  },
+                  {
+                    "DataTime": "2026-10-22T04:00:00+08:00",
+                    "ElementValue": [
+                      {
+                        "DewPoint": "21"
+                      }
+                    ]
+                  },
+                  {
+                    "DataTime": "2026-10-22T05:00:00+08:00",
                     "ElementValue": [
                       {
                         "DewPoint": "21"
@@ -886,7 +870,7 @@
                     "DataTime": "2026-10-22T09:00:00+08:00",
                     "ElementValue": [
                       {
-                        "DewPoint": "20"
+                        "DewPoint": "21"
                       }
                     ]
                   },
@@ -902,7 +886,7 @@
                     "DataTime": "2026-10-22T15:00:00+08:00",
                     "ElementValue": [
                       {
-                        "DewPoint": "22"
+                        "DewPoint": "23"
                       }
                     ]
                   },
@@ -910,7 +894,7 @@
                     "DataTime": "2026-10-22T18:00:00+08:00",
                     "ElementValue": [
                       {
-                        "DewPoint": "21"
+                        "DewPoint": "22"
                       }
                     ]
                   },
@@ -1017,60 +1001,28 @@
                         "DewPoint": "26"
                       }
                     ]
+                  },
+                  {
+                    "DataTime": "2026-10-24T12:00:00+08:00",
+                    "ElementValue": [
+                      {
+                        "DewPoint": "28"
+                      }
+                    ]
+                  },
+                  {
+                    "DataTime": "2026-10-24T15:00:00+08:00",
+                    "ElementValue": [
+                      {
+                        "DewPoint": "28"
+                      }
+                    ]
                   }
                 ]
               },
               {
                 "ElementName": "相對濕度",
                 "Time": [
-                  {
-                    "DataTime": "2026-10-20T12:00:00+08:00",
-                    "ElementValue": [
-                      {
-                        "RelativeHumidity": "75"
-                      }
-                    ]
-                  },
-                  {
-                    "DataTime": "2026-10-20T13:00:00+08:00",
-                    "ElementValue": [
-                      {
-                        "RelativeHumidity": "77"
-                      }
-                    ]
-                  },
-                  {
-                    "DataTime": "2026-10-20T14:00:00+08:00",
-                    "ElementValue": [
-                      {
-                        "RelativeHumidity": "78"
-                      }
-                    ]
-                  },
-                  {
-                    "DataTime": "2026-10-20T15:00:00+08:00",
-                    "ElementValue": [
-                      {
-                        "RelativeHumidity": "80"
-                      }
-                    ]
-                  },
-                  {
-                    "DataTime": "2026-10-20T16:00:00+08:00",
-                    "ElementValue": [
-                      {
-                        "RelativeHumidity": "82"
-                      }
-                    ]
-                  },
-                  {
-                    "DataTime": "2026-10-20T17:00:00+08:00",
-                    "ElementValue": [
-                      {
-                        "RelativeHumidity": "84"
-                      }
-                    ]
-                  },
                   {
                     "DataTime": "2026-10-20T18:00:00+08:00",
                     "ElementValue": [
@@ -1320,10 +1272,42 @@
                     ]
                   },
                   {
+                    "DataTime": "2026-10-22T01:00:00+08:00",
+                    "ElementValue": [
+                      {
+                        "RelativeHumidity": "91"
+                      }
+                    ]
+                  },
+                  {
+                    "DataTime": "2026-10-22T02:00:00+08:00",
+                    "ElementValue": [
+                      {
+                        "RelativeHumidity": "91"
+                      }
+                    ]
+                  },
+                  {
                     "DataTime": "2026-10-22T03:00:00+08:00",
                     "ElementValue": [
                       {
                         "RelativeHumidity": "91"
+                      }
+                    ]
+                  },
+                  {
+                    "DataTime": "2026-10-22T04:00:00+08:00",
+                    "ElementValue": [
+                      {
+                        "RelativeHumidity": "91"
+                      }
+                    ]
+                  },
+                  {
+                    "DataTime": "2026-10-22T05:00:00+08:00",
+                    "ElementValue": [
+                      {
+                        "RelativeHumidity": "92"
                       }
                     ]
                   },
@@ -1459,7 +1443,7 @@
                     "DataTime": "2026-10-24T06:00:00+08:00",
                     "ElementValue": [
                       {
-                        "RelativeHumidity": "93"
+                        "RelativeHumidity": "95"
                       }
                     ]
                   },
@@ -1470,60 +1454,28 @@
                         "RelativeHumidity": "94"
                       }
                     ]
+                  },
+                  {
+                    "DataTime": "2026-10-24T12:00:00+08:00",
+                    "ElementValue": [
+                      {
+                        "RelativeHumidity": "93"
+                      }
+                    ]
+                  },
+                  {
+                    "DataTime": "2026-10-24T15:00:00+08:00",
+                    "ElementValue": [
+                      {
+                        "RelativeHumidity": "93"
+                      }
+                    ]
                   }
                 ]
               },
               {
                 "ElementName": "體感溫度",
                 "Time": [
-                  {
-                    "DataTime": "2026-10-20T12:00:00+08:00",
-                    "ElementValue": [
-                      {
-                        "ApparentTemperature": "35"
-                      }
-                    ]
-                  },
-                  {
-                    "DataTime": "2026-10-20T13:00:00+08:00",
-                    "ElementValue": [
-                      {
-                        "ApparentTemperature": "35"
-                      }
-                    ]
-                  },
-                  {
-                    "DataTime": "2026-10-20T14:00:00+08:00",
-                    "ElementValue": [
-                      {
-                        "ApparentTemperature": "35"
-                      }
-                    ]
-                  },
-                  {
-                    "DataTime": "2026-10-20T15:00:00+08:00",
-                    "ElementValue": [
-                      {
-                        "ApparentTemperature": "34"
-                      }
-                    ]
-                  },
-                  {
-                    "DataTime": "2026-10-20T16:00:00+08:00",
-                    "ElementValue": [
-                      {
-                        "ApparentTemperature": "33"
-                      }
-                    ]
-                  },
-                  {
-                    "DataTime": "2026-10-20T17:00:00+08:00",
-                    "ElementValue": [
-                      {
-                        "ApparentTemperature": "32"
-                      }
-                    ]
-                  },
                   {
                     "DataTime": "2026-10-20T18:00:00+08:00",
                     "ElementValue": [
@@ -1640,7 +1592,7 @@
                     "DataTime": "2026-10-21T08:00:00+08:00",
                     "ElementValue": [
                       {
-                        "ApparentTemperature": "27"
+                        "ApparentTemperature": "28"
                       }
                     ]
                   },
@@ -1648,7 +1600,7 @@
                     "DataTime": "2026-10-21T09:00:00+08:00",
                     "ElementValue": [
                       {
-                        "ApparentTemperature": "29"
+                        "ApparentTemperature": "30"
                       }
                     ]
                   },
@@ -1656,7 +1608,7 @@
                     "DataTime": "2026-10-21T10:00:00+08:00",
                     "ElementValue": [
                       {
-                        "ApparentTemperature": "30"
+                        "ApparentTemperature": "31"
                       }
                     ]
                   },
@@ -1664,7 +1616,7 @@
                     "DataTime": "2026-10-21T11:00:00+08:00",
                     "ElementValue": [
                       {
-                        "ApparentTemperature": "31"
+                        "ApparentTemperature": "32"
                       }
                     ]
                   },
@@ -1672,7 +1624,7 @@
                     "DataTime": "2026-10-21T12:00:00+08:00",
                     "ElementValue": [
                       {
-                        "ApparentTemperature": "31"
+                        "ApparentTemperature": "32"
                       }
                     ]
                   },
@@ -1688,7 +1640,7 @@
                     "DataTime": "2026-10-21T14:00:00+08:00",
                     "ElementValue": [
                       {
-                        "ApparentTemperature": "30"
+                        "ApparentTemperature": "31"
                       }
                     ]
                   },
@@ -1704,7 +1656,7 @@
                     "DataTime": "2026-10-21T16:00:00+08:00",
                     "ElementValue": [
                       {
-                        "ApparentTemperature": "29"
+                        "ApparentTemperature": "30"
                       }
                     ]
                   },
@@ -1712,7 +1664,7 @@
                     "DataTime": "2026-10-21T17:00:00+08:00",
                     "ElementValue": [
                       {
-                        "ApparentTemperature": "28"
+                        "ApparentTemperature": "29"
                       }
                     ]
                   },
@@ -1720,7 +1672,7 @@
                     "DataTime": "2026-10-21T18:00:00+08:00",
                     "ElementValue": [
                       {
-                        "ApparentTemperature": "27"
+                        "ApparentTemperature": "28"
                       }
                     ]
                   },
@@ -1736,7 +1688,7 @@
                     "DataTime": "2026-10-21T20:00:00+08:00",
                     "ElementValue": [
                       {
-                        "ApparentTemperature": "26"
+                        "ApparentTemperature": "25"
                       }
                     ]
                   },
@@ -1744,7 +1696,7 @@
                     "DataTime": "2026-10-21T21:00:00+08:00",
                     "ElementValue": [
                       {
-                        "ApparentTemperature": "25"
+                        "ApparentTemperature": "24"
                       }
                     ]
                   },
@@ -1760,7 +1712,7 @@
                     "DataTime": "2026-10-21T23:00:00+08:00",
                     "ElementValue": [
                       {
-                        "ApparentTemperature": "25"
+                        "ApparentTemperature": "26"
                       }
                     ]
                   },
@@ -1768,7 +1720,23 @@
                     "DataTime": "2026-10-22T00:00:00+08:00",
                     "ElementValue": [
                       {
-                        "ApparentTemperature": "25"
+                        "ApparentTemperature": "26"
+                      }
+                    ]
+                  },
+                  {
+                    "DataTime": "2026-10-22T01:00:00+08:00",
+                    "ElementValue": [
+                      {
+                        "ApparentTemperature": "23"
+                      }
+                    ]
+                  },
+                  {
+                    "DataTime": "2026-10-22T02:00:00+08:00",
+                    "ElementValue": [
+                      {
+                        "ApparentTemperature": "23"
                       }
                     ]
                   },
@@ -1776,7 +1744,23 @@
                     "DataTime": "2026-10-22T03:00:00+08:00",
                     "ElementValue": [
                       {
-                        "ApparentTemperature": "24"
+                        "ApparentTemperature": "23"
+                      }
+                    ]
+                  },
+                  {
+                    "DataTime": "2026-10-22T04:00:00+08:00",
+                    "ElementValue": [
+                      {
+                        "ApparentTemperature": "23"
+                      }
+                    ]
+                  },
+                  {
+                    "DataTime": "2026-10-22T05:00:00+08:00",
+                    "ElementValue": [
+                      {
+                        "ApparentTemperature": "23"
                       }
                     ]
                   },
@@ -1792,7 +1776,7 @@
                     "DataTime": "2026-10-22T09:00:00+08:00",
                     "ElementValue": [
                       {
-                        "ApparentTemperature": "24"
+                        "ApparentTemperature": "23"
                       }
                     ]
                   },
@@ -1800,7 +1784,7 @@
                     "DataTime": "2026-10-22T12:00:00+08:00",
                     "ElementValue": [
                       {
-                        "ApparentTemperature": "25"
+                        "ApparentTemperature": "26"
                       }
                     ]
                   },
@@ -1816,7 +1800,7 @@
                     "DataTime": "2026-10-22T18:00:00+08:00",
                     "ElementValue": [
                       {
-                        "ApparentTemperature": "25"
+                        "ApparentTemperature": "24"
                       }
                     ]
                   },
@@ -1824,7 +1808,7 @@
                     "DataTime": "2026-10-22T21:00:00+08:00",
                     "ElementValue": [
                       {
-                        "ApparentTemperature": "24"
+                        "ApparentTemperature": "23"
                       }
                     ]
                   },
@@ -1840,7 +1824,7 @@
                     "DataTime": "2026-10-23T03:00:00+08:00",
                     "ElementValue": [
                       {
-                        "ApparentTemperature": "23"
+                        "ApparentTemperature": "22"
                       }
                     ]
                   },
@@ -1880,7 +1864,7 @@
                     "DataTime": "2026-10-23T18:00:00+08:00",
                     "ElementValue": [
                       {
-                        "ApparentTemperature": "27"
+                        "ApparentTemperature": "25"
                       }
                     ]
                   },
@@ -1904,7 +1888,7 @@
                     "DataTime": "2026-10-24T03:00:00+08:00",
                     "ElementValue": [
                       {
-                        "ApparentTemperature": "23"
+                        "ApparentTemperature": "24"
                       }
                     ]
                   },
@@ -1912,7 +1896,7 @@
                     "DataTime": "2026-10-24T06:00:00+08:00",
                     "ElementValue": [
                       {
-                        "ApparentTemperature": "22"
+                        "ApparentTemperature": "23"
                       }
                     ]
                   },
@@ -1921,6 +1905,22 @@
                     "ElementValue": [
                       {
                         "ApparentTemperature": "27"
+                      }
+                    ]
+                  },
+                  {
+                    "DataTime": "2026-10-24T12:00:00+08:00",
+                    "ElementValue": [
+                      {
+                        "ApparentTemperature": "32"
+                      }
+                    ]
+                  },
+                  {
+                    "DataTime": "2026-10-24T15:00:00+08:00",
+                    "ElementValue": [
+                      {
+                        "ApparentTemperature": "32"
                       }
                     ]
                   }
@@ -1930,60 +1930,6 @@
                 "ElementName": "舒適度指數",
                 "Time": [
                   {
-                    "DataTime": "2026-10-20T12:00:00+08:00",
-                    "ElementValue": [
-                      {
-                        "ComfortIndex": "28",
-                        "ComfortIndexDescription": "悶熱"
-                      }
-                    ]
-                  },
-                  {
-                    "DataTime": "2026-10-20T13:00:00+08:00",
-                    "ElementValue": [
-                      {
-                        "ComfortIndex": "29",
-                        "ComfortIndexDescription": "悶熱"
-                      }
-                    ]
-                  },
-                  {
-                    "DataTime": "2026-10-20T14:00:00+08:00",
-                    "ElementValue": [
-                      {
-                        "ComfortIndex": "29",
-                        "ComfortIndexDescription": "悶熱"
-                      }
-                    ]
-                  },
-                  {
-                    "DataTime": "2026-10-20T15:00:00+08:00",
-                    "ElementValue": [
-                      {
-                        "ComfortIndex": "28",
-                        "ComfortIndexDescription": "悶熱"
-                      }
-                    ]
-                  },
-                  {
-                    "DataTime": "2026-10-20T16:00:00+08:00",
-                    "ElementValue": [
-                      {
-                        "ComfortIndex": "28",
-                        "ComfortIndexDescription": "悶熱"
-                      }
-                    ]
-                  },
-                  {
-                    "DataTime": "2026-10-20T17:00:00+08:00",
-                    "ElementValue": [
-                      {
-                        "ComfortIndex": "27",
-                        "ComfortIndexDescription": "悶熱"
-                      }
-                    ]
-                  },
-                  {
                     "DataTime": "2026-10-20T18:00:00+08:00",
                     "ElementValue": [
                       {
@@ -2140,8 +2086,8 @@
                     "DataTime": "2026-10-21T11:00:00+08:00",
                     "ElementValue": [
                       {
-                        "ComfortIndex": "26",
-                        "ComfortIndexDescription": "舒適"
+                        "ComfortIndex": "27",
+                        "ComfortIndexDescription": "悶熱"
                       }
                     ]
                   },
@@ -2158,8 +2104,8 @@
                     "DataTime": "2026-10-21T13:00:00+08:00",
                     "ElementValue": [
                       {
-                        "ComfortIndex": "26",
-                        "ComfortIndexDescription": "舒適"
+                        "ComfortIndex": "27",
+                        "ComfortIndexDescription": "悶熱"
                       }
                     ]
                   },
@@ -2167,8 +2113,8 @@
                     "DataTime": "2026-10-21T14:00:00+08:00",
                     "ElementValue": [
                       {
-                        "ComfortIndex": "26",
-                        "ComfortIndexDescription": "舒適"
+                        "ComfortIndex": "27",
+                        "ComfortIndexDescription": "悶熱"
                       }
                     ]
                   },
@@ -2203,7 +2149,7 @@
                     "DataTime": "2026-10-21T18:00:00+08:00",
                     "ElementValue": [
                       {
-                        "ComfortIndex": "24",
+                        "ComfortIndex": "25",
                         "ComfortIndexDescription": "舒適"
                       }
                     ]
@@ -2263,7 +2209,43 @@
                     ]
                   },
                   {
+                    "DataTime": "2026-10-22T01:00:00+08:00",
+                    "ElementValue": [
+                      {
+                        "ComfortIndex": "23",
+                        "ComfortIndexDescription": "舒適"
+                      }
+                    ]
+                  },
+                  {
+                    "DataTime": "2026-10-22T02:00:00+08:00",
+                    "ElementValue": [
+                      {
+                        "ComfortIndex": "22",
+                        "ComfortIndexDescription": "舒適"
+                      }
+                    ]
+                  },
+                  {
                     "DataTime": "2026-10-22T03:00:00+08:00",
+                    "ElementValue": [
+                      {
+                        "ComfortIndex": "22",
+                        "ComfortIndexDescription": "舒適"
+                      }
+                    ]
+                  },
+                  {
+                    "DataTime": "2026-10-22T04:00:00+08:00",
+                    "ElementValue": [
+                      {
+                        "ComfortIndex": "22",
+                        "ComfortIndexDescription": "舒適"
+                      }
+                    ]
+                  },
+                  {
+                    "DataTime": "2026-10-22T05:00:00+08:00",
                     "ElementValue": [
                       {
                         "ComfortIndex": "22",
@@ -2429,6 +2411,24 @@
                     "ElementValue": [
                       {
                         "ComfortIndex": "27",
+                        "ComfortIndexDescription": "悶熱"
+                      }
+                    ]
+                  },
+                  {
+                    "DataTime": "2026-10-24T12:00:00+08:00",
+                    "ElementValue": [
+                      {
+                        "ComfortIndex": "29",
+                        "ComfortIndexDescription": "悶熱"
+                      }
+                    ]
+                  },
+                  {
+                    "DataTime": "2026-10-24T15:00:00+08:00",
+                    "ElementValue": [
+                      {
+                        "ComfortIndex": "28",
                         "ComfortIndexDescription": "悶熱"
                       }
                     ]
@@ -2439,24 +2439,6 @@
                 "ElementName": "風速",
                 "Time": [
                   {
-                    "DataTime": "2026-10-20T12:00:00+08:00",
-                    "ElementValue": [
-                      {
-                        "WindSpeed": "2",
-                        "BeaufortScale": "2"
-                      }
-                    ]
-                  },
-                  {
-                    "DataTime": "2026-10-20T15:00:00+08:00",
-                    "ElementValue": [
-                      {
-                        "WindSpeed": "2",
-                        "BeaufortScale": "2"
-                      }
-                    ]
-                  },
-                  {
                     "DataTime": "2026-10-20T18:00:00+08:00",
                     "ElementValue": [
                       {
@@ -2523,8 +2505,8 @@
                     "DataTime": "2026-10-21T15:00:00+08:00",
                     "ElementValue": [
                       {
-                        "WindSpeed": "3",
-                        "BeaufortScale": "2"
+                        "WindSpeed": "4",
+                        "BeaufortScale": "3"
                       }
                     ]
                   },
@@ -2532,8 +2514,8 @@
                     "DataTime": "2026-10-21T18:00:00+08:00",
                     "ElementValue": [
                       {
-                        "WindSpeed": "4",
-                        "BeaufortScale": "3"
+                        "WindSpeed": "3",
+                        "BeaufortScale": "2"
                       }
                     ]
                   },
@@ -2541,8 +2523,8 @@
                     "DataTime": "2026-10-21T21:00:00+08:00",
                     "ElementValue": [
                       {
-                        "WindSpeed": "3",
-                        "BeaufortScale": "2"
+                        "WindSpeed": "5",
+                        "BeaufortScale": "3"
                       }
                     ]
                   },
@@ -2559,8 +2541,8 @@
                     "DataTime": "2026-10-22T03:00:00+08:00",
                     "ElementValue": [
                       {
-                        "WindSpeed": "3",
-                        "BeaufortScale": "2"
+                        "WindSpeed": "5",
+                        "BeaufortScale": "3"
                       }
                     ]
                   },
@@ -2577,8 +2559,8 @@
                     "DataTime": "2026-10-22T09:00:00+08:00",
                     "ElementValue": [
                       {
-                        "WindSpeed": "3",
-                        "BeaufortScale": "2"
+                        "WindSpeed": "5",
+                        "BeaufortScale": "3"
                       }
                     ]
                   },
@@ -2595,8 +2577,8 @@
                     "DataTime": "2026-10-22T15:00:00+08:00",
                     "ElementValue": [
                       {
-                        "WindSpeed": "2",
-                        "BeaufortScale": "2"
+                        "WindSpeed": "4",
+                        "BeaufortScale": "3"
                       }
                     ]
                   },
@@ -2604,7 +2586,7 @@
                     "DataTime": "2026-10-22T18:00:00+08:00",
                     "ElementValue": [
                       {
-                        "WindSpeed": "2",
+                        "WindSpeed": "3",
                         "BeaufortScale": "2"
                       }
                     ]
@@ -2613,7 +2595,7 @@
                     "DataTime": "2026-10-22T21:00:00+08:00",
                     "ElementValue": [
                       {
-                        "WindSpeed": "2",
+                        "WindSpeed": "3",
                         "BeaufortScale": "2"
                       }
                     ]
@@ -2622,7 +2604,7 @@
                     "DataTime": "2026-10-23T00:00:00+08:00",
                     "ElementValue": [
                       {
-                        "WindSpeed": "2",
+                        "WindSpeed": "3",
                         "BeaufortScale": "2"
                       }
                     ]
@@ -2631,8 +2613,8 @@
                     "DataTime": "2026-10-23T03:00:00+08:00",
                     "ElementValue": [
                       {
-                        "WindSpeed": "3",
-                        "BeaufortScale": "2"
+                        "WindSpeed": "4",
+                        "BeaufortScale": "3"
                       }
                     ]
                   },
@@ -2640,8 +2622,8 @@
                     "DataTime": "2026-10-23T06:00:00+08:00",
                     "ElementValue": [
                       {
-                        "WindSpeed": "3",
-                        "BeaufortScale": "2"
+                        "WindSpeed": "4",
+                        "BeaufortScale": "3"
                       }
                     ]
                   },
@@ -2676,8 +2658,8 @@
                     "DataTime": "2026-10-23T18:00:00+08:00",
                     "ElementValue": [
                       {
-                        "WindSpeed": "4",
-                        "BeaufortScale": "3"
+                        "WindSpeed": "8",
+                        "BeaufortScale": "5"
                       }
                     ]
                   },
@@ -2685,7 +2667,7 @@
                     "DataTime": "2026-10-23T21:00:00+08:00",
                     "ElementValue": [
                       {
-                        "WindSpeed": "4",
+                        "WindSpeed": "5",
                         "BeaufortScale": "3"
                       }
                     ]
@@ -2694,13 +2676,22 @@
                     "DataTime": "2026-10-24T00:00:00+08:00",
                     "ElementValue": [
                       {
+                        "WindSpeed": "5",
+                        "BeaufortScale": "3"
+                      }
+                    ]
+                  },
+                  {
+                    "DataTime": "2026-10-24T03:00:00+08:00",
+                    "ElementValue": [
+                      {
                         "WindSpeed": "6",
                         "BeaufortScale": "4"
                       }
                     ]
                   },
                   {
-                    "DataTime": "2026-10-24T03:00:00+08:00",
+                    "DataTime": "2026-10-24T06:00:00+08:00",
                     "ElementValue": [
                       {
                         "WindSpeed": "8",
@@ -2709,20 +2700,29 @@
                     ]
                   },
                   {
-                    "DataTime": "2026-10-24T06:00:00+08:00",
+                    "DataTime": "2026-10-24T09:00:00+08:00",
                     "ElementValue": [
                       {
-                        "WindSpeed": "9",
+                        "WindSpeed": "8",
                         "BeaufortScale": "5"
                       }
                     ]
                   },
                   {
-                    "DataTime": "2026-10-24T09:00:00+08:00",
+                    "DataTime": "2026-10-24T12:00:00+08:00",
                     "ElementValue": [
                       {
-                        "WindSpeed": "9",
-                        "BeaufortScale": "5"
+                        "WindSpeed": "6",
+                        "BeaufortScale": "4"
+                      }
+                    ]
+                  },
+                  {
+                    "DataTime": "2026-10-24T15:00:00+08:00",
+                    "ElementValue": [
+                      {
+                        "WindSpeed": "4",
+                        "BeaufortScale": "3"
                       }
                     ]
                   }
@@ -2731,22 +2731,6 @@
               {
                 "ElementName": "風向",
                 "Time": [
-                  {
-                    "DataTime": "2026-10-20T12:00:00+08:00",
-                    "ElementValue": [
-                      {
-                        "WindDirection": "東南風"
-                      }
-                    ]
-                  },
-                  {
-                    "DataTime": "2026-10-20T15:00:00+08:00",
-                    "ElementValue": [
-                      {
-                        "WindDirection": "偏東風"
-                      }
-                    ]
-                  },
                   {
                     "DataTime": "2026-10-20T18:00:00+08:00",
                     "ElementValue": [
@@ -2887,7 +2871,7 @@
                     "DataTime": "2026-10-22T21:00:00+08:00",
                     "ElementValue": [
                       {
-                        "WindDirection": "偏北風"
+                        "WindDirection": "西南風"
                       }
                     ]
                   },
@@ -2986,30 +2970,28 @@
                         "WindDirection": "偏北風"
                       }
                     ]
+                  },
+                  {
+                    "DataTime": "2026-10-24T12:00:00+08:00",
+                    "ElementValue": [
+                      {
+                        "WindDirection": "西北風"
+                      }
+                    ]
+                  },
+                  {
+                    "DataTime": "2026-10-24T15:00:00+08:00",
+                    "ElementValue": [
+                      {
+                        "WindDirection": "偏西風"
+                      }
+                    ]
                   }
                 ]
               },
               {
                 "ElementName": "3小時降雨機率",
                 "Time": [
-                  {
-                    "StartTime": "2026-10-20T12:00:00+08:00",
-                    "EndTime": "2026-10-20T15:00:00+08:00",
-                    "ElementValue": [
-                      {
-                        "ProbabilityOfPrecipitation": "10"
-                      }
-                    ]
-                  },
-                  {
-                    "StartTime": "2026-10-20T15:00:00+08:00",
-                    "EndTime": "2026-10-20T18:00:00+08:00",
-                    "ElementValue": [
-                      {
-                        "ProbabilityOfPrecipitation": "10"
-                      }
-                    ]
-                  },
                   {
                     "StartTime": "2026-10-20T18:00:00+08:00",
                     "EndTime": "2026-10-20T21:00:00+08:00",
@@ -3024,7 +3006,7 @@
                     "EndTime": "2026-10-21T00:00:00+08:00",
                     "ElementValue": [
                       {
-                        "ProbabilityOfPrecipitation": "20"
+                        "ProbabilityOfPrecipitation": "10"
                       }
                     ]
                   },
@@ -3087,7 +3069,7 @@
                     "EndTime": "2026-10-21T21:00:00+08:00",
                     "ElementValue": [
                       {
-                        "ProbabilityOfPrecipitation": "40"
+                        "ProbabilityOfPrecipitation": "50"
                       }
                     ]
                   },
@@ -3096,7 +3078,7 @@
                     "EndTime": "2026-10-22T00:00:00+08:00",
                     "ElementValue": [
                       {
-                        "ProbabilityOfPrecipitation": "50"
+                        "ProbabilityOfPrecipitation": "40"
                       }
                     ]
                   },
@@ -3105,7 +3087,7 @@
                     "EndTime": "2026-10-22T03:00:00+08:00",
                     "ElementValue": [
                       {
-                        "ProbabilityOfPrecipitation": "30"
+                        "ProbabilityOfPrecipitation": "50"
                       }
                     ]
                   },
@@ -3123,7 +3105,7 @@
                     "EndTime": "2026-10-22T09:00:00+08:00",
                     "ElementValue": [
                       {
-                        "ProbabilityOfPrecipitation": "40"
+                        "ProbabilityOfPrecipitation": "30"
                       }
                     ]
                   },
@@ -3132,7 +3114,7 @@
                     "EndTime": "2026-10-22T12:00:00+08:00",
                     "ElementValue": [
                       {
-                        "ProbabilityOfPrecipitation": "60"
+                        "ProbabilityOfPrecipitation": "40"
                       }
                     ]
                   },
@@ -3141,7 +3123,7 @@
                     "EndTime": "2026-10-22T15:00:00+08:00",
                     "ElementValue": [
                       {
-                        "ProbabilityOfPrecipitation": "70"
+                        "ProbabilityOfPrecipitation": "50"
                       }
                     ]
                   },
@@ -3150,7 +3132,7 @@
                     "EndTime": "2026-10-22T18:00:00+08:00",
                     "ElementValue": [
                       {
-                        "ProbabilityOfPrecipitation": "80"
+                        "ProbabilityOfPrecipitation": "60"
                       }
                     ]
                   },
@@ -3159,7 +3141,7 @@
                     "EndTime": "2026-10-22T21:00:00+08:00",
                     "ElementValue": [
                       {
-                        "ProbabilityOfPrecipitation": "90"
+                        "ProbabilityOfPrecipitation": "70"
                       }
                     ]
                   },
@@ -3168,7 +3150,7 @@
                     "EndTime": "2026-10-23T00:00:00+08:00",
                     "ElementValue": [
                       {
-                        "ProbabilityOfPrecipitation": "90"
+                        "ProbabilityOfPrecipitation": "70"
                       }
                     ]
                   },
@@ -3177,7 +3159,7 @@
                     "EndTime": "2026-10-23T03:00:00+08:00",
                     "ElementValue": [
                       {
-                        "ProbabilityOfPrecipitation": "90"
+                        "ProbabilityOfPrecipitation": "70"
                       }
                     ]
                   },
@@ -3186,7 +3168,7 @@
                     "EndTime": "2026-10-23T06:00:00+08:00",
                     "ElementValue": [
                       {
-                        "ProbabilityOfPrecipitation": "90"
+                        "ProbabilityOfPrecipitation": "70"
                       }
                     ]
                   },
@@ -3195,7 +3177,7 @@
                     "EndTime": "2026-10-23T09:00:00+08:00",
                     "ElementValue": [
                       {
-                        "ProbabilityOfPrecipitation": "90"
+                        "ProbabilityOfPrecipitation": "70"
                       }
                     ]
                   },
@@ -3213,7 +3195,7 @@
                     "EndTime": "2026-10-23T15:00:00+08:00",
                     "ElementValue": [
                       {
-                        "ProbabilityOfPrecipitation": "90"
+                        "ProbabilityOfPrecipitation": "100"
                       }
                     ]
                   },
@@ -3222,7 +3204,7 @@
                     "EndTime": "2026-10-23T18:00:00+08:00",
                     "ElementValue": [
                       {
-                        "ProbabilityOfPrecipitation": "90"
+                        "ProbabilityOfPrecipitation": "100"
                       }
                     ]
                   },
@@ -3231,7 +3213,7 @@
                     "EndTime": "2026-10-23T21:00:00+08:00",
                     "ElementValue": [
                       {
-                        "ProbabilityOfPrecipitation": "90"
+                        "ProbabilityOfPrecipitation": "100"
                       }
                     ]
                   },
@@ -3240,7 +3222,7 @@
                     "EndTime": "2026-10-24T00:00:00+08:00",
                     "ElementValue": [
                       {
-                        "ProbabilityOfPrecipitation": "90"
+                        "ProbabilityOfPrecipitation": "100"
                       }
                     ]
                   },
@@ -3249,7 +3231,7 @@
                     "EndTime": "2026-10-24T03:00:00+08:00",
                     "ElementValue": [
                       {
-                        "ProbabilityOfPrecipitation": "90"
+                        "ProbabilityOfPrecipitation": "100"
                       }
                     ]
                   },
@@ -3258,7 +3240,7 @@
                     "EndTime": "2026-10-24T06:00:00+08:00",
                     "ElementValue": [
                       {
-                        "ProbabilityOfPrecipitation": "90"
+                        "ProbabilityOfPrecipitation": "100"
                       }
                     ]
                   },
@@ -3267,13 +3249,31 @@
                     "EndTime": "2026-10-24T09:00:00+08:00",
                     "ElementValue": [
                       {
-                        "ProbabilityOfPrecipitation": "90"
+                        "ProbabilityOfPrecipitation": "100"
                       }
                     ]
                   },
                   {
                     "StartTime": "2026-10-24T09:00:00+08:00",
                     "EndTime": "2026-10-24T12:00:00+08:00",
+                    "ElementValue": [
+                      {
+                        "ProbabilityOfPrecipitation": "100"
+                      }
+                    ]
+                  },
+                  {
+                    "StartTime": "2026-10-24T12:00:00+08:00",
+                    "EndTime": "2026-10-24T15:00:00+08:00",
+                    "ElementValue": [
+                      {
+                        "ProbabilityOfPrecipitation": "100"
+                      }
+                    ]
+                  },
+                  {
+                    "StartTime": "2026-10-24T15:00:00+08:00",
+                    "EndTime": "2026-10-24T18:00:00+08:00",
                     "ElementValue": [
                       {
                         "ProbabilityOfPrecipitation": "90"
@@ -3285,26 +3285,6 @@
               {
                 "ElementName": "天氣現象",
                 "Time": [
-                  {
-                    "StartTime": "2026-10-20T12:00:00+08:00",
-                    "EndTime": "2026-10-20T15:00:00+08:00",
-                    "ElementValue": [
-                      {
-                        "Weather": "晴",
-                        "WeatherCode": "01"
-                      }
-                    ]
-                  },
-                  {
-                    "StartTime": "2026-10-20T15:00:00+08:00",
-                    "EndTime": "2026-10-20T18:00:00+08:00",
-                    "ElementValue": [
-                      {
-                        "Weather": "晴",
-                        "WeatherCode": "01"
-                      }
-                    ]
-                  },
                   {
                     "StartTime": "2026-10-20T18:00:00+08:00",
                     "EndTime": "2026-10-20T21:00:00+08:00",
@@ -3320,8 +3300,8 @@
                     "EndTime": "2026-10-21T00:00:00+08:00",
                     "ElementValue": [
                       {
-                        "Weather": "多雲",
-                        "WeatherCode": "04"
+                        "Weather": "晴",
+                        "WeatherCode": "01"
                       }
                     ]
                   },
@@ -3604,30 +3584,32 @@
                         "WeatherCode": "08"
                       }
                     ]
+                  },
+                  {
+                    "StartTime": "2026-10-24T12:00:00+08:00",
+                    "EndTime": "2026-10-24T15:00:00+08:00",
+                    "ElementValue": [
+                      {
+                        "Weather": "短暫陣雨",
+                        "WeatherCode": "08"
+                      }
+                    ]
+                  },
+                  {
+                    "StartTime": "2026-10-24T15:00:00+08:00",
+                    "EndTime": "2026-10-24T18:00:00+08:00",
+                    "ElementValue": [
+                      {
+                        "Weather": "短暫陣雨",
+                        "WeatherCode": "08"
+                      }
+                    ]
                   }
                 ]
               },
               {
                 "ElementName": "天氣預報綜合描述",
                 "Time": [
-                  {
-                    "StartTime": "2026-10-20T12:00:00+08:00",
-                    "EndTime": "2026-10-20T15:00:00+08:00",
-                    "ElementValue": [
-                      {
-                        "WeatherDescription": "晴。降雨機率10%。溫度攝氏31度。悶熱。東南風 平均風速1-2級(每秒2公尺)。相對濕度75至78%。"
-                      }
-                    ]
-                  },
-                  {
-                    "StartTime": "2026-10-20T15:00:00+08:00",
-                    "EndTime": "2026-10-20T18:00:00+08:00",
-                    "ElementValue": [
-                      {
-                        "WeatherDescription": "晴。降雨機率10%。溫度攝氏28至30度。悶熱。偏東風 平均風速1-2級(每秒2公尺)。相對濕度80至84%。"
-                      }
-                    ]
-                  },
                   {
                     "StartTime": "2026-10-20T18:00:00+08:00",
                     "EndTime": "2026-10-20T21:00:00+08:00",
@@ -3642,7 +3624,7 @@
                     "EndTime": "2026-10-21T00:00:00+08:00",
                     "ElementValue": [
                       {
-                        "WeatherDescription": "多雲。降雨機率20%。溫度攝氏25度。舒適。偏北風 平均風速<= 1級(每秒1公尺)。相對濕度90至91%。"
+                        "WeatherDescription": "晴。降雨機率10%。溫度攝氏25度。舒適。偏北風 平均風速<= 1級(每秒1公尺)。相對濕度90至91%。"
                       }
                     ]
                   },
@@ -3678,7 +3660,7 @@
                     "EndTime": "2026-10-21T12:00:00+08:00",
                     "ElementValue": [
                       {
-                        "WeatherDescription": "晴。降雨機率20%。溫度攝氏26至28度。舒適。偏西風 平均風速<= 1級(每秒1公尺)。相對濕度79%。"
+                        "WeatherDescription": "晴。降雨機率20%。溫度攝氏27至28度。舒適至悶熱。偏西風 平均風速<= 1級(每秒1公尺)。相對濕度79%。"
                       }
                     ]
                   },
@@ -3687,7 +3669,7 @@
                     "EndTime": "2026-10-21T15:00:00+08:00",
                     "ElementValue": [
                       {
-                        "WeatherDescription": "陰。降雨機率20%。溫度攝氏28至29度。舒適至悶熱。東北風 平均風速1-2級(每秒2公尺)。相對濕度71至77%。"
+                        "WeatherDescription": "陰。降雨機率20%。溫度攝氏29度。悶熱。東北風 平均風速1-2級(每秒2公尺)。相對濕度71至77%。"
                       }
                     ]
                   },
@@ -3696,7 +3678,7 @@
                     "EndTime": "2026-10-21T18:00:00+08:00",
                     "ElementValue": [
                       {
-                        "WeatherDescription": "多雲。降雨機率20%。溫度攝氏26至28度。舒適。東北風 平均風速1-2級(每秒3公尺)。相對濕度75至84%。"
+                        "WeatherDescription": "多雲。降雨機率20%。溫度攝氏27至28度。舒適。東北風 平均風速2-3級(每秒4公尺)。相對濕度75至84%。"
                       }
                     ]
                   },
@@ -3705,7 +3687,7 @@
                     "EndTime": "2026-10-21T21:00:00+08:00",
                     "ElementValue": [
                       {
-                        "WeatherDescription": "短暫陣雨。降雨機率40%。溫度攝氏24至25度。舒適。東北風 平均風速2-3級(每秒4公尺)。相對濕度86至91%。"
+                        "WeatherDescription": "短暫陣雨。降雨機率50%。溫度攝氏24至26度。舒適。東北風 平均風速1-2級(每秒3公尺)。相對濕度86至91%。"
                       }
                     ]
                   },
@@ -3714,7 +3696,7 @@
                     "EndTime": "2026-10-22T00:00:00+08:00",
                     "ElementValue": [
                       {
-                        "WeatherDescription": "短暫陣雨。降雨機率50%。溫度攝氏23至24度。舒適。西北風 平均風速1-2級(每秒3公尺)。相對濕度91至92%。"
+                        "WeatherDescription": "短暫陣雨。降雨機率40%。溫度攝氏23至24度。舒適。西北風 平均風速2-3級(每秒5公尺)。相對濕度91至92%。"
                       }
                     ]
                   },
@@ -3723,7 +3705,7 @@
                     "EndTime": "2026-10-22T03:00:00+08:00",
                     "ElementValue": [
                       {
-                        "WeatherDescription": "短暫陣雨。降雨機率30%。溫度攝氏23度。舒適。偏北風 平均風速1-2級(每秒2公尺)。相對濕度91%。"
+                        "WeatherDescription": "短暫陣雨。降雨機率50%。溫度攝氏23度。舒適。偏北風 平均風速1-2級(每秒2公尺)。相對濕度91%。"
                       }
                     ]
                   },
@@ -3732,7 +3714,7 @@
                     "EndTime": "2026-10-22T06:00:00+08:00",
                     "ElementValue": [
                       {
-                        "WeatherDescription": "短暫陣雨。降雨機率40%。溫度攝氏23度。舒適。偏北風 平均風速1-2級(每秒3公尺)。相對濕度91%。"
+                        "WeatherDescription": "短暫陣雨。降雨機率40%。溫度攝氏22至23度。舒適。偏北風 平均風速2-3級(每秒5公尺)。相對濕度91至92%。"
                       }
                     ]
                   },
@@ -3741,7 +3723,7 @@
                     "EndTime": "2026-10-22T09:00:00+08:00",
                     "ElementValue": [
                       {
-                        "WeatherDescription": "短暫陣雨。降雨機率40%。溫度攝氏22度。舒適。偏西風 平均風速2-3級(每秒4公尺)。相對濕度89%。"
+                        "WeatherDescription": "短暫陣雨。降雨機率30%。溫度攝氏22度。舒適。偏西風 平均風速2-3級(每秒4公尺)。相對濕度89%。"
                       }
                     ]
                   },
@@ -3750,7 +3732,7 @@
                     "EndTime": "2026-10-22T12:00:00+08:00",
                     "ElementValue": [
                       {
-                        "WeatherDescription": "短暫陣雨。降雨機率60%。溫度攝氏23度。舒適。偏北風 平均風速1-2級(每秒3公尺)。相對濕度86%。"
+                        "WeatherDescription": "短暫陣雨。降雨機率40%。溫度攝氏23度。舒適。偏北風 平均風速2-3級(每秒5公尺)。相對濕度86%。"
                       }
                     ]
                   },
@@ -3759,7 +3741,7 @@
                     "EndTime": "2026-10-22T15:00:00+08:00",
                     "ElementValue": [
                       {
-                        "WeatherDescription": "短暫陣雨。降雨機率70%。溫度攝氏23度。舒適。偏西風 平均風速1-2級(每秒3公尺)。相對濕度92%。"
+                        "WeatherDescription": "短暫陣雨。降雨機率50%。溫度攝氏24度。舒適。偏西風 平均風速1-2級(每秒3公尺)。相對濕度92%。"
                       }
                     ]
                   },
@@ -3768,7 +3750,7 @@
                     "EndTime": "2026-10-22T18:00:00+08:00",
                     "ElementValue": [
                       {
-                        "WeatherDescription": "短暫陣雨。降雨機率80%。溫度攝氏23度。舒適。偏西風 平均風速1-2級(每秒2公尺)。相對濕度94%。"
+                        "WeatherDescription": "短暫陣雨。降雨機率60%。溫度攝氏24度。舒適。偏西風 平均風速2-3級(每秒4公尺)。相對濕度94%。"
                       }
                     ]
                   },
@@ -3777,7 +3759,7 @@
                     "EndTime": "2026-10-22T21:00:00+08:00",
                     "ElementValue": [
                       {
-                        "WeatherDescription": "短暫陣雨。降雨機率90%。溫度攝氏23度。舒適。西南風 平均風速1-2級(每秒2公尺)。相對濕度93%。"
+                        "WeatherDescription": "短暫陣雨。降雨機率70%。溫度攝氏23度。舒適。西南風 平均風速1-2級(每秒3公尺)。相對濕度93%。"
                       }
                     ]
                   },
@@ -3786,7 +3768,7 @@
                     "EndTime": "2026-10-23T00:00:00+08:00",
                     "ElementValue": [
                       {
-                        "WeatherDescription": "短暫陣雨。降雨機率90%。溫度攝氏22度。舒適。偏北風 平均風速1-2級(每秒2公尺)。相對濕度90%。"
+                        "WeatherDescription": "短暫陣雨。降雨機率70%。溫度攝氏22度。舒適。西南風 平均風速1-2級(每秒3公尺)。相對濕度90%。"
                       }
                     ]
                   },
@@ -3795,7 +3777,7 @@
                     "EndTime": "2026-10-23T03:00:00+08:00",
                     "ElementValue": [
                       {
-                        "WeatherDescription": "陣雨。降雨機率90%。溫度攝氏22度。舒適。西南風 平均風速1-2級(每秒2公尺)。相對濕度91%。"
+                        "WeatherDescription": "陣雨。降雨機率70%。溫度攝氏22度。舒適。西南風 平均風速1-2級(每秒3公尺)。相對濕度91%。"
                       }
                     ]
                   },
@@ -3804,7 +3786,7 @@
                     "EndTime": "2026-10-23T06:00:00+08:00",
                     "ElementValue": [
                       {
-                        "WeatherDescription": "陣雨。降雨機率90%。溫度攝氏22度。舒適。偏南風 平均風速1-2級(每秒3公尺)。相對濕度92%。"
+                        "WeatherDescription": "陣雨。降雨機率70%。溫度攝氏22度。舒適。偏南風 平均風速2-3級(每秒4公尺)。相對濕度92%。"
                       }
                     ]
                   },
@@ -3813,7 +3795,7 @@
                     "EndTime": "2026-10-23T09:00:00+08:00",
                     "ElementValue": [
                       {
-                        "WeatherDescription": "陣雨。降雨機率90%。溫度攝氏22度。舒適。西南風 平均風速1-2級(每秒3公尺)。相對濕度93%。"
+                        "WeatherDescription": "陣雨。降雨機率70%。溫度攝氏22度。舒適。西南風 平均風速2-3級(每秒4公尺)。相對濕度93%。"
                       }
                     ]
                   },
@@ -3831,7 +3813,7 @@
                     "EndTime": "2026-10-23T15:00:00+08:00",
                     "ElementValue": [
                       {
-                        "WeatherDescription": "陣雨。降雨機率90%。溫度攝氏27度。舒適。西北風 平均風速2-3級(每秒5公尺)。相對濕度95%。"
+                        "WeatherDescription": "陣雨。降雨機率100%。溫度攝氏27度。舒適。西北風 平均風速2-3級(每秒5公尺)。相對濕度95%。"
                       }
                     ]
                   },
@@ -3840,7 +3822,7 @@
                     "EndTime": "2026-10-23T18:00:00+08:00",
                     "ElementValue": [
                       {
-                        "WeatherDescription": "陣雨。降雨機率90%。溫度攝氏26度。舒適。西北風 平均風速2-3級(每秒5公尺)。相對濕度94%。"
+                        "WeatherDescription": "陣雨。降雨機率100%。溫度攝氏26度。舒適。西北風 平均風速2-3級(每秒5公尺)。相對濕度94%。"
                       }
                     ]
                   },
@@ -3849,7 +3831,7 @@
                     "EndTime": "2026-10-23T21:00:00+08:00",
                     "ElementValue": [
                       {
-                        "WeatherDescription": "陣雨。降雨機率90%。溫度攝氏26度。舒適。偏西風 平均風速2-3級(每秒4公尺)。相對濕度90%。"
+                        "WeatherDescription": "陣雨。降雨機率100%。溫度攝氏26度。舒適。偏西風 平均風速4-5級(每秒8公尺)。相對濕度90%。"
                       }
                     ]
                   },
@@ -3858,7 +3840,7 @@
                     "EndTime": "2026-10-24T00:00:00+08:00",
                     "ElementValue": [
                       {
-                        "WeatherDescription": "陣雨。降雨機率90%。溫度攝氏25度。舒適。西南風 平均風速2-3級(每秒4公尺)。相對濕度88%。"
+                        "WeatherDescription": "陣雨。降雨機率100%。溫度攝氏25度。舒適。西南風 平均風速2-3級(每秒5公尺)。相對濕度88%。"
                       }
                     ]
                   },
@@ -3867,7 +3849,7 @@
                     "EndTime": "2026-10-24T03:00:00+08:00",
                     "ElementValue": [
                       {
-                        "WeatherDescription": "短暫陣雨。降雨機率90%。溫度攝氏25度。舒適。偏西風 平均風速3-4級(每秒6公尺)。相對濕度91%。"
+                        "WeatherDescription": "短暫陣雨。降雨機率100%。溫度攝氏25度。舒適。偏西風 平均風速2-3級(每秒5公尺)。相對濕度91%。"
                       }
                     ]
                   },
@@ -3876,7 +3858,7 @@
                     "EndTime": "2026-10-24T06:00:00+08:00",
                     "ElementValue": [
                       {
-                        "WeatherDescription": "短暫陣雨。降雨機率90%。溫度攝氏24度。舒適。西北風 平均風速4-5級(每秒8公尺)。相對濕度93%。"
+                        "WeatherDescription": "短暫陣雨。降雨機率100%。溫度攝氏24度。舒適。西北風 平均風速3-4級(每秒6公尺)。相對濕度93%。"
                       }
                     ]
                   },
@@ -3885,7 +3867,7 @@
                     "EndTime": "2026-10-24T09:00:00+08:00",
                     "ElementValue": [
                       {
-                        "WeatherDescription": "短暫陣雨。降雨機率90%。溫度攝氏24度。舒適。西北風 平均風速4-5級(每秒9公尺)。相對濕度93%。"
+                        "WeatherDescription": "短暫陣雨。降雨機率100%。溫度攝氏24度。舒適。西北風 平均風速4-5級(每秒8公尺)。相對濕度95%。"
                       }
                     ]
                   },
@@ -3894,7 +3876,25 @@
                     "EndTime": "2026-10-24T12:00:00+08:00",
                     "ElementValue": [
                       {
-                        "WeatherDescription": "短暫陣雨。降雨機率90%。溫度攝氏27度。悶熱。偏北風 平均風速4-5級(每秒9公尺)。相對濕度94%。"
+                        "WeatherDescription": "短暫陣雨。降雨機率100%。溫度攝氏27度。悶熱。偏北風 平均風速4-5級(每秒8公尺)。相對濕度94%。"
+                      }
+                    ]
+                  },
+                  {
+                    "StartTime": "2026-10-24T12:00:00+08:00",
+                    "EndTime": "2026-10-24T15:00:00+08:00",
+                    "ElementValue": [
+                      {
+                        "WeatherDescription": "短暫陣雨。降雨機率100%。溫度攝氏29度。悶熱。西北風 平均風速3-4級(每秒6公尺)。相對濕度93%。"
+                      }
+                    ]
+                  },
+                  {
+                    "StartTime": "2026-10-24T15:00:00+08:00",
+                    "EndTime": "2026-10-24T18:00:00+08:00",
+                    "ElementValue": [
+                      {
+                        "WeatherDescription": "短暫陣雨。降雨機率90%。溫度攝氏29度。悶熱。偏西風 平均風速2-3級(每秒4公尺)。相對濕度93%。"
                       }
                     ]
                   }
@@ -3912,54 +3912,6 @@
                 "ElementName": "溫度",
                 "Time": [
                   {
-                    "DataTime": "2026-10-20T12:00:00+08:00",
-                    "ElementValue": [
-                      {
-                        "Temperature": "31"
-                      }
-                    ]
-                  },
-                  {
-                    "DataTime": "2026-10-20T13:00:00+08:00",
-                    "ElementValue": [
-                      {
-                        "Temperature": "31"
-                      }
-                    ]
-                  },
-                  {
-                    "DataTime": "2026-10-20T14:00:00+08:00",
-                    "ElementValue": [
-                      {
-                        "Temperature": "31"
-                      }
-                    ]
-                  },
-                  {
-                    "DataTime": "2026-10-20T15:00:00+08:00",
-                    "ElementValue": [
-                      {
-                        "Temperature": "30"
-                      }
-                    ]
-                  },
-                  {
-                    "DataTime": "2026-10-20T16:00:00+08:00",
-                    "ElementValue": [
-                      {
-                        "Temperature": "30"
-                      }
-                    ]
-                  },
-                  {
-                    "DataTime": "2026-10-20T17:00:00+08:00",
-                    "ElementValue": [
-                      {
-                        "Temperature": "29"
-                      }
-                    ]
-                  },
-                  {
                     "DataTime": "2026-10-20T18:00:00+08:00",
                     "ElementValue": [
                       {
@@ -4099,7 +4051,7 @@
                     "DataTime": "2026-10-21T11:00:00+08:00",
                     "ElementValue": [
                       {
-                        "Temperature": "28"
+                        "Temperature": "29"
                       }
                     ]
                   },
@@ -4139,7 +4091,7 @@
                     "DataTime": "2026-10-21T16:00:00+08:00",
                     "ElementValue": [
                       {
-                        "Temperature": "27"
+                        "Temperature": "28"
                       }
                     ]
                   },
@@ -4208,10 +4160,42 @@
                     ]
                   },
                   {
+                    "DataTime": "2026-10-22T01:00:00+08:00",
+                    "ElementValue": [
+                      {
+                        "Temperature": "23"
+                      }
+                    ]
+                  },
+                  {
+                    "DataTime": "2026-10-22T02:00:00+08:00",
+                    "ElementValue": [
+                      {
+                        "Temperature": "23"
+                      }
+                    ]
+                  },
+                  {
                     "DataTime": "2026-10-22T03:00:00+08:00",
                     "ElementValue": [
                       {
                         "Temperature": "23"
+                      }
+                    ]
+                  },
+                  {
+                    "DataTime": "2026-10-22T04:00:00+08:00",
+                    "ElementValue": [
+                      {
+                        "Temperature": "23"
+                      }
+                    ]
+                  },
+                  {
+                    "DataTime": "2026-10-22T05:00:00+08:00",
+                    "ElementValue": [
+                      {
+                        "Temperature": "22"
                       }
                     ]
                   },
@@ -4235,7 +4219,7 @@
                     "DataTime": "2026-10-22T12:00:00+08:00",
                     "ElementValue": [
                       {
-                        "Temperature": "23"
+                        "Temperature": "24"
                       }
                     ]
                   },
@@ -4356,6 +4340,22 @@
                     "ElementValue": [
                       {
                         "Temperature": "27"
+                      }
+                    ]
+                  },
+                  {
+                    "DataTime": "2026-10-24T12:00:00+08:00",
+                    "ElementValue": [
+                      {
+                        "Temperature": "30"
+                      }
+                    ]
+                  },
+                  {
+                    "DataTime": "2026-10-24T15:00:00+08:00",
+                    "ElementValue": [
+                      {
+                        "Temperature": "29"
                       }
                     ]
                   }
@@ -4365,54 +4365,6 @@
                 "ElementName": "露點溫度",
                 "Time": [
                   {
-                    "DataTime": "2026-10-20T12:00:00+08:00",
-                    "ElementValue": [
-                      {
-                        "DewPoint": "26"
-                      }
-                    ]
-                  },
-                  {
-                    "DataTime": "2026-10-20T13:00:00+08:00",
-                    "ElementValue": [
-                      {
-                        "DewPoint": "26"
-                      }
-                    ]
-                  },
-                  {
-                    "DataTime": "2026-10-20T14:00:00+08:00",
-                    "ElementValue": [
-                      {
-                        "DewPoint": "26"
-                      }
-                    ]
-                  },
-                  {
-                    "DataTime": "2026-10-20T15:00:00+08:00",
-                    "ElementValue": [
-                      {
-                        "DewPoint": "26"
-                      }
-                    ]
-                  },
-                  {
-                    "DataTime": "2026-10-20T16:00:00+08:00",
-                    "ElementValue": [
-                      {
-                        "DewPoint": "26"
-                      }
-                    ]
-                  },
-                  {
-                    "DataTime": "2026-10-20T17:00:00+08:00",
-                    "ElementValue": [
-                      {
-                        "DewPoint": "25"
-                      }
-                    ]
-                  },
-                  {
                     "DataTime": "2026-10-20T18:00:00+08:00",
                     "ElementValue": [
                       {
@@ -4528,7 +4480,7 @@
                     "DataTime": "2026-10-21T08:00:00+08:00",
                     "ElementValue": [
                       {
-                        "DewPoint": "20"
+                        "DewPoint": "21"
                       }
                     ]
                   },
@@ -4568,7 +4520,7 @@
                     "DataTime": "2026-10-21T13:00:00+08:00",
                     "ElementValue": [
                       {
-                        "DewPoint": "24"
+                        "DewPoint": "25"
                       }
                     ]
                   },
@@ -4616,7 +4568,7 @@
                     "DataTime": "2026-10-21T19:00:00+08:00",
                     "ElementValue": [
                       {
-                        "DewPoint": "23"
+                        "DewPoint": "24"
                       }
                     ]
                   },
@@ -4661,7 +4613,39 @@
                     ]
                   },
                   {
+                    "DataTime": "2026-10-22T01:00:00+08:00",
+                    "ElementValue": [
+                      {
+                        "DewPoint": "22"
+                      }
+                    ]
+                  },
+                  {
+                    "DataTime": "2026-10-22T02:00:00+08:00",
+                    "ElementValue": [
+                      {
+                        "DewPoint": "22"
+                      }
+                    ]
+                  },
+                  {
                     "DataTime": "2026-10-22T03:00:00+08:00",
+                    "ElementValue": [
+                      {
+                        "DewPoint": "21"
+                      }
+                    ]
+                  },
+                  {
+                    "DataTime": "2026-10-22T04:00:00+08:00",
+                    "ElementValue": [
+                      {
+                        "DewPoint": "21"
+                      }
+                    ]
+                  },
+                  {
+                    "DataTime": "2026-10-22T05:00:00+08:00",
                     "ElementValue": [
                       {
                         "DewPoint": "21"
@@ -4811,60 +4795,28 @@
                         "DewPoint": "26"
                       }
                     ]
+                  },
+                  {
+                    "DataTime": "2026-10-24T12:00:00+08:00",
+                    "ElementValue": [
+                      {
+                        "DewPoint": "28"
+                      }
+                    ]
+                  },
+                  {
+                    "DataTime": "2026-10-24T15:00:00+08:00",
+                    "ElementValue": [
+                      {
+                        "DewPoint": "27"
+                      }
+                    ]
                   }
                 ]
               },
               {
                 "ElementName": "相對濕度",
                 "Time": [
-                  {
-                    "DataTime": "2026-10-20T12:00:00+08:00",
-                    "ElementValue": [
-                      {
-                        "RelativeHumidity": "75"
-                      }
-                    ]
-                  },
-                  {
-                    "DataTime": "2026-10-20T13:00:00+08:00",
-                    "ElementValue": [
-                      {
-                        "RelativeHumidity": "75"
-                      }
-                    ]
-                  },
-                  {
-                    "DataTime": "2026-10-20T14:00:00+08:00",
-                    "ElementValue": [
-                      {
-                        "RelativeHumidity": "76"
-                      }
-                    ]
-                  },
-                  {
-                    "DataTime": "2026-10-20T15:00:00+08:00",
-                    "ElementValue": [
-                      {
-                        "RelativeHumidity": "77"
-                      }
-                    ]
-                  },
-                  {
-                    "DataTime": "2026-10-20T16:00:00+08:00",
-                    "ElementValue": [
-                      {
-                        "RelativeHumidity": "79"
-                      }
-                    ]
-                  },
-                  {
-                    "DataTime": "2026-10-20T17:00:00+08:00",
-                    "ElementValue": [
-                      {
-                        "RelativeHumidity": "81"
-                      }
-                    ]
-                  },
                   {
                     "DataTime": "2026-10-20T18:00:00+08:00",
                     "ElementValue": [
@@ -5114,10 +5066,42 @@
                     ]
                   },
                   {
+                    "DataTime": "2026-10-22T01:00:00+08:00",
+                    "ElementValue": [
+                      {
+                        "RelativeHumidity": "92"
+                      }
+                    ]
+                  },
+                  {
+                    "DataTime": "2026-10-22T02:00:00+08:00",
+                    "ElementValue": [
+                      {
+                        "RelativeHumidity": "92"
+                      }
+                    ]
+                  },
+                  {
                     "DataTime": "2026-10-22T03:00:00+08:00",
                     "ElementValue": [
                       {
                         "RelativeHumidity": "92"
+                      }
+                    ]
+                  },
+                  {
+                    "DataTime": "2026-10-22T04:00:00+08:00",
+                    "ElementValue": [
+                      {
+                        "RelativeHumidity": "92"
+                      }
+                    ]
+                  },
+                  {
+                    "DataTime": "2026-10-22T05:00:00+08:00",
+                    "ElementValue": [
+                      {
+                        "RelativeHumidity": "93"
                       }
                     ]
                   },
@@ -5253,7 +5237,7 @@
                     "DataTime": "2026-10-24T06:00:00+08:00",
                     "ElementValue": [
                       {
-                        "RelativeHumidity": "92"
+                        "RelativeHumidity": "93"
                       }
                     ]
                   },
@@ -5262,6 +5246,22 @@
                     "ElementValue": [
                       {
                         "RelativeHumidity": "92"
+                      }
+                    ]
+                  },
+                  {
+                    "DataTime": "2026-10-24T12:00:00+08:00",
+                    "ElementValue": [
+                      {
+                        "RelativeHumidity": "92"
+                      }
+                    ]
+                  },
+                  {
+                    "DataTime": "2026-10-24T15:00:00+08:00",
+                    "ElementValue": [
+                      {
+                        "RelativeHumidity": "91"
                       }
                     ]
                   }
@@ -5271,54 +5271,6 @@
                 "ElementName": "體感溫度",
                 "Time": [
                   {
-                    "DataTime": "2026-10-20T12:00:00+08:00",
-                    "ElementValue": [
-                      {
-                        "ApparentTemperature": "35"
-                      }
-                    ]
-                  },
-                  {
-                    "DataTime": "2026-10-20T13:00:00+08:00",
-                    "ElementValue": [
-                      {
-                        "ApparentTemperature": "35"
-                      }
-                    ]
-                  },
-                  {
-                    "DataTime": "2026-10-20T14:00:00+08:00",
-                    "ElementValue": [
-                      {
-                        "ApparentTemperature": "35"
-                      }
-                    ]
-                  },
-                  {
-                    "DataTime": "2026-10-20T15:00:00+08:00",
-                    "ElementValue": [
-                      {
-                        "ApparentTemperature": "34"
-                      }
-                    ]
-                  },
-                  {
-                    "DataTime": "2026-10-20T16:00:00+08:00",
-                    "ElementValue": [
-                      {
-                        "ApparentTemperature": "34"
-                      }
-                    ]
-                  },
-                  {
-                    "DataTime": "2026-10-20T17:00:00+08:00",
-                    "ElementValue": [
-                      {
-                        "ApparentTemperature": "32"
-                      }
-                    ]
-                  },
-                  {
                     "DataTime": "2026-10-20T18:00:00+08:00",
                     "ElementValue": [
                       {
@@ -5458,7 +5410,7 @@
                     "DataTime": "2026-10-21T11:00:00+08:00",
                     "ElementValue": [
                       {
-                        "ApparentTemperature": "31"
+                        "ApparentTemperature": "32"
                       }
                     ]
                   },
@@ -5466,7 +5418,7 @@
                     "DataTime": "2026-10-21T12:00:00+08:00",
                     "ElementValue": [
                       {
-                        "ApparentTemperature": "31"
+                        "ApparentTemperature": "32"
                       }
                     ]
                   },
@@ -5482,7 +5434,7 @@
                     "DataTime": "2026-10-21T14:00:00+08:00",
                     "ElementValue": [
                       {
-                        "ApparentTemperature": "31"
+                        "ApparentTemperature": "30"
                       }
                     ]
                   },
@@ -5530,7 +5482,7 @@
                     "DataTime": "2026-10-21T20:00:00+08:00",
                     "ElementValue": [
                       {
-                        "ApparentTemperature": "26"
+                        "ApparentTemperature": "25"
                       }
                     ]
                   },
@@ -5538,7 +5490,7 @@
                     "DataTime": "2026-10-21T21:00:00+08:00",
                     "ElementValue": [
                       {
-                        "ApparentTemperature": "25"
+                        "ApparentTemperature": "24"
                       }
                     ]
                   },
@@ -5567,10 +5519,42 @@
                     ]
                   },
                   {
-                    "DataTime": "2026-10-22T03:00:00+08:00",
+                    "DataTime": "2026-10-22T01:00:00+08:00",
                     "ElementValue": [
                       {
                         "ApparentTemperature": "23"
+                      }
+                    ]
+                  },
+                  {
+                    "DataTime": "2026-10-22T02:00:00+08:00",
+                    "ElementValue": [
+                      {
+                        "ApparentTemperature": "23"
+                      }
+                    ]
+                  },
+                  {
+                    "DataTime": "2026-10-22T03:00:00+08:00",
+                    "ElementValue": [
+                      {
+                        "ApparentTemperature": "22"
+                      }
+                    ]
+                  },
+                  {
+                    "DataTime": "2026-10-22T04:00:00+08:00",
+                    "ElementValue": [
+                      {
+                        "ApparentTemperature": "23"
+                      }
+                    ]
+                  },
+                  {
+                    "DataTime": "2026-10-22T05:00:00+08:00",
+                    "ElementValue": [
+                      {
+                        "ApparentTemperature": "22"
                       }
                     ]
                   },
@@ -5586,7 +5570,7 @@
                     "DataTime": "2026-10-22T09:00:00+08:00",
                     "ElementValue": [
                       {
-                        "ApparentTemperature": "23"
+                        "ApparentTemperature": "22"
                       }
                     ]
                   },
@@ -5602,7 +5586,7 @@
                     "DataTime": "2026-10-22T15:00:00+08:00",
                     "ElementValue": [
                       {
-                        "ApparentTemperature": "25"
+                        "ApparentTemperature": "24"
                       }
                     ]
                   },
@@ -5618,7 +5602,7 @@
                     "DataTime": "2026-10-22T21:00:00+08:00",
                     "ElementValue": [
                       {
-                        "ApparentTemperature": "24"
+                        "ApparentTemperature": "23"
                       }
                     ]
                   },
@@ -5626,7 +5610,7 @@
                     "DataTime": "2026-10-23T00:00:00+08:00",
                     "ElementValue": [
                       {
-                        "ApparentTemperature": "25"
+                        "ApparentTemperature": "23"
                       }
                     ]
                   },
@@ -5642,7 +5626,7 @@
                     "DataTime": "2026-10-23T06:00:00+08:00",
                     "ElementValue": [
                       {
-                        "ApparentTemperature": "23"
+                        "ApparentTemperature": "22"
                       }
                     ]
                   },
@@ -5650,7 +5634,7 @@
                     "DataTime": "2026-10-23T09:00:00+08:00",
                     "ElementValue": [
                       {
-                        "ApparentTemperature": "25"
+                        "ApparentTemperature": "26"
                       }
                     ]
                   },
@@ -5658,7 +5642,7 @@
                     "DataTime": "2026-10-23T12:00:00+08:00",
                     "ElementValue": [
                       {
-                        "ApparentTemperature": "27"
+                        "ApparentTemperature": "28"
                       }
                     ]
                   },
@@ -5666,7 +5650,7 @@
                     "DataTime": "2026-10-23T15:00:00+08:00",
                     "ElementValue": [
                       {
-                        "ApparentTemperature": "26"
+                        "ApparentTemperature": "27"
                       }
                     ]
                   },
@@ -5674,7 +5658,7 @@
                     "DataTime": "2026-10-23T18:00:00+08:00",
                     "ElementValue": [
                       {
-                        "ApparentTemperature": "26"
+                        "ApparentTemperature": "24"
                       }
                     ]
                   },
@@ -5690,7 +5674,7 @@
                     "DataTime": "2026-10-24T00:00:00+08:00",
                     "ElementValue": [
                       {
-                        "ApparentTemperature": "24"
+                        "ApparentTemperature": "25"
                       }
                     ]
                   },
@@ -5698,7 +5682,7 @@
                     "DataTime": "2026-10-24T03:00:00+08:00",
                     "ElementValue": [
                       {
-                        "ApparentTemperature": "23"
+                        "ApparentTemperature": "24"
                       }
                     ]
                   },
@@ -5706,7 +5690,7 @@
                     "DataTime": "2026-10-24T06:00:00+08:00",
                     "ElementValue": [
                       {
-                        "ApparentTemperature": "22"
+                        "ApparentTemperature": "23"
                       }
                     ]
                   },
@@ -5715,6 +5699,22 @@
                     "ElementValue": [
                       {
                         "ApparentTemperature": "27"
+                      }
+                    ]
+                  },
+                  {
+                    "DataTime": "2026-10-24T12:00:00+08:00",
+                    "ElementValue": [
+                      {
+                        "ApparentTemperature": "32"
+                      }
+                    ]
+                  },
+                  {
+                    "DataTime": "2026-10-24T15:00:00+08:00",
+                    "ElementValue": [
+                      {
+                        "ApparentTemperature": "33"
                       }
                     ]
                   }
@@ -5724,60 +5724,6 @@
                 "ElementName": "舒適度指數",
                 "Time": [
                   {
-                    "DataTime": "2026-10-20T12:00:00+08:00",
-                    "ElementValue": [
-                      {
-                        "ComfortIndex": "29",
-                        "ComfortIndexDescription": "悶熱"
-                      }
-                    ]
-                  },
-                  {
-                    "DataTime": "2026-10-20T13:00:00+08:00",
-                    "ElementValue": [
-                      {
-                        "ComfortIndex": "29",
-                        "ComfortIndexDescription": "悶熱"
-                      }
-                    ]
-                  },
-                  {
-                    "DataTime": "2026-10-20T14:00:00+08:00",
-                    "ElementValue": [
-                      {
-                        "ComfortIndex": "29",
-                        "ComfortIndexDescription": "悶熱"
-                      }
-                    ]
-                  },
-                  {
-                    "DataTime": "2026-10-20T15:00:00+08:00",
-                    "ElementValue": [
-                      {
-                        "ComfortIndex": "28",
-                        "ComfortIndexDescription": "悶熱"
-                      }
-                    ]
-                  },
-                  {
-                    "DataTime": "2026-10-20T16:00:00+08:00",
-                    "ElementValue": [
-                      {
-                        "ComfortIndex": "28",
-                        "ComfortIndexDescription": "悶熱"
-                      }
-                    ]
-                  },
-                  {
-                    "DataTime": "2026-10-20T17:00:00+08:00",
-                    "ElementValue": [
-                      {
-                        "ComfortIndex": "27",
-                        "ComfortIndexDescription": "悶熱"
-                      }
-                    ]
-                  },
-                  {
                     "DataTime": "2026-10-20T18:00:00+08:00",
                     "ElementValue": [
                       {
@@ -5970,8 +5916,8 @@
                     "DataTime": "2026-10-21T15:00:00+08:00",
                     "ElementValue": [
                       {
-                        "ComfortIndex": "26",
-                        "ComfortIndexDescription": "舒適"
+                        "ComfortIndex": "27",
+                        "ComfortIndexDescription": "悶熱"
                       }
                     ]
                   },
@@ -6057,7 +6003,43 @@
                     ]
                   },
                   {
+                    "DataTime": "2026-10-22T01:00:00+08:00",
+                    "ElementValue": [
+                      {
+                        "ComfortIndex": "23",
+                        "ComfortIndexDescription": "舒適"
+                      }
+                    ]
+                  },
+                  {
+                    "DataTime": "2026-10-22T02:00:00+08:00",
+                    "ElementValue": [
+                      {
+                        "ComfortIndex": "23",
+                        "ComfortIndexDescription": "舒適"
+                      }
+                    ]
+                  },
+                  {
                     "DataTime": "2026-10-22T03:00:00+08:00",
+                    "ElementValue": [
+                      {
+                        "ComfortIndex": "22",
+                        "ComfortIndexDescription": "舒適"
+                      }
+                    ]
+                  },
+                  {
+                    "DataTime": "2026-10-22T04:00:00+08:00",
+                    "ElementValue": [
+                      {
+                        "ComfortIndex": "22",
+                        "ComfortIndexDescription": "舒適"
+                      }
+                    ]
+                  },
+                  {
+                    "DataTime": "2026-10-22T05:00:00+08:00",
                     "ElementValue": [
                       {
                         "ComfortIndex": "22",
@@ -6223,6 +6205,24 @@
                     "ElementValue": [
                       {
                         "ComfortIndex": "27",
+                        "ComfortIndexDescription": "悶熱"
+                      }
+                    ]
+                  },
+                  {
+                    "DataTime": "2026-10-24T12:00:00+08:00",
+                    "ElementValue": [
+                      {
+                        "ComfortIndex": "29",
+                        "ComfortIndexDescription": "悶熱"
+                      }
+                    ]
+                  },
+                  {
+                    "DataTime": "2026-10-24T15:00:00+08:00",
+                    "ElementValue": [
+                      {
+                        "ComfortIndex": "28",
                         "ComfortIndexDescription": "悶熱"
                       }
                     ]
@@ -6233,24 +6233,6 @@
                 "ElementName": "風速",
                 "Time": [
                   {
-                    "DataTime": "2026-10-20T12:00:00+08:00",
-                    "ElementValue": [
-                      {
-                        "WindSpeed": "2",
-                        "BeaufortScale": "2"
-                      }
-                    ]
-                  },
-                  {
-                    "DataTime": "2026-10-20T15:00:00+08:00",
-                    "ElementValue": [
-                      {
-                        "WindSpeed": "2",
-                        "BeaufortScale": "2"
-                      }
-                    ]
-                  },
-                  {
                     "DataTime": "2026-10-20T18:00:00+08:00",
                     "ElementValue": [
                       {
@@ -6317,8 +6299,8 @@
                     "DataTime": "2026-10-21T15:00:00+08:00",
                     "ElementValue": [
                       {
-                        "WindSpeed": "3",
-                        "BeaufortScale": "2"
+                        "WindSpeed": "4",
+                        "BeaufortScale": "3"
                       }
                     ]
                   },
@@ -6335,8 +6317,8 @@
                     "DataTime": "2026-10-21T21:00:00+08:00",
                     "ElementValue": [
                       {
-                        "WindSpeed": "4",
-                        "BeaufortScale": "3"
+                        "WindSpeed": "6",
+                        "BeaufortScale": "4"
                       }
                     ]
                   },
@@ -6353,8 +6335,8 @@
                     "DataTime": "2026-10-22T03:00:00+08:00",
                     "ElementValue": [
                       {
-                        "WindSpeed": "4",
-                        "BeaufortScale": "3"
+                        "WindSpeed": "6",
+                        "BeaufortScale": "4"
                       }
                     ]
                   },
@@ -6371,8 +6353,8 @@
                     "DataTime": "2026-10-22T09:00:00+08:00",
                     "ElementValue": [
                       {
-                        "WindSpeed": "4",
-                        "BeaufortScale": "3"
+                        "WindSpeed": "6",
+                        "BeaufortScale": "4"
                       }
                     ]
                   },
@@ -6389,8 +6371,8 @@
                     "DataTime": "2026-10-22T15:00:00+08:00",
                     "ElementValue": [
                       {
-                        "WindSpeed": "3",
-                        "BeaufortScale": "2"
+                        "WindSpeed": "5",
+                        "BeaufortScale": "3"
                       }
                     ]
                   },
@@ -6398,8 +6380,8 @@
                     "DataTime": "2026-10-22T18:00:00+08:00",
                     "ElementValue": [
                       {
-                        "WindSpeed": "3",
-                        "BeaufortScale": "2"
+                        "WindSpeed": "4",
+                        "BeaufortScale": "3"
                       }
                     ]
                   },
@@ -6407,8 +6389,8 @@
                     "DataTime": "2026-10-22T21:00:00+08:00",
                     "ElementValue": [
                       {
-                        "WindSpeed": "3",
-                        "BeaufortScale": "2"
+                        "WindSpeed": "4",
+                        "BeaufortScale": "3"
                       }
                     ]
                   },
@@ -6416,31 +6398,13 @@
                     "DataTime": "2026-10-23T00:00:00+08:00",
                     "ElementValue": [
                       {
-                        "WindSpeed": "1",
-                        "BeaufortScale": "<= 1"
+                        "WindSpeed": "4",
+                        "BeaufortScale": "3"
                       }
                     ]
                   },
                   {
                     "DataTime": "2026-10-23T03:00:00+08:00",
-                    "ElementValue": [
-                      {
-                        "WindSpeed": "4",
-                        "BeaufortScale": "3"
-                      }
-                    ]
-                  },
-                  {
-                    "DataTime": "2026-10-23T06:00:00+08:00",
-                    "ElementValue": [
-                      {
-                        "WindSpeed": "4",
-                        "BeaufortScale": "3"
-                      }
-                    ]
-                  },
-                  {
-                    "DataTime": "2026-10-23T09:00:00+08:00",
                     "ElementValue": [
                       {
                         "WindSpeed": "5",
@@ -6449,11 +6413,29 @@
                     ]
                   },
                   {
+                    "DataTime": "2026-10-23T06:00:00+08:00",
+                    "ElementValue": [
+                      {
+                        "WindSpeed": "5",
+                        "BeaufortScale": "3"
+                      }
+                    ]
+                  },
+                  {
+                    "DataTime": "2026-10-23T09:00:00+08:00",
+                    "ElementValue": [
+                      {
+                        "WindSpeed": "4",
+                        "BeaufortScale": "3"
+                      }
+                    ]
+                  },
+                  {
                     "DataTime": "2026-10-23T12:00:00+08:00",
                     "ElementValue": [
                       {
-                        "WindSpeed": "7",
-                        "BeaufortScale": "4"
+                        "WindSpeed": "5",
+                        "BeaufortScale": "3"
                       }
                     ]
                   },
@@ -6461,7 +6443,7 @@
                     "DataTime": "2026-10-23T15:00:00+08:00",
                     "ElementValue": [
                       {
-                        "WindSpeed": "7",
+                        "WindSpeed": "6",
                         "BeaufortScale": "4"
                       }
                     ]
@@ -6470,8 +6452,8 @@
                     "DataTime": "2026-10-23T18:00:00+08:00",
                     "ElementValue": [
                       {
-                        "WindSpeed": "6",
-                        "BeaufortScale": "4"
+                        "WindSpeed": "9",
+                        "BeaufortScale": "5"
                       }
                     ]
                   },
@@ -6488,7 +6470,7 @@
                     "DataTime": "2026-10-24T00:00:00+08:00",
                     "ElementValue": [
                       {
-                        "WindSpeed": "7",
+                        "WindSpeed": "6",
                         "BeaufortScale": "4"
                       }
                     ]
@@ -6497,8 +6479,8 @@
                     "DataTime": "2026-10-24T03:00:00+08:00",
                     "ElementValue": [
                       {
-                        "WindSpeed": "8",
-                        "BeaufortScale": "5"
+                        "WindSpeed": "6",
+                        "BeaufortScale": "4"
                       }
                     ]
                   },
@@ -6506,7 +6488,7 @@
                     "DataTime": "2026-10-24T06:00:00+08:00",
                     "ElementValue": [
                       {
-                        "WindSpeed": "9",
+                        "WindSpeed": "8",
                         "BeaufortScale": "5"
                       }
                     ]
@@ -6519,28 +6501,30 @@
                         "BeaufortScale": "5"
                       }
                     ]
+                  },
+                  {
+                    "DataTime": "2026-10-24T12:00:00+08:00",
+                    "ElementValue": [
+                      {
+                        "WindSpeed": "6",
+                        "BeaufortScale": "4"
+                      }
+                    ]
+                  },
+                  {
+                    "DataTime": "2026-10-24T15:00:00+08:00",
+                    "ElementValue": [
+                      {
+                        "WindSpeed": "3",
+                        "BeaufortScale": "2"
+                      }
+                    ]
                   }
                 ]
               },
               {
                 "ElementName": "風向",
                 "Time": [
-                  {
-                    "DataTime": "2026-10-20T12:00:00+08:00",
-                    "ElementValue": [
-                      {
-                        "WindDirection": "東南風"
-                      }
-                    ]
-                  },
-                  {
-                    "DataTime": "2026-10-20T15:00:00+08:00",
-                    "ElementValue": [
-                      {
-                        "WindDirection": "東南風"
-                      }
-                    ]
-                  },
                   {
                     "DataTime": "2026-10-20T18:00:00+08:00",
                     "ElementValue": [
@@ -6780,30 +6764,28 @@
                         "WindDirection": "偏東風"
                       }
                     ]
+                  },
+                  {
+                    "DataTime": "2026-10-24T12:00:00+08:00",
+                    "ElementValue": [
+                      {
+                        "WindDirection": "偏南風"
+                      }
+                    ]
+                  },
+                  {
+                    "DataTime": "2026-10-24T15:00:00+08:00",
+                    "ElementValue": [
+                      {
+                        "WindDirection": "西南風"
+                      }
+                    ]
                   }
                 ]
               },
               {
                 "ElementName": "3小時降雨機率",
                 "Time": [
-                  {
-                    "StartTime": "2026-10-20T12:00:00+08:00",
-                    "EndTime": "2026-10-20T15:00:00+08:00",
-                    "ElementValue": [
-                      {
-                        "ProbabilityOfPrecipitation": "10"
-                      }
-                    ]
-                  },
-                  {
-                    "StartTime": "2026-10-20T15:00:00+08:00",
-                    "EndTime": "2026-10-20T18:00:00+08:00",
-                    "ElementValue": [
-                      {
-                        "ProbabilityOfPrecipitation": "10"
-                      }
-                    ]
-                  },
                   {
                     "StartTime": "2026-10-20T18:00:00+08:00",
                     "EndTime": "2026-10-20T21:00:00+08:00",
@@ -6818,7 +6800,7 @@
                     "EndTime": "2026-10-21T00:00:00+08:00",
                     "ElementValue": [
                       {
-                        "ProbabilityOfPrecipitation": "20"
+                        "ProbabilityOfPrecipitation": "10"
                       }
                     ]
                   },
@@ -6872,7 +6854,7 @@
                     "EndTime": "2026-10-21T18:00:00+08:00",
                     "ElementValue": [
                       {
-                        "ProbabilityOfPrecipitation": "30"
+                        "ProbabilityOfPrecipitation": "40"
                       }
                     ]
                   },
@@ -6881,7 +6863,7 @@
                     "EndTime": "2026-10-21T21:00:00+08:00",
                     "ElementValue": [
                       {
-                        "ProbabilityOfPrecipitation": "50"
+                        "ProbabilityOfPrecipitation": "60"
                       }
                     ]
                   },
@@ -6890,7 +6872,7 @@
                     "EndTime": "2026-10-22T00:00:00+08:00",
                     "ElementValue": [
                       {
-                        "ProbabilityOfPrecipitation": "70"
+                        "ProbabilityOfPrecipitation": "60"
                       }
                     ]
                   },
@@ -6899,7 +6881,7 @@
                     "EndTime": "2026-10-22T03:00:00+08:00",
                     "ElementValue": [
                       {
-                        "ProbabilityOfPrecipitation": "70"
+                        "ProbabilityOfPrecipitation": "60"
                       }
                     ]
                   },
@@ -6908,7 +6890,7 @@
                     "EndTime": "2026-10-22T06:00:00+08:00",
                     "ElementValue": [
                       {
-                        "ProbabilityOfPrecipitation": "60"
+                        "ProbabilityOfPrecipitation": "70"
                       }
                     ]
                   },
@@ -6917,7 +6899,7 @@
                     "EndTime": "2026-10-22T09:00:00+08:00",
                     "ElementValue": [
                       {
-                        "ProbabilityOfPrecipitation": "80"
+                        "ProbabilityOfPrecipitation": "60"
                       }
                     ]
                   },
@@ -6926,7 +6908,7 @@
                     "EndTime": "2026-10-22T12:00:00+08:00",
                     "ElementValue": [
                       {
-                        "ProbabilityOfPrecipitation": "90"
+                        "ProbabilityOfPrecipitation": "70"
                       }
                     ]
                   },
@@ -6944,7 +6926,7 @@
                     "EndTime": "2026-10-22T18:00:00+08:00",
                     "ElementValue": [
                       {
-                        "ProbabilityOfPrecipitation": "90"
+                        "ProbabilityOfPrecipitation": "80"
                       }
                     ]
                   },
@@ -6962,7 +6944,7 @@
                     "EndTime": "2026-10-23T00:00:00+08:00",
                     "ElementValue": [
                       {
-                        "ProbabilityOfPrecipitation": "90"
+                        "ProbabilityOfPrecipitation": "80"
                       }
                     ]
                   },
@@ -6989,7 +6971,7 @@
                     "EndTime": "2026-10-23T09:00:00+08:00",
                     "ElementValue": [
                       {
-                        "ProbabilityOfPrecipitation": "90"
+                        "ProbabilityOfPrecipitation": "80"
                       }
                     ]
                   },
@@ -6998,7 +6980,7 @@
                     "EndTime": "2026-10-23T12:00:00+08:00",
                     "ElementValue": [
                       {
-                        "ProbabilityOfPrecipitation": "90"
+                        "ProbabilityOfPrecipitation": "100"
                       }
                     ]
                   },
@@ -7016,7 +6998,7 @@
                     "EndTime": "2026-10-23T18:00:00+08:00",
                     "ElementValue": [
                       {
-                        "ProbabilityOfPrecipitation": "90"
+                        "ProbabilityOfPrecipitation": "100"
                       }
                     ]
                   },
@@ -7025,7 +7007,7 @@
                     "EndTime": "2026-10-23T21:00:00+08:00",
                     "ElementValue": [
                       {
-                        "ProbabilityOfPrecipitation": "90"
+                        "ProbabilityOfPrecipitation": "100"
                       }
                     ]
                   },
@@ -7034,7 +7016,7 @@
                     "EndTime": "2026-10-24T00:00:00+08:00",
                     "ElementValue": [
                       {
-                        "ProbabilityOfPrecipitation": "90"
+                        "ProbabilityOfPrecipitation": "100"
                       }
                     ]
                   },
@@ -7043,7 +7025,7 @@
                     "EndTime": "2026-10-24T03:00:00+08:00",
                     "ElementValue": [
                       {
-                        "ProbabilityOfPrecipitation": "90"
+                        "ProbabilityOfPrecipitation": "100"
                       }
                     ]
                   },
@@ -7052,7 +7034,7 @@
                     "EndTime": "2026-10-24T06:00:00+08:00",
                     "ElementValue": [
                       {
-                        "ProbabilityOfPrecipitation": "90"
+                        "ProbabilityOfPrecipitation": "100"
                       }
                     ]
                   },
@@ -7061,13 +7043,31 @@
                     "EndTime": "2026-10-24T09:00:00+08:00",
                     "ElementValue": [
                       {
-                        "ProbabilityOfPrecipitation": "90"
+                        "ProbabilityOfPrecipitation": "100"
                       }
                     ]
                   },
                   {
                     "StartTime": "2026-10-24T09:00:00+08:00",
                     "EndTime": "2026-10-24T12:00:00+08:00",
+                    "ElementValue": [
+                      {
+                        "ProbabilityOfPrecipitation": "100"
+                      }
+                    ]
+                  },
+                  {
+                    "StartTime": "2026-10-24T12:00:00+08:00",
+                    "EndTime": "2026-10-24T15:00:00+08:00",
+                    "ElementValue": [
+                      {
+                        "ProbabilityOfPrecipitation": "90"
+                      }
+                    ]
+                  },
+                  {
+                    "StartTime": "2026-10-24T15:00:00+08:00",
+                    "EndTime": "2026-10-24T18:00:00+08:00",
                     "ElementValue": [
                       {
                         "ProbabilityOfPrecipitation": "90"
@@ -7080,26 +7080,6 @@
                 "ElementName": "天氣現象",
                 "Time": [
                   {
-                    "StartTime": "2026-10-20T12:00:00+08:00",
-                    "EndTime": "2026-10-20T15:00:00+08:00",
-                    "ElementValue": [
-                      {
-                        "Weather": "多雲",
-                        "WeatherCode": "04"
-                      }
-                    ]
-                  },
-                  {
-                    "StartTime": "2026-10-20T15:00:00+08:00",
-                    "EndTime": "2026-10-20T18:00:00+08:00",
-                    "ElementValue": [
-                      {
-                        "Weather": "晴",
-                        "WeatherCode": "01"
-                      }
-                    ]
-                  },
-                  {
                     "StartTime": "2026-10-20T18:00:00+08:00",
                     "EndTime": "2026-10-20T21:00:00+08:00",
                     "ElementValue": [
@@ -7114,8 +7094,8 @@
                     "EndTime": "2026-10-21T00:00:00+08:00",
                     "ElementValue": [
                       {
-                        "Weather": "多雲",
-                        "WeatherCode": "04"
+                        "Weather": "晴",
+                        "WeatherCode": "01"
                       }
                     ]
                   },
@@ -7134,8 +7114,8 @@
                     "EndTime": "2026-10-21T06:00:00+08:00",
                     "ElementValue": [
                       {
-                        "Weather": "多雲",
-                        "WeatherCode": "04"
+                        "Weather": "晴",
+                        "WeatherCode": "01"
                       }
                     ]
                   },
@@ -7398,30 +7378,32 @@
                         "WeatherCode": "08"
                       }
                     ]
+                  },
+                  {
+                    "StartTime": "2026-10-24T12:00:00+08:00",
+                    "EndTime": "2026-10-24T15:00:00+08:00",
+                    "ElementValue": [
+                      {
+                        "Weather": "短暫陣雨",
+                        "WeatherCode": "08"
+                      }
+                    ]
+                  },
+                  {
+                    "StartTime": "2026-10-24T15:00:00+08:00",
+                    "EndTime": "2026-10-24T18:00:00+08:00",
+                    "ElementValue": [
+                      {
+                        "Weather": "短暫陣雨",
+                        "WeatherCode": "08"
+                      }
+                    ]
                   }
                 ]
               },
               {
                 "ElementName": "天氣預報綜合描述",
                 "Time": [
-                  {
-                    "StartTime": "2026-10-20T12:00:00+08:00",
-                    "EndTime": "2026-10-20T15:00:00+08:00",
-                    "ElementValue": [
-                      {
-                        "WeatherDescription": "多雲。降雨機率10%。溫度攝氏31度。悶熱。東南風 平均風速1-2級(每秒2公尺)。相對濕度75至76%。"
-                      }
-                    ]
-                  },
-                  {
-                    "StartTime": "2026-10-20T15:00:00+08:00",
-                    "EndTime": "2026-10-20T18:00:00+08:00",
-                    "ElementValue": [
-                      {
-                        "WeatherDescription": "晴。降雨機率10%。溫度攝氏29至30度。悶熱。東南風 平均風速1-2級(每秒2公尺)。相對濕度77至81%。"
-                      }
-                    ]
-                  },
                   {
                     "StartTime": "2026-10-20T18:00:00+08:00",
                     "EndTime": "2026-10-20T21:00:00+08:00",
@@ -7436,7 +7418,7 @@
                     "EndTime": "2026-10-21T00:00:00+08:00",
                     "ElementValue": [
                       {
-                        "WeatherDescription": "多雲。降雨機率20%。溫度攝氏25度。舒適。西南風 平均風速<= 1級(每秒1公尺)。相對濕度90至91%。"
+                        "WeatherDescription": "晴。降雨機率10%。溫度攝氏25度。舒適。西南風 平均風速<= 1級(每秒1公尺)。相對濕度90至91%。"
                       }
                     ]
                   },
@@ -7454,7 +7436,7 @@
                     "EndTime": "2026-10-21T06:00:00+08:00",
                     "ElementValue": [
                       {
-                        "WeatherDescription": "多雲。降雨機率20%。溫度攝氏23至24度。舒適。偏西風 平均風速<= 1級(每秒1公尺)。相對濕度91%。"
+                        "WeatherDescription": "晴。降雨機率20%。溫度攝氏23至24度。舒適。偏西風 平均風速<= 1級(每秒1公尺)。相對濕度91%。"
                       }
                     ]
                   },
@@ -7472,7 +7454,7 @@
                     "EndTime": "2026-10-21T12:00:00+08:00",
                     "ElementValue": [
                       {
-                        "WeatherDescription": "晴。降雨機率20%。溫度攝氏26至28度。舒適至悶熱。偏西風 平均風速<= 1級(每秒1公尺)。相對濕度79至82%。"
+                        "WeatherDescription": "晴。降雨機率20%。溫度攝氏26至29度。舒適至悶熱。偏西風 平均風速<= 1級(每秒1公尺)。相對濕度79至82%。"
                       }
                     ]
                   },
@@ -7490,7 +7472,7 @@
                     "EndTime": "2026-10-21T18:00:00+08:00",
                     "ElementValue": [
                       {
-                        "WeatherDescription": "短暫陣雨。降雨機率30%。溫度攝氏27至28度。舒適。偏北風 平均風速1-2級(每秒3公尺)。相對濕度79至86%。"
+                        "WeatherDescription": "短暫陣雨。降雨機率40%。溫度攝氏27至28度。舒適至悶熱。偏北風 平均風速2-3級(每秒4公尺)。相對濕度79至86%。"
                       }
                     ]
                   },
@@ -7499,7 +7481,7 @@
                     "EndTime": "2026-10-21T21:00:00+08:00",
                     "ElementValue": [
                       {
-                        "WeatherDescription": "短暫陣雨。降雨機率50%。溫度攝氏25至26度。舒適。東北風 平均風速2-3級(每秒4公尺)。相對濕度88至93%。"
+                        "WeatherDescription": "短暫陣雨。降雨機率60%。溫度攝氏25至26度。舒適。東北風 平均風速2-3級(每秒4公尺)。相對濕度88至93%。"
                       }
                     ]
                   },
@@ -7508,7 +7490,7 @@
                     "EndTime": "2026-10-22T00:00:00+08:00",
                     "ElementValue": [
                       {
-                        "WeatherDescription": "短暫陣雨。降雨機率70%。溫度攝氏24度。舒適。西北風 平均風速2-3級(每秒4公尺)。相對濕度93%。"
+                        "WeatherDescription": "短暫陣雨。降雨機率60%。溫度攝氏24度。舒適。西北風 平均風速3-4級(每秒6公尺)。相對濕度93%。"
                       }
                     ]
                   },
@@ -7517,7 +7499,7 @@
                     "EndTime": "2026-10-22T03:00:00+08:00",
                     "ElementValue": [
                       {
-                        "WeatherDescription": "短暫陣雨。降雨機率70%。溫度攝氏24度。舒適。西北風 平均風速2-3級(每秒4公尺)。相對濕度93%。"
+                        "WeatherDescription": "短暫陣雨。降雨機率60%。溫度攝氏23至24度。舒適。西北風 平均風速2-3級(每秒4公尺)。相對濕度92至93%。"
                       }
                     ]
                   },
@@ -7526,7 +7508,7 @@
                     "EndTime": "2026-10-22T06:00:00+08:00",
                     "ElementValue": [
                       {
-                        "WeatherDescription": "短暫陣雨。降雨機率60%。溫度攝氏23度。舒適。西北風 平均風速2-3級(每秒4公尺)。相對濕度92%。"
+                        "WeatherDescription": "短暫陣雨。降雨機率70%。溫度攝氏22至23度。舒適。西北風 平均風速3-4級(每秒6公尺)。相對濕度92至93%。"
                       }
                     ]
                   },
@@ -7535,7 +7517,7 @@
                     "EndTime": "2026-10-22T09:00:00+08:00",
                     "ElementValue": [
                       {
-                        "WeatherDescription": "短暫陣雨。降雨機率80%。溫度攝氏22度。舒適。偏西風 平均風速2-3級(每秒5公尺)。相對濕度90%。"
+                        "WeatherDescription": "短暫陣雨。降雨機率60%。溫度攝氏22度。舒適。偏西風 平均風速2-3級(每秒5公尺)。相對濕度90%。"
                       }
                     ]
                   },
@@ -7544,7 +7526,7 @@
                     "EndTime": "2026-10-22T12:00:00+08:00",
                     "ElementValue": [
                       {
-                        "WeatherDescription": "短暫陣雨。降雨機率90%。溫度攝氏23度。舒適。偏西風 平均風速2-3級(每秒4公尺)。相對濕度88%。"
+                        "WeatherDescription": "短暫陣雨。降雨機率70%。溫度攝氏23度。舒適。偏西風 平均風速3-4級(每秒6公尺)。相對濕度88%。"
                       }
                     ]
                   },
@@ -7553,7 +7535,7 @@
                     "EndTime": "2026-10-22T15:00:00+08:00",
                     "ElementValue": [
                       {
-                        "WeatherDescription": "短暫陣雨。降雨機率80%。溫度攝氏23度。舒適。偏西風 平均風速2-3級(每秒4公尺)。相對濕度94%。"
+                        "WeatherDescription": "短暫陣雨。降雨機率80%。溫度攝氏24度。舒適。偏西風 平均風速2-3級(每秒4公尺)。相對濕度94%。"
                       }
                     ]
                   },
@@ -7562,7 +7544,7 @@
                     "EndTime": "2026-10-22T18:00:00+08:00",
                     "ElementValue": [
                       {
-                        "WeatherDescription": "短暫陣雨。降雨機率90%。溫度攝氏23度。舒適。偏西風 平均風速1-2級(每秒3公尺)。相對濕度95%。"
+                        "WeatherDescription": "短暫陣雨。降雨機率80%。溫度攝氏23度。舒適。偏西風 平均風速2-3級(每秒5公尺)。相對濕度95%。"
                       }
                     ]
                   },
@@ -7571,7 +7553,7 @@
                     "EndTime": "2026-10-22T21:00:00+08:00",
                     "ElementValue": [
                       {
-                        "WeatherDescription": "短暫陣雨。降雨機率90%。溫度攝氏23度。舒適。偏西風 平均風速1-2級(每秒3公尺)。相對濕度94%。"
+                        "WeatherDescription": "短暫陣雨。降雨機率90%。溫度攝氏23度。舒適。偏西風 平均風速2-3級(每秒4公尺)。相對濕度94%。"
                       }
                     ]
                   },
@@ -7580,7 +7562,7 @@
                     "EndTime": "2026-10-23T00:00:00+08:00",
                     "ElementValue": [
                       {
-                        "WeatherDescription": "短暫陣雨。降雨機率90%。溫度攝氏22度。舒適。偏西風 平均風速1-2級(每秒3公尺)。相對濕度91%。"
+                        "WeatherDescription": "短暫陣雨。降雨機率80%。溫度攝氏22度。舒適。偏西風 平均風速2-3級(每秒4公尺)。相對濕度91%。"
                       }
                     ]
                   },
@@ -7589,7 +7571,7 @@
                     "EndTime": "2026-10-23T03:00:00+08:00",
                     "ElementValue": [
                       {
-                        "WeatherDescription": "陣雨。降雨機率90%。溫度攝氏22度。舒適。偏西風 平均風速<= 1級(每秒1公尺)。相對濕度92%。"
+                        "WeatherDescription": "陣雨。降雨機率90%。溫度攝氏22度。舒適。偏西風 平均風速2-3級(每秒4公尺)。相對濕度92%。"
                       }
                     ]
                   },
@@ -7598,7 +7580,7 @@
                     "EndTime": "2026-10-23T06:00:00+08:00",
                     "ElementValue": [
                       {
-                        "WeatherDescription": "陣雨。降雨機率90%。溫度攝氏22度。舒適。偏西風 平均風速2-3級(每秒4公尺)。相對濕度93%。"
+                        "WeatherDescription": "陣雨。降雨機率90%。溫度攝氏22度。舒適。偏西風 平均風速2-3級(每秒5公尺)。相對濕度93%。"
                       }
                     ]
                   },
@@ -7607,7 +7589,7 @@
                     "EndTime": "2026-10-23T09:00:00+08:00",
                     "ElementValue": [
                       {
-                        "WeatherDescription": "陣雨。降雨機率90%。溫度攝氏22度。舒適。偏西風 平均風速2-3級(每秒4公尺)。相對濕度95%。"
+                        "WeatherDescription": "陣雨。降雨機率80%。溫度攝氏22度。舒適。偏西風 平均風速2-3級(每秒5公尺)。相對濕度95%。"
                       }
                     ]
                   },
@@ -7616,7 +7598,7 @@
                     "EndTime": "2026-10-23T12:00:00+08:00",
                     "ElementValue": [
                       {
-                        "WeatherDescription": "陣雨。降雨機率90%。溫度攝氏24度。舒適。偏南風 平均風速2-3級(每秒5公尺)。相對濕度96%。"
+                        "WeatherDescription": "陣雨。降雨機率100%。溫度攝氏24度。舒適。偏南風 平均風速2-3級(每秒4公尺)。相對濕度96%。"
                       }
                     ]
                   },
@@ -7625,7 +7607,7 @@
                     "EndTime": "2026-10-23T15:00:00+08:00",
                     "ElementValue": [
                       {
-                        "WeatherDescription": "陣雨。降雨機率90%。溫度攝氏26度。舒適。西南風 平均風速3-4級(每秒7公尺)。相對濕度95%。"
+                        "WeatherDescription": "陣雨。降雨機率90%。溫度攝氏26度。舒適。西南風 平均風速2-3級(每秒5公尺)。相對濕度95%。"
                       }
                     ]
                   },
@@ -7634,7 +7616,7 @@
                     "EndTime": "2026-10-23T18:00:00+08:00",
                     "ElementValue": [
                       {
-                        "WeatherDescription": "陣雨。降雨機率90%。溫度攝氏26度。舒適。西南風 平均風速3-4級(每秒7公尺)。相對濕度94%。"
+                        "WeatherDescription": "陣雨。降雨機率100%。溫度攝氏26度。舒適。西南風 平均風速3-4級(每秒6公尺)。相對濕度94%。"
                       }
                     ]
                   },
@@ -7643,7 +7625,7 @@
                     "EndTime": "2026-10-23T21:00:00+08:00",
                     "ElementValue": [
                       {
-                        "WeatherDescription": "陣雨。降雨機率90%。溫度攝氏25度。舒適。西南風 平均風速3-4級(每秒6公尺)。相對濕度91%。"
+                        "WeatherDescription": "陣雨。降雨機率100%。溫度攝氏25度。舒適。西南風 平均風速4-5級(每秒9公尺)。相對濕度91%。"
                       }
                     ]
                   },
@@ -7652,7 +7634,7 @@
                     "EndTime": "2026-10-24T00:00:00+08:00",
                     "ElementValue": [
                       {
-                        "WeatherDescription": "陣雨。降雨機率90%。溫度攝氏25度。舒適。偏西風 平均風速3-4級(每秒6公尺)。相對濕度89%。"
+                        "WeatherDescription": "陣雨。降雨機率100%。溫度攝氏25度。舒適。偏西風 平均風速3-4級(每秒6公尺)。相對濕度89%。"
                       }
                     ]
                   },
@@ -7661,7 +7643,7 @@
                     "EndTime": "2026-10-24T03:00:00+08:00",
                     "ElementValue": [
                       {
-                        "WeatherDescription": "短暫陣雨。降雨機率90%。溫度攝氏25度。舒適。偏西風 平均風速3-4級(每秒7公尺)。相對濕度91%。"
+                        "WeatherDescription": "短暫陣雨。降雨機率100%。溫度攝氏25度。舒適。偏西風 平均風速3-4級(每秒6公尺)。相對濕度91%。"
                       }
                     ]
                   },
@@ -7670,7 +7652,7 @@
                     "EndTime": "2026-10-24T06:00:00+08:00",
                     "ElementValue": [
                       {
-                        "WeatherDescription": "短暫陣雨。降雨機率90%。溫度攝氏24度。舒適。偏西風 平均風速4-5級(每秒8公尺)。相對濕度92%。"
+                        "WeatherDescription": "短暫陣雨。降雨機率100%。溫度攝氏24度。舒適。偏西風 平均風速3-4級(每秒6公尺)。相對濕度92%。"
                       }
                     ]
                   },
@@ -7679,7 +7661,7 @@
                     "EndTime": "2026-10-24T09:00:00+08:00",
                     "ElementValue": [
                       {
-                        "WeatherDescription": "短暫陣雨。降雨機率90%。溫度攝氏24度。舒適。偏南風 平均風速4-5級(每秒9公尺)。相對濕度92%。"
+                        "WeatherDescription": "短暫陣雨。降雨機率100%。溫度攝氏24度。舒適。偏南風 平均風速4-5級(每秒8公尺)。相對濕度93%。"
                       }
                     ]
                   },
@@ -7688,7 +7670,25 @@
                     "EndTime": "2026-10-24T12:00:00+08:00",
                     "ElementValue": [
                       {
-                        "WeatherDescription": "短暫陣雨。降雨機率90%。溫度攝氏27度。悶熱。偏東風 平均風速4-5級(每秒8公尺)。相對濕度92%。"
+                        "WeatherDescription": "短暫陣雨。降雨機率100%。溫度攝氏27度。悶熱。偏東風 平均風速4-5級(每秒8公尺)。相對濕度92%。"
+                      }
+                    ]
+                  },
+                  {
+                    "StartTime": "2026-10-24T12:00:00+08:00",
+                    "EndTime": "2026-10-24T15:00:00+08:00",
+                    "ElementValue": [
+                      {
+                        "WeatherDescription": "短暫陣雨。降雨機率90%。溫度攝氏30度。悶熱。偏南風 平均風速3-4級(每秒6公尺)。相對濕度92%。"
+                      }
+                    ]
+                  },
+                  {
+                    "StartTime": "2026-10-24T15:00:00+08:00",
+                    "EndTime": "2026-10-24T18:00:00+08:00",
+                    "ElementValue": [
+                      {
+                        "WeatherDescription": "短暫陣雨。降雨機率90%。溫度攝氏29度。悶熱。西南風 平均風速1-2級(每秒3公尺)。相對濕度91%。"
                       }
                     ]
                   }
