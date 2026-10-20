@@ -234,9 +234,10 @@ function openDetail(k){
   const week = state.mode === 'week', pts = r.pts;
   const alerts = [...new Map(r.pts.flatMap(p => alertHits(p, cols[0].ws, cols[cols.length-1].we)).map(a => [a.county+a.type, a])).values()];   // 詳情列出所有生效中的特報（含不列入燈號的）
   const v = (x, f) => x == null ? '—' : f(x);
-  const table = (p, k) => `<div class="pt"><h3>${esc(p.label)}・${week ? '一週預報' : MODES[state.mode].name+'逐 3 小時預報'}</h3><div class="vt-box"><table class="vt"><thead><tr><th>${week?'日期':'時段'}</th><th>燈號</th><th>天氣現象</th><th>降雨機率</th><th>風速</th><th>氣溫</th><th>體感</th><th>原因</th></tr></thead><tbody>
-      ${r.cells.map((c,j) => { const x = c.per[k], col = cols[j];
-        return `<tr class="${c.ref||c.past?'ref':''}"><td>${week?fmtH(col.date):col.label}</td><td>${lamp({lv:x.j.lv,plus:x.j.plus,ref:c.ref,past:c.past},true)}</td><td>${v(x.fc?.wx, esc)}</td><td class="num">${v(x.fc?.pop, n=>n+'%')}</td><td class="num">${v(x.fc?.bf ?? (x.fc?.ws != null ? beaufort(x.fc.ws) : null), n=>n+' 級')}</td><td class="num">${v(x.fc?.t, n=>n+'°C')}</td><td class="num">${v(x.fc?.at, n=>n+'°C')}</td><td class="why">${esc(x.j.why.join('、')||'—')}</td></tr>`; }).join('')}
+  // 詳情表格：手機上每個時段排成兩三行，不需左右滑動（2026-10-20）；原因只列 C、D（以及無資料）
+  const table = (p, k) => `<div class="pt"><h3>${esc(p.label)}・${week ? '一週預報' : MODES[state.mode].name+'逐 3 小時預報'}</h3><div class="vt-box"><table class="vt"><thead><tr><th>${week?'日期':'時段'}</th><th>燈號</th><th>天氣現象</th><th>降雨機率</th><th>風速</th><th>氣溫</th><th>體感</th><th>C、D燈號原因</th></tr></thead><tbody>
+      ${r.cells.map((c,j) => { const x = c.per[k], col = cols[j], why = x.j.lv !== 0 ? x.j.why.join('、') : '';
+        return `<tr class="${c.ref||c.past?'ref':''}"><td class="t">${week?fmtH(col.date):col.label}</td><td class="l">${lamp({lv:x.j.lv,plus:x.j.plus,ref:c.ref,past:c.past},true)}</td><td class="w">${v(x.fc?.wx, esc)}</td><td class="num" data-l="降雨">${v(x.fc?.pop, n=>n+'%')}</td><td class="num" data-l="風">${v(x.fc?.bf ?? (x.fc?.ws != null ? beaufort(x.fc.ws) : null), n=>n+' 級')}</td><td class="num" data-l="氣溫">${v(x.fc?.t, n=>n+'°C')}</td><td class="num" data-l="體感">${v(x.fc?.at, n=>n+'°C')}</td><td class="why${why?'':' none'}">${esc(why||'—')}</td></tr>`; }).join('')}
       </tbody></table></div></div>`;
   const dr = $('drawer');
   dr.innerHTML = `
