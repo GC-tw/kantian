@@ -48,7 +48,9 @@ h1 .logo{width:1.05em;height:1.05em;flex:none}
 .s-btn.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
 .search input,.s-x{display:none}
 .search input::-webkit-search-cancel-button{-webkit-appearance:none;display:none}
-.search.open{position:absolute;inset:0;z-index:3;background:var(--bg)}
+.row1.searching h1{display:none}   /* 搜尋展開時：標題讓出位置，搜尋框和「篩選」並排，不遮住篩選數字 */
+.row1.searching .tools{flex:1;min-width:0}
+.search.open{flex:1;min-width:0}
 .search.open input{display:block;flex:1;border-radius:999px;background:var(--surface);padding:6px 12px}
 .search.open .s-x{display:grid;place-items:center;width:34px;height:34px;flex:none;font-size:20px;line-height:1;border:0;background:none;color:var(--muted);cursor:pointer}
 .search svg,.filter-btn svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;flex:none}
@@ -98,7 +100,6 @@ input:focus-visible,select:focus-visible,button:focus-visible{outline:2px solid 
 .d-head h2 .star{font-size:22px;margin-left:6px}
 .chip.reset{border-style:dashed;color:var(--muted)}
 .chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
-.picks{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:8px}
 .pick{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 10px 8px 12px;display:flex;flex-direction:column;gap:5px;cursor:pointer;text-align:left;font:inherit;color:inherit}
 .pick:hover{border-color:var(--accent)}
 .pick .p1{display:flex;align-items:baseline;gap:8px;min-width:0}
@@ -107,18 +108,13 @@ input:focus-visible,select:focus-visible,button:focus-visible{outline:2px solid 
 .pick .p1 .star{align-self:center;margin-left:auto;font-size:18px}
 .cards{display:none;flex-direction:column;gap:8px}
 .cards .empty{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:12px}
-.reroll[hidden]{display:none}
-.reroll:disabled{opacity:.35;cursor:default}
-.reroll{flex:none;display:inline-flex;align-items:center;gap:5px;font:inherit;font-size:13px;font-weight:500;height:32px;padding:0 12px 0 10px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;white-space:nowrap}
-.picks-head{flex-wrap:nowrap;align-items:center}
-.picks-head .ph-l{flex:1;min-width:0;display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 16px}
-.reroll:not(:disabled):hover{border-color:var(--accent)}
 .pick .p2{display:flex;align-items:flex-end;gap:10px}
 .pick .lights{flex:1;min-width:0;display:grid;grid-template-columns:repeat(var(--n,8),minmax(0,1fr));gap:3px}
 .pick .lights .lamp.sm{width:auto;height:24px;font-size:12px}
 .pick .ph{font-family:var(--f-mono);font-size:11px;line-height:1.2;color:var(--ink);text-align:center;padding:2px 0;border-radius:3px}
 .pick .ph .wd{display:block;font-family:var(--f-body);font-size:10px}
-.pick .ph.peak{background:var(--accent-soft)}
+.pick .ph.peak{background:var(--accent);color:var(--accent-ink);font-weight:600}   /* 使用者選的登山時段：實心深色底 */
+.pick .ph.peak.we{color:var(--accent-ink)}
 .pick .ph.ref{color:var(--muted)}
 .pick .ph.we{color:var(--we)}
 .nw{white-space:nowrap}
@@ -137,7 +133,7 @@ table.matrix{border-collapse:separate;border-spacing:0;width:100%;font-variant-n
 .matrix .mt{text-align:left;position:sticky;left:0;background:var(--surface);z-index:1;min-width:170px;max-width:340px;padding-left:12px}
 .matrix tbody tr{cursor:pointer}
 .matrix tbody tr:hover td,.matrix tbody tr:hover th{background:var(--accent-soft)}
-/* 山名列與推薦卡同一形式：山名＋資訊同一行（太長以「…」省略），收藏在最右 */
+/* 山名列與山岳卡片同一形式：山名＋資訊同一行（太長以「…」省略），收藏在最右 */
 .mt-in{display:flex;align-items:baseline;gap:8px;min-width:0}
 .mt .nm{font-family:var(--f-display);font-weight:800;font-size:16px;line-height:1.3;flex:none}
 .mt .sub{font-size:12px;color:var(--muted);font-weight:400;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -157,7 +153,8 @@ table.matrix{border-collapse:separate;border-spacing:0;width:100%;font-variant-n
 .seg button:first-child{border-left:0}
 .seg button small{font-weight:500;font-size:12px}
 .seg button[aria-selected="true"]{background:var(--accent);color:var(--accent-ink)}
-.matrix th.peak{background:var(--accent-soft)}
+.matrix th.peak{background:var(--accent);color:var(--accent-ink)}
+.matrix thead th.peak .dt,.matrix thead th.peak .pk-sub{color:var(--accent-ink)}
 .we{color:var(--we)}
 .matrix thead th.we .dt,.matrix thead th.we{color:var(--we)}
 .seg button small.we{color:var(--we)}
@@ -196,7 +193,7 @@ table.vt{border-collapse:collapse;width:100%;font-size:13px;font-variant-numeric
 .kbd{font-family:var(--f-mono);font-size:13px;background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:0 5px}
 footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);padding-top:12px}
 @media (prefers-reduced-motion:no-preference){aside.drawer{animation:slide .18s ease-out}@keyframes slide{from{transform:translateX(24px);opacity:.6}to{transform:none;opacity:1}}}
-/* 手機：所有山岳燈號、我的收藏改用和推薦完全相同的卡片（時段標示在每張卡裡，和小燈號對齊） */
+/* 手機：燈號排序列表、我的收藏改用卡片（時段標示在每張卡裡，和小燈號對齊） */
 @media (max-width:640px){
   .matrix-box{overflow-x:visible;background:none;border:0;border-radius:0}
   .matrix-box table.matrix{display:none}
@@ -219,7 +216,6 @@ footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);paddin
   header.top .chip,header.top .s-btn,header.top .filter-btn{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.2);color:var(--bar-ink)}
   header.top .chip[aria-pressed="true"],header.top .s-btn.on{background:var(--bar-ink);border-color:var(--bar-ink);color:var(--bar)}
   header.top .filter-btn .badge{background:var(--bar-ink);color:var(--bar)}
-  header.top .search.open{background:var(--bar)}
   header.top .search.open .s-x{color:var(--bar-muted)}
   header.top h1{font-size:22px}
   header.top h1 small{font-size:11px;margin-top:1px}
@@ -300,18 +296,13 @@ footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);paddin
       </div>
     </div>
 
-    <section style="display:flex;flex-direction:column;gap:10px" aria-labelledby="h-picks">
-      <div class="sec-head picks-head"><div class="ph-l"><h2 id="h-picks"><span id="h-picks-t">推薦</span><button type="button" class="info" id="pick-info-btn" aria-expanded="false" aria-controls="pick-info" aria-label="推薦怎麼比較與排序">i</button></h2><p id="range-text"></p></div><button type="button" class="reroll" id="reroll" hidden aria-label="換一批推薦（同分的山）"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v5h-5"/></svg><span>換一批</span></button></div>
+    <section style="display:flex;flex-direction:column;gap:10px" aria-labelledby="h-matrix">
+      <div class="sec-head"><h2 id="h-matrix"><span id="h-picks-t">燈號排序</span><button type="button" class="info" id="pick-info-btn" aria-expanded="false" aria-controls="pick-info" aria-label="怎麼比較與排序">i</button></h2><p id="range-text"></p></div>
       <div class="info-pop" id="pick-info" hidden>
-        <div class="info-head"><b id="pick-info-t">推薦怎麼比較與排序？</b><button type="button" class="info-x" id="pick-info-x" aria-label="關閉說明">×</button></div>
+        <div class="info-head"><b id="pick-info-t">怎麼比較與排序？</b><button type="button" class="info-x" id="pick-info-x" aria-label="關閉說明">×</button></div>
         <div id="pick-info-body"></div>
         <button type="button" class="linkbtn" id="pick-info-more">看完整規則 →</button>
       </div>
-      <div class="picks" id="picks"></div>
-    </section>
-
-    <section style="display:flex;flex-direction:column;gap:10px" aria-labelledby="h-matrix">
-      <div class="sec-head"><h2 id="h-matrix">所有山岳燈號</h2></div>
       <div class="matrix-box"><table class="matrix" id="matrix"><thead></thead><tbody></tbody></table><div class="cards" id="matrix-cards"></div></div>
       <div class="more" id="more-box"><button class="btn" id="more" type="button">顯示更多</button></div>
     </section>
@@ -337,8 +328,8 @@ footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);paddin
       </ul>
       <h3>燈號怎麼算</h3>
       <ul>
-        <li>燈號分四級：A+、A（適合）、B（注意）、C（不建議）。A+ 是 A 之中天氣描述為「晴」的時段；一週預報要你選的登頂時段都是「晴」才算 A+；跨多個鄉鎮的山，每個鄉鎮都是 A+ 才算。</li>
-        <li>登頂時段由你從 8 個 3 小時時段中自由多選，預設為 06–12。今天、明天、後天：逐 3 小時判定每個時段。一週預報：取你選的登頂時段中最差的情況作為當天燈號。一週資料為逐 12 小時（白天 06–18、晚上 18–06），會依你選的時段對應到白天或晚上。</li>
+        <li>燈號分四級：A+、A（適合）、B（注意）、C（不建議）。A+ 是 A 之中天氣描述為「晴」的時段；一週預報要你選的登山時段都是「晴」才算 A+；跨多個鄉鎮的山，每個鄉鎮都是 A+ 才算。</li>
+        <li>登山時段由你從 8 個 3 小時時段中自由多選，預設為 06–12。今天、明天、後天：逐 3 小時判定每個時段。一週預報：取你選的登山時段中最差的情況作為當天燈號。一週資料為逐 12 小時（白天 06–18、晚上 18–06），會依你選的時段對應到白天或晚上。</li>
         <li>降雨：降雨機率未滿 30% 為 A；30% 以上 B；60% 以上 C。天氣描述出現「大雨」「豪雨」，不論機率都是 C。</li>
         <li>第 4–7 天沒有降雨機率，改看天氣描述：有「雨」為 B，有「大雨」「豪雨」為 C。因此這幾天的燈號通常最多只到 B，詳情會列出原始天氣描述。這幾天以虛線顯示，僅供參考，請在出發前 3 天內再確認。</li>
         <li>風速（平均風速）：未滿每秒 8 公尺（4 級以下）A；每秒 8.0–13.8 公尺（5–6 級）B；每秒 13.9 公尺以上（7 級以上）C。陣風通常比平均風速強 1.5–3 倍，稜線上請特別小心。</li>
@@ -351,7 +342,7 @@ footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);paddin
         <li>各項取最差的結果作為該時段的燈號。</li>
       </ul>
       <h3>排序方式</h3>
-      <ul><li>今天、明天、後天：先比你選的登頂時段中 A（含 A+）的段數（已過的時段不計），再比其中 A+ 的段數，再比當天所有時段 A 的段數（今天已過的時段不計）。登頂時段若已全部過去，改依剩餘時段排序。</li><li>一週預報：先比 7 天中 A（含 A+）的天數，再比其中 A+ 的天數，再比 B 的天數；天數相同時，B 裡天氣描述為「陣雨」（非「短暫陣雨」）的天數較少者排前面。</li><li>以上條件都相同時，順序每天輪換一次（同一天內固定），讓不同的山都有機會出現在推薦裡，不代表哪座比較好。</li></ul>
+      <ul><li>今天、明天、後天：先比你選的登山時段中 A（含 A+）的段數（已過的時段不計），再比其中 A+ 的段數，再比當天所有時段 A 的段數（今天已過的時段不計）。登山時段若已全部過去，改依剩餘時段排序。</li><li>一週預報：先比 7 天中 A（含 A+）的天數，再比其中 A+ 的天數，再比 B 的天數；天數相同時，B 裡天氣描述為「陣雨」（非「短暫陣雨」）的天數較少者排前面。</li><li>以上條件都相同時，順序每天輪換一次（同一天內固定），讓不同的山都有機會排在前面，不代表哪座比較好。</li></ul>
       <h3>注意事項</h3>
       <ul>
         <li>本站不是氣象預報，也不取代氣象署的預報與特報。出發前請再查看氣象署最新資訊與步道開放狀態。</li>
