@@ -158,10 +158,9 @@ const lamp = (c, sm) => { const t = c.plus ? 'A+' : SYM[LV(c.lv)];
   return `<i class="lamp ${CLS[LV(c.lv)]}${c.plus?' p':''}${c.ref?' ref':''}${c.past?' past':''}${sm?' sm':''}" title="${c.plus ? 'A+（晴）' : WORD[LV(c.lv)]}${c.ref?'（參考）':''}${c.past?'（已過）':''}">${t}</i>`; };
 const sub = m => `${m.h ? m.h.toLocaleString()+' m' : '標高待補'}・${m.c}・${esc(m.co)}`;   // 標高、類別、縣市（不顯示編號）
 const peaksLeft = () => cols.filter(c => c.peak && !c.past).length;
-// 比較結果只在一週模式顯示（適合天數）；逐 3 小時模式不顯示段數（使用者認為難懂），排序仍照規則
-const isWeek = () => state.mode === 'week';
-const headRow = () => `<tr><th class="mt">山岳</th>${cols.map(c=>`<th class="${c.ref?'ref ':''}${c.peak?'peak ':''}${c.wkd?'we':''}"><span class="dt"><span class="lg">${c.head||c.label}</span><span class="st">${c.short}</span></span>${c.sub}</th>`).join('')}${isWeek()?'<th class="cnt-h">A 天數</th>':''}</tr>`;
-const bodyRow = r => `<tr data-k="${r.k}" tabindex="0"><th class="mt" scope="row"><div class="mt-in"><span class="nm">${esc(r.m.n)}</span><span class="sub">${sub(r.m)}</span>${star(r.k)}</div></th>${r.cells.map(c=>`<td>${lamp(c)}</td>`).join('')}${isWeek()?`<td class="cnt"><span class="cn-s">${r.k1} / 7</span><span class="cn-l">A ${r.k1} 天</span></td>`:''}</tr>`;
+// 列表與卡片都不顯示比較結果（段數、A 天數；2026-10-20 拿掉），排序仍照規則
+const headRow = () => `<tr><th class="mt">山岳</th>${cols.map(c=>`<th class="${c.ref?'ref ':''}${c.peak?'peak ':''}${c.wkd?'we':''}"><span class="dt"><span class="lg">${c.head||c.label}</span><span class="st">${c.short}</span></span>${c.sub}</th>`).join('')}</tr>`;
+const bodyRow = r => `<tr data-k="${r.k}" tabindex="0"><th class="mt" scope="row"><div class="mt-in"><span class="nm">${esc(r.m.n)}</span><span class="sub">${sub(r.m)}</span>${star(r.k)}</div></th>${r.cells.map(c=>`<td>${lamp(c)}</td>`).join('')}</tr>`;
 // 山岳卡片（手機列表與收藏；精簡兩列）：山名＋資訊＋收藏／燈號（不顯示比較結果，一週也不寫 A 天數；2026-10-20）
 // 小燈上方標出時段（逐 3 小時寫開始時刻，一週寫日期＋星期）；登頂時段實心深色底、週末紅色
 const pickHead = () => cols.map(c => `<span class="ph${c.peak?' peak':''}${c.wkd?' we':''}${c.ref?' ref':''}" aria-hidden="true">${c.short}</span>`).join('');
