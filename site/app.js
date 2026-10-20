@@ -72,7 +72,7 @@ function judge(fc, lowHill, alert, noPop){
   if (/下雪|積冰|暴風雪/.test(wx)) up(2, wx);             // 雪：下雪、積冰、暴風雪不建議；「雨或雪」等其他有「雪」的描述為注意
   else if (wx.includes('雪')) up(1, wx);
   if (wx.includes('霧')) up(1, '有霧');
-  if (!noPop && fc.pop != null){ if (fc.pop>=60) up(2, '降雨機率 '+fc.pop+'%'); else if (fc.pop>=30) up(1, '降雨機率 '+fc.pop+'%'); }
+  if (!noPop && fc.pop != null){ if (fc.pop>=50) up(2, '降雨機率 '+fc.pop+'%'); else if (fc.pop>=30) up(1, '降雨機率 '+fc.pop+'%'); }
   else if (wx.includes('雨')){                            // 沒有降雨機率（第 4–7 天）：寫出原始天氣描述，「短暫」以外的雨另外標記，排序時往後
     up(1, noPop ? wx + '（第 4–7 天無降雨機率）' : '可能下雨');
     heavy = noPop && !/短暫/.test(wx);
@@ -118,6 +118,7 @@ function buildCols(){
 }
 const hash = t => { let h = 2166136261; for (const ch of t){ h ^= ch.codePointAt(0); h = Math.imul(h, 16777619); } return h >>> 0; };
 const fmtDayKey = () => { const d = new Date(Date.now() + 8*3600e3); return d.toISOString().slice(0, 10); };   // 台灣日期
+const SCORE = c => c.plus ? 3 : 2 - c.lv;                 // A+ 3、A 2、B 1、C 0
 function evaluate(){                                       // 依時段與登頂時段計算所有山的燈號並排序
   evalStamp = timeStamp(); dataStamp = FC?.fetchedAt || '';
   cols = buildCols();
@@ -133,13 +134,17 @@ function evaluate(){                                       // 依時段與登頂
       const lv = Math.max(...per.map(y=>y.j.lv));
       return {lv, plus: lv === 0 && per.every(y => y.j.plus), per, ref:!!c.ref, past:!!c.past};   // 跨鄉鎮：每個鄉鎮都是 A+ 才算 A+
     });
-    let k1 = 0, kp = 0, k2 = 0, k3 = 0;                    // kp：k1 之中 A+ 的數目；k3：B 的天數中，天氣描述是陣雨（非短暫）的天數
+    // 計分排序（2026-10-20 方案乙）：A+ 3、A 2、B 1、C 0；已過與無資料不計分
+    // s1：登頂時段總分（一週為 7 天總分）；p1：其中 A+ 數；s2：當天所有時段總分（只用於逐 3 小時）；k3：一週 B 之中「陣雨」（非短暫）的天數
+    let s1 = 0, p1 = 0, s2 = 0, k3 = 0;
     cells.forEach((c, i) => {
-      if (week){ if (c.lv===0){ k1++; if (c.plus) kp++; } else if (c.lv===1){ k2++; if (c.per.some(y => y.j.heavy)) k3++; } }
-      else if (!c.past && c.lv===0){ k2++; if (cols[i].peak){ k1++; if (c.plus) kp++; } }
+      if (c.past || c.lv < 0) return;
+      const pt = SCORE(c);
+      if (week){ s1 += pt; if (c.plus) p1++; if (c.lv===1 && c.per.some(y => y.j.heavy)) k3++; }
+      else { s2 += pt; if (cols[i].peak){ s1 += pt; if (c.plus) p1++; } }
     });
-    return {...x, cells, k1, kp, k2, k3, mix: hash(day + '|' + x.k)};
-  }).sort((a,b) => b.k1-a.k1 || b.kp-a.kp || b.k2-a.k2 || a.k3-b.k3 || a.mix-b.mix);
+    return {...x, cells, s1, p1, s2, k3, mix: hash(day + '|' + x.k)};
+  }).sort((a,b) => b.s1-a.s1 || b.p1-a.p1 || b.s2-a.s2 || a.k3-b.k3 || a.mix-b.mix);
   byKey = new Map(all.map(r => [r.k, r]));
   applyFilters();
 }
@@ -219,16 +224,17 @@ function openDetail(k){
 }
 function closeDetail(){ $('drawer').hidden = true; $('scrim').hidden = true; }
 // 燈號排序旁的 i：依目前模式說明比較標準與排序
+const SCORE_TXT = u => `每${u}計分：A+ 3 分、A 2 分、B 1 分、C 0 分（已過與無資料不計）`;
 const GRADE = '<li>A+：A 之中天氣描述為「晴」；A：適合；B：注意；C：不建議。</li>';
 function pickInfo(week){
   const slots = sortedSlots().map(slotLabel).join('、');
   const base = GRADE + '<li>燈號依氣象署預報判定：降雨機率、天氣描述（雷、大雨、豪雨）、平均風速、天氣特報；標高 1,000 公尺以下另看高溫。各項取最差的結果。</li><li>跨多個鄉鎮的山，取最差的鄉鎮。</li>';
   const li = a => '<ul>' + a.map(x => '<li>' + x + '</li>').join('') + '</ul>';
   if (week) return '<h4>比較標準</h4><ul>' + base + `<li>每天以你選的登頂時段（${esc(slots)}）中最差的情況作為當天燈號。</li><li>第 4–7 天氣象署沒有降雨機率，燈號最多只會到 B，僅供參考。</li></ul>`
-    + '<h4>排序</h4>' + li(['A（含 A+）的天數多者在前', '再比其中 A+ 的天數', '再比 B 的天數', '再比 B 裡天氣描述為「陣雨」（非「短暫陣雨」）的天數，少者在前', '以上都相同時，順序每天輪換一次，不代表哪座比較好']);
+    + '<h4>排序</h4>' + li([SCORE_TXT('天'), '先比 7 天的總分，高者在前', '再比 A+ 的天數，多者在前', '再比天氣描述為「陣雨」（非「短暫陣雨」）的天數，少者在前', '以上都相同時，順序每天輪換一次，不代表哪座比較好']);
   const today = state.mode === 'today';
   return '<h4>比較標準</h4><ul>' + base + `<li>逐 3 小時判定，每個時段一個燈號。</li>${today ? '<li>今天已過的時段不列入比較。</li>' : ''}</ul>`
-    + '<h4>排序</h4>' + li(['登頂時段中 A（含 A+）的段數多者在前', '再比其中 A+ 的段數', '再比當天所有時段 A 的段數', '以上都相同時，順序每天輪換一次，不代表哪座比較好']);
+    + '<h4>排序</h4>' + li([SCORE_TXT('個時段'), '先比登頂時段的總分，高者在前', '再比登頂時段中 A+ 的段數，多者在前', '再比當天所有時段的總分，高者在前', '以上都相同時，順序每天輪換一次，不代表哪座比較好']);
 }
 function setPickInfo(v){ $('pick-info').hidden = !v; $('pick-info-btn').setAttribute('aria-expanded', v); }
 function setInfo(v){ $('info-ref').hidden = !v; $('info-btn').setAttribute('aria-expanded', v); }

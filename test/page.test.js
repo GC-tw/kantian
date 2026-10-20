@@ -34,9 +34,19 @@ let fails = 0; const ok = (c, m) => { console.log((c ? '✓ ' : '✗ ') + m); if
     const body = d.body.innerHTML.replace(/<script>[\s\S]*<\/script>/, '');
     const L = lamps(), cnt = k => L.filter(x => x === k).length;
     ok(d.querySelectorAll('#matrix tbody tr').length === 235, `${m}：235 座都列出`);
+    { // 計分排序（A+ 3、A 2、B 1、C 0；已過與無資料不計）：依畫面上的燈號重算，順序須為 總分 → A+ 數 → 全日總分 由高到低
+      const peakCol = [...d.querySelectorAll('#matrix thead th')].slice(1).map(th => m === 'week' || th.classList.contains('peak'));
+      const keys = [...d.querySelectorAll('#matrix tbody tr')].map(tr => { let s1 = 0, p1 = 0, s2 = 0;
+        [...tr.querySelectorAll('.lamp')].forEach((l, i) => { if (l.classList.contains('past') || l.classList.contains('na')) return;
+          const pt = l.classList.contains('p') ? 3 : l.classList.contains('g') ? 2 : l.classList.contains('y') ? 1 : 0;
+          s2 += pt; if (peakCol[i]){ s1 += pt; if (pt === 3) p1++; } });
+        return [s1, p1, m === 'week' ? 0 : s2]; });
+      const cmp = (a, b) => a[0]-b[0] || a[1]-b[1] || a[2]-b[2];
+      ok(keys.every((k, i) => !i || cmp(keys[i-1], k) >= 0) && new Set(keys.map(String)).size > 1, `${m}：依計分排序（最前 ${keys[0]}、最後 ${keys[keys.length-1]}）`);
+    }
     click(w, d.getElementById('pick-info-btn'));
     const info = d.getElementById('pick-info');
-    ok(!info.hidden && /比較標準/.test(info.textContent) && /排序/.test(info.textContent) && (m === 'week' ? /A（含 A\+）的天數/ : /登頂時段中 A（含 A\+）的段數/).test(info.textContent) && /燈號排序$/.test(d.getElementById('h-picks-t').textContent), `${m}：燈號排序旁的 i 顯示對應的比較標準與排序`);
+    ok(!info.hidden && /比較標準/.test(info.textContent) && /排序/.test(info.textContent) && (m === 'week' ? /先比 7 天的總分/ : /先比登頂時段的總分/).test(info.textContent) && /燈號排序$/.test(d.getElementById('h-picks-t').textContent), `${m}：燈號排序旁的 i 顯示對應的比較標準與排序`);
     click(w, d.getElementById('pick-info-x'));
     ok(!/第\s*\d+\s*名|最推薦/.test(d.getElementById('h-matrix').textContent), `${m}：標題不顯示名次與「最推薦」`);
     ok(!d.getElementById('picks') && !d.getElementById('reroll'), `${m}：推薦區與「換一批」已移除`);
