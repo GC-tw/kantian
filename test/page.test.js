@@ -36,7 +36,7 @@ let fails = 0; const ok = (c, m) => { console.log((c ? '✓ ' : '✗ ') + m); if
     ok(d.querySelectorAll('#matrix tbody tr').length === 235, `${m}：235 座都列出`);
     click(w, d.getElementById('pick-info-btn'));
     const info = d.getElementById('pick-info');
-    ok(!info.hidden && /比較標準/.test(info.textContent) && /排序/.test(info.textContent) && (m === 'week' ? /A（含 A\+）的天數/ : /登山時段中 A（含 A\+）的段數/).test(info.textContent) && /燈號排序$/.test(d.getElementById('h-picks-t').textContent), `${m}：燈號排序旁的 i 顯示對應的比較標準與排序`);
+    ok(!info.hidden && /比較標準/.test(info.textContent) && /排序/.test(info.textContent) && (m === 'week' ? /A（含 A\+）的天數/ : /登頂時段中 A（含 A\+）的段數/).test(info.textContent) && /燈號排序$/.test(d.getElementById('h-picks-t').textContent), `${m}：燈號排序旁的 i 顯示對應的比較標準與排序`);
     click(w, d.getElementById('pick-info-x'));
     ok(!/第\s*\d+\s*名|最推薦/.test(d.getElementById('h-matrix').textContent), `${m}：標題不顯示名次與「最推薦」`);
     ok(!d.getElementById('picks') && !d.getElementById('reroll'), `${m}：推薦區與「換一批」已移除`);
