@@ -26,7 +26,8 @@ const dayAt = i => { const d = new Date(); d.setHours(0,0,0,0); d.setDate(d.getD
 const beaufort = ws => BF.reduce((b, v, i) => ws >= v ? i : b, 0);
 const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));  // 外部資料（氣象署文字）放進畫面前先轉義
 const sortedSlots = () => [...state.slots].sort((a,b)=>a-b);
-const DEF_SLOTS = [9];                                      // 預設登頂時段 09–12（2026-10-20 由 06–12 改）
+const DEF_SLOTS = [9];
+const HT_BAND = h => h == null ? -1 : h < 1000 ? 0 : h < 2000 ? 1 : h < 3000 ? 2 : 3;   // 標高篩選：0＝1,000 m 以下、1＝1,000–2,000、2＝2,000–3,000、3＝3,000 m 以上（2026-10-20）                                      // 預設登頂時段 09–12（2026-10-20 由 06–12 改）
 const store = {                                             // 瀏覽器儲存：讀寫失敗時不影響畫面
   raw(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } },
   get(k, fb){ const v = this.raw(k); if (v == null) return fb; try{ return JSON.parse(v); }catch(e){ return v; } },
@@ -102,15 +103,23 @@ const MOUNTAINS = M.map(m => {
   const pts = m.pid
     ? [{key:m.pid, label:'氣象署登山預報點「'+(m.pt||m.n)+'」', code:m.pid, county:counties[0], counties}]
     : m.tw.map(t => ({key:t, label:t+' 鄉鎮預報', code:'', county:t.slice(0,3), counties:[t.slice(0,3)]}));
-  return {m, k:m.c+m.no, pts, counties, low: m.h!=null && m.h<1000, search: [m.n, ...(m.al||[]), m.note||''].join('\n')};
+  return {m, k:m.c+m.no, pts, counties, low: m.h!=null && m.h<1000, ht: HT_BAND(m.h), search: [m.n, ...(m.al||[]), m.note||''].join('\n')};
 });
 
 // ---------- 狀態 ----------
 const state = {
   mode: MODES[store.get('mode')] ? store.get('mode') : 'today',
   slots: new Set((a => Array.isArray(a) && a.length ? a : DEF_SLOTS)(store.get('peak'))),   // 儲存名稱改為 peak：預設改 09–12 時，讓舊的 06–12 設定一起換成新預設
-  cats: new Set(), counties: new Set(), name: '', shown: PAGE
+  name: '', shown: PAGE,
+  // 篩選條件會記住（2026-10-20 使用者決定）：使用者沒改就維持上次設定，重新整理也一樣
+  ...(f => ({cats: new Set(f.cats), counties: new Set(f.counties), hts: new Set(f.hts)}))((f => {
+    const ok = (a, test) => Array.isArray(a) ? a.filter(test) : [];
+    f = f && typeof f === 'object' ? f : {};
+    return {cats: ok(f.cats, v => ['百岳','小百岳','其他山岳'].includes(v)), counties: ok(f.counties, v => typeof v === 'string' && M.some(m => m.co.split('、').includes(v))), hts: ok(f.hts, v => [0,1,2,3].includes(v))};
+  })(store.get('filters')))
 };
+const filterCount = () => state.cats.size + state.counties.size + state.hts.size + (sameSet(state.slots, DEF_SLOTS) ? 0 : 1);   // 「篩選」按鈕：改了幾項（登頂時段不是預設算 1 項）
+const saveFilters = () => { store.set('peak', [...state.slots]); store.set('filters', {cats:[...state.cats], counties:[...state.counties], hts:[...state.hts]}); };
 const favs = new Set((a => Array.isArray(a) ? a : [])(store.get('favs')));
 let cols = [], all = [], rows = [], favRows = [], byKey = new Map();
 let evalStamp = '', dataStamp = '';
@@ -168,6 +177,7 @@ function applyFilters(){                                    // 篩選不需重�
   const q = state.name.trim();
   rows = all.filter(r => (!state.cats.size || state.cats.has(r.m.c))
     && (!state.counties.size || r.counties.some(c => state.counties.has(c)))
+    && (!state.hts.size || state.hts.has(r.ht))
     && (!q || r.search.includes(q)));
   favRows = all.filter(r => favs.has(r.k));
 }
@@ -200,7 +210,7 @@ function render(){
   const ph = pickHead();
   const head = headRow();
   $('fav-tab-n').textContent = favRows.length || '';
-  $('filter-n').textContent = (state.cats.size + state.counties.size + (sameSet(state.slots, DEF_SLOTS) ? 0 : 1)) || '';   // 「篩選」按鈕：改了幾項（登頂時段不是預設算 1 項）
+  $('filter-n').textContent = filterCount() || '';
   $('fav-box').hidden = !favRows.length; $('fav-empty').hidden = !!favRows.length;
   $('fav-matrix').tHead.innerHTML = head;
   $('fav-matrix').tBodies[0].innerHTML = favRows.map(bodyRow).join('');
@@ -318,12 +328,12 @@ const sameSet = (set, arr) => set.size === arr.length && arr.every(x => set.has(
 
   // 篩選面板裡的選擇先記下，按「完成」（或關閉面板）時才一次重新計算、排序，並回到列表最上面
   let pending = false;
-  const onPick = () => { pending = true; $('filter-n').textContent = (state.cats.size + state.counties.size + (sameSet(state.slots, DEF_SLOTS) ? 0 : 1)) || ''; };
+  const onPick = () => { pending = true; $('filter-n').textContent = filterCount() || ''; };
   chipGroup($('f-county'), 'data-co', state.counties, {allId:'c-all', onChange: onPick});
   chipGroup($('f-cat'), 'data-c', state.cats, {allId:'cat-all', onChange: onPick});
-  const onSlots = {parse: Number, keepOne: true, onChange(){ store.set('peak', [...state.slots]); onPick(); }};
-  chipGroup($('f-slots'), 'data-h', state.slots, onSlots);
-  store.set('peak', [...state.slots]);
+  chipGroup($('f-ht'), 'data-ht', state.hts, {allId:'ht-all', parse: Number, onChange: onPick});
+  chipGroup($('f-slots'), 'data-h', state.slots, {parse: Number, keepOne: true, onChange: onPick});
+  saveFilters();
 
   const seg = document.querySelectorAll('#seg button');
   const syncSeg = () => seg.forEach(b => b.setAttribute('aria-selected', b.dataset.mode === state.mode));
@@ -337,12 +347,14 @@ const sameSet = (set, arr) => set.size === arr.length && arr.every(x => set.has(
   $('f-name').addEventListener('blur', () => setTimeout(() => { if (!$('search').contains(document.activeElement)) setSearch(false); }, 150));   // 離開搜尋框就收起（已輸入的字保留，放大鏡會變深色）
   const setFilter = open => {
     $('q').classList.toggle('open', open); $('f-scrim').hidden = !open; $('filter-btn').setAttribute('aria-expanded', open);
-    if (!open && pending){ pending = false; state.shown = PAGE; refresh(); window.scrollTo(0, 0); }
+    if (!open && pending){ pending = false; saveFilters(); state.shown = PAGE; refresh(); window.scrollTo(0, 0); }   // 按「完成」才套用並記住
   };
   $('filter-btn').onclick = () => { if (!$('view-find').hidden || !$('view-fav').hidden) setFilter(!$('q').classList.contains('open')); else { $('tab-find').click(); setFilter(true); } };
   $('filter-done').onclick = $('f-scrim').onclick = () => setFilter(false);
   document.addEventListener('keydown', e => { if (e.key === 'Escape'){ setFilter(false); setSearch(false); } });
   $('q').onsubmit = e => e.preventDefault();
+  $('brand').onclick = e => { e.preventDefault(); window.scrollTo(0, 0); location.reload(); };   // 點標題：回到最上方並重新整理（篩選與登頂時段會保留）
+  if (!store.raw('seenFilter')){ store.set('seenFilter', '1'); setFilter(true); }   // 第一次造訪時自動打開篩選，之後不再自動打開
   $('more').onclick = () => { state.shown += PAGE; if (!fresh()) evaluate(); render(); };
   $('info-btn').onclick = () => setInfo($('info-ref').hidden);
   $('info-x').onclick = () => { setInfo(false); $('info-btn').focus(); };
