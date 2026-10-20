@@ -5,19 +5,12 @@
 const M = __DATA__;
 const WD = ['日','一','二','三','四','五','六'];
 const SLOTS = [0,3,6,9,12,15,18,21];                       // 每段 3 小時的開始時刻
-const RARE = [0,18,21];                                    // 較少用的登頂時段，放在進階篩選
 const MODES = {today:{di:0,name:'今天'}, tmr:{di:1,name:'明天'}, d2:{di:2,name:'後天'}, week:{name:'一週'}};
 const COUNTY_ORDER = ['基隆市','臺北市','新北市','桃園市','新竹市','新竹縣','苗栗縣','臺中市','彰化縣','南投縣','雲林縣','嘉義市','嘉義縣','臺南市','高雄市','屏東縣','宜蘭縣','花蓮縣','臺東縣','澎湖縣','金門縣','連江縣'];
 const BF = [0,0.3,1.6,3.4,5.5,8.0,10.8,13.9,17.2,20.8,24.5];  // 蒲福風級下限（公尺／秒）
 const SYM = ['A','B','C','—'], CLS = ['g','y','r','na'], WORD = ['A','B','C','已過或無資料'];
 const LV = lv => lv < 0 ? 3 : lv;                                // 燈號等級 -1 代表沒有資料
 // A+：燈號 A 且天氣描述剛好是「晴」（2026-10-20 使用者決定）；畫面上寫 A+，class 多加 p
-const REGIONS = [['全台', []],                              // 標題列的地點快速切換（北、中、南用單字，2026-10-20）；選了地區＝勾選該地區所有縣市
-  ['北', ['基隆市','臺北市','新北市','桃園市','新竹市','新竹縣','宜蘭縣'], '北部'],
-  ['中', ['苗栗縣','臺中市','彰化縣','南投縣','雲林縣'], '中部'],
-  ['南', ['嘉義市','嘉義縣','臺南市','高雄市','屏東縣'], '南部'],
-  ['花東', ['花蓮縣','臺東縣']],
-  ['離島', ['澎湖縣','金門縣','連江縣']]];
 const PAGE = 10;                                           // 山岳列表一次顯示幾座
 const H = 3600e3, STALE = 9*H;                              // 超過 9 小時沒更新就提醒
 
@@ -33,6 +26,11 @@ const dayAt = i => { const d = new Date(); d.setHours(0,0,0,0); d.setDate(d.getD
 const beaufort = ws => BF.reduce((b, v, i) => ws >= v ? i : b, 0);
 const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));  // 外部資料（氣象署文字）放進畫面前先轉義
 const sortedSlots = () => [...state.slots].sort((a,b)=>a-b);
+const DEF_SLOTS = [6,9];                                    // 預設登山時段 06–12
+const slotRange = () => {                                   // 相連的時段合併，例如 06–09、09–12 → 06–12
+  const out = []; for (const h of sortedSlots()){ const l = out[out.length-1]; if (l && l[1] === h) l[1] = h+3; else out.push([h, h+3]); }
+  return out.map(([a,b]) => `${pad(a)}–${pad(b)}`).join('、');
+};
 const store = {                                             // 瀏覽器儲存：讀寫失敗時不影響畫面
   raw(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } },
   get(k, fb){ const v = this.raw(k); if (v == null) return fb; try{ return JSON.parse(v); }catch(e){ return v; } },
@@ -178,7 +176,7 @@ function render(){
   const title = week ? `一週 ${fmtH(dayAt(0))} – ${fmtH(dayAt(6))}` : `${MODES[state.mode].name} ${fmtH(d0)} 逐 3 小時預報`;
   $('h-picks-t').textContent = (week ? '這週' : MODES[state.mode].name) + '推薦';
   $('pick-info-body').innerHTML = pickInfo(week);
-  $('range-text').innerHTML = `${title}・${(r => r && (r[2] || r[0]))(regionNow()) || state.counties.size + ' 個縣市'}`;
+  $('range-text').innerHTML = `${title}・<span class="nw">${esc(placeText())}</span>・<span class="nw">登山 ${slotRange()}</span>`;   // 篩選都收在「篩選」裡，這裡寫出目前的地點與登山時段
   document.querySelectorAll('#seg .sd').forEach((e, i) => { const d = dayAt(i); e.textContent = fmt(d); e.classList.toggle('we', isWE(d)); });
   const md = d => `${d.getMonth()+1}/${d.getDate()}`;
   $('seg-week').textContent = `${md(dayAt(0))}–${md(dayAt(6))}`;   // 一週預報按鈕下方寫日期區間
@@ -194,9 +192,7 @@ function render(){
     || `<div class="empty">${rows.length ? '這段期間沒有燈號為 A 的山，可以參考下方列表。' : '沒有符合條件的山，請放寬類別或縣市。'}</div>`;
   const head = headRow();
   $('fav-tab-n').textContent = favRows.length || '';
-  const rg = regionNow();
-  document.querySelectorAll('#f-region [data-rg]').forEach(b => b.setAttribute('aria-pressed', !!rg && REGIONS[+b.dataset.rg] === rg));
-  $('filter-n').textContent = (state.cats.size + (rg ? 0 : state.counties.size) + RARE.filter(h => state.slots.has(h)).length) || '';   // 手機「篩選」按鈕：地區以外另外選了幾項（含較少用的登頂時段）
+  $('filter-n').textContent = (state.cats.size + state.counties.size + (sameSet(state.slots, DEF_SLOTS) ? 0 : 1)) || '';   // 「篩選」按鈕：改了幾項（登山時段不是預設算 1 項）
   $('fav-count').innerHTML = favRows.length ? `${title}・${favRows.length} 座，依燈號排序` : '';
   $('fav-box').hidden = !favRows.length; $('fav-empty').hidden = !!favRows.length;
   $('fav-matrix').tHead.innerHTML = head;
@@ -304,29 +300,18 @@ function chipGroup(box, attr, set, {allId, parse = v => v, keepOne, onChange}){
   return sync;
 }
 const sameSet = (set, arr) => set.size === arr.length && arr.every(x => set.has(x));
-const regionNow = () => REGIONS.find(([, cs]) => sameSet(state.counties, cs));   // 目前縣市剛好等於某個地區，就回傳那個地區
+const placeText = () => !state.counties.size ? '全台' : state.counties.size <= 2 ? [...state.counties].join('、') : state.counties.size + ' 個縣市';
 
 // ---------- 啟動與事件 ----------
 (function init(){
   const counties = [...new Set(M.flatMap(m => m.co.split('、')))].filter(Boolean).sort((a,b) => COUNTY_ORDER.indexOf(a) - COUNTY_ORDER.indexOf(b));
   $('f-county').innerHTML = `<button type="button" class="chip reset" id="c-all" aria-pressed="true">全部</button>` + counties.map(c=>`<button type="button" class="chip" data-co="${esc(c)}" aria-pressed="false">${esc(c)}</button>`).join('');
-  const slotChips = a => a.map(h=>`<button type="button" class="chip mono" data-h="${h}">${slotLabel(h)}</button>`).join('');
-  $('f-slots').innerHTML = slotChips(SLOTS.filter(h => !RARE.includes(h)));
-  $('f-slots2').innerHTML = slotChips(RARE);
+  $('f-slots').innerHTML = SLOTS.map(h=>`<button type="button" class="chip mono" data-h="${h}">${slotLabel(h)}</button>`).join('');
 
-  const syncCounty = chipGroup($('f-county'), 'data-co', state.counties, {allId:'c-all', onChange: refilter});
-  $('f-region').innerHTML = REGIONS.map(([n], i) => `<button type="button" class="chip" data-rg="${i}" aria-pressed="false">${n}</button>`).join('');
-  $('f-region').onclick = e => {
-    const b = e.target.closest('[data-rg]'); if (!b) return;
-    state.counties.clear(); REGIONS[+b.dataset.rg][1].forEach(c => state.counties.add(c));
-    syncCounty();
-    if ($('view-find').hidden) $('tab-find').click();
-    refilter();
-  };
+  chipGroup($('f-county'), 'data-co', state.counties, {allId:'c-all', onChange: refilter});
   chipGroup($('f-cat'), 'data-c', state.cats, {allId:'cat-all', onChange: refilter});
   const onSlots = {parse: Number, keepOne: true, onChange(){ store.set('slots', [...state.slots]); refresh(); }};
   chipGroup($('f-slots'), 'data-h', state.slots, onSlots);
-  chipGroup($('f-slots2'), 'data-h', state.slots, onSlots);   // 較少用的時段（進階篩選裡），和上面共用同一組登頂時段
   store.set('slots', [...state.slots]);
 
   const seg = document.querySelectorAll('#seg button');
@@ -340,7 +325,7 @@ const regionNow = () => REGIONS.find(([, cs]) => sameSet(state.counties, cs));  
   $('s-x').onclick = () => { const f = $('f-name'); if (f.value){ f.value = ''; f.dispatchEvent(new Event('input')); } setSearch(false); $('s-btn').focus(); };
   $('f-name').addEventListener('blur', () => setTimeout(() => { if (!$('search').contains(document.activeElement)) setSearch(false); }, 150));   // 離開搜尋框就收起（已輸入的字保留，放大鏡會變深色）
   const setFilter = open => { $('q').classList.toggle('open', open); $('f-scrim').hidden = !open; $('filter-btn').setAttribute('aria-expanded', open); };
-  $('filter-btn').onclick = () => { if ($('view-find').hidden) $('tab-find').click(); setFilter(true); };
+  $('filter-btn').onclick = () => { if (!$('view-find').hidden || !$('view-fav').hidden) setFilter(!$('q').classList.contains('open')); else { $('tab-find').click(); setFilter(true); } };
   $('filter-done').onclick = $('f-scrim').onclick = () => setFilter(false);
   document.addEventListener('keydown', e => { if (e.key === 'Escape'){ setFilter(false); setSearch(false); } });
   $('q').onsubmit = e => e.preventDefault();
@@ -357,7 +342,8 @@ const regionNow = () => REGIONS.find(([, cs]) => sameSet(state.counties, cs));  
     const v = b.dataset.view;
     tabs.forEach(o => o.setAttribute('aria-selected', o === b));
     ['find','fav','rules'].forEach(x => $('view-'+x).hidden = v !== x);
-    document.body.dataset.view = v;                       // 排序規則頁隱藏登山時段與預報時段
+    document.body.dataset.view = v;
+    if (v === 'rules') setFilter(false);                       // 排序規則頁隱藏登山時段與預報時段
     window.scrollTo(0, 0);                                // 切換分頁時回到頁面頂端
   });
 
@@ -381,17 +367,6 @@ const regionNow = () => REGIONS.find(([, cs]) => sameSet(state.counties, cs));  
     if (e.key === 'Escape') return closeDetail();
     if (e.key === 'Enter' && !e.target.closest('[data-fav]')){ const t = e.target.closest('[data-k]'); if (t) openDetail(t.dataset.k); }
   });
-
-  // 手機：往下滑時標題那一排收起，只留搜尋、地區、篩選；往上滑或回到頂端再出現
-  let lastY = window.scrollY, lockUntil = 0;
-  window.addEventListener('scroll', () => {
-    const y = window.scrollY, hd = document.querySelector('header.top'), now = Date.now();
-    if (now < lockUntil){ lastY = y; return; }           // 剛收起／展開，等動畫結束再判斷，避免來回閃動
-    const want = y < 60 ? false : y > lastY + 6 ? true : y < lastY - 6 ? false : null;
-    if (want === null) return;
-    lastY = y;
-    if (want !== hd.classList.contains('compact')){ hd.classList.toggle('compact', want); lockUntil = now + 350; }
-  }, {passive: true});
 
   refresh();                                                // 先顯示山岳清單，資料到了再補上燈號
   loadForecast();
