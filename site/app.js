@@ -162,10 +162,10 @@ const peaksLeft = () => cols.filter(c => c.peak && !c.past).length;
 const isWeek = () => state.mode === 'week';
 const headRow = () => `<tr><th class="mt">山岳</th>${cols.map(c=>`<th class="${c.ref?'ref ':''}${c.peak?'peak ':''}${c.wkd?'we':''}"><span class="dt"><span class="lg">${c.head||c.label}</span><span class="st">${c.short}</span></span>${c.sub}</th>`).join('')}${isWeek()?'<th class="cnt-h">A 天數</th>':''}</tr>`;
 const bodyRow = r => `<tr data-k="${r.k}" tabindex="0"><th class="mt" scope="row"><div class="mt-in"><span class="nm">${esc(r.m.n)}</span><span class="sub">${sub(r.m)}</span>${star(r.k)}</div></th>${r.cells.map(c=>`<td>${lamp(c)}</td>`).join('')}${isWeek()?`<td class="cnt"><span class="cn-s">${r.k1} / 7</span><span class="cn-l">A ${r.k1} 天</span></td>`:''}</tr>`;
-// 山岳卡片（手機列表與收藏；精簡兩列）：山名＋資訊＋收藏／燈號＋比較結果
+// 山岳卡片（手機列表與收藏；精簡兩列）：山名＋資訊＋收藏／燈號（不顯示比較結果，一週也不寫 A 天數；2026-10-20）
 // 小燈上方標出時段（逐 3 小時寫開始時刻，一週寫日期＋星期）；登頂時段實心深色底、週末紅色
 const pickHead = () => cols.map(c => `<span class="ph${c.peak?' peak':''}${c.wkd?' we':''}${c.ref?' ref':''}" aria-hidden="true">${c.short}</span>`).join('');
-const pickCard = (r, head) => `<div class="pick" data-k="${r.k}" tabindex="0" role="button"><div class="p1"><span class="nm">${esc(r.m.n)}</span><span class="meta">${sub(r.m)}</span>${star(r.k)}</div><div class="p2"><span class="lights" style="--n:${cols.length}">${head}${r.cells.map(c=>lamp(c,true)).join('')}</span>${isWeek()?`<span class="rank">A ${r.k1} 天</span>`:''}</div></div>`;
+const pickCard = (r, head) => `<div class="pick" data-k="${r.k}" tabindex="0" role="button"><div class="p1"><span class="nm">${esc(r.m.n)}</span><span class="meta">${sub(r.m)}</span>${star(r.k)}</div><div class="p2"><span class="lights" style="--n:${cols.length}">${head}${r.cells.map(c=>lamp(c,true)).join('')}</span></div></div>`;
 
 function render(){
   const week = state.mode === 'week', d0 = cols[0].date;
