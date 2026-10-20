@@ -84,8 +84,13 @@ input:focus-visible,select:focus-visible,button:focus-visible{outline:2px solid 
 .chip.mono{font-family:var(--f-mono);font-size:13px}
 #f-cat{flex-wrap:nowrap;overflow-x:auto}
 #f-cat .chip{white-space:nowrap;flex:none}
-.info{font:600 11px/1 var(--f-mono);width:18px;height:18px;border-radius:50%;border:1.5px solid var(--accent);color:var(--accent);background:transparent;display:inline-grid;place-items:center;cursor:pointer;padding:0;margin-left:4px;font-style:normal}
-.info[aria-expanded="true"]{background:var(--accent);color:var(--accent-ink)}
+/* i 說明按鈕：無襯線字、上下置中；外圍加大可點範圍（手機好按） */
+.info{font:700 11.5px/1 var(--f-body);width:18px;height:18px;border-radius:50%;border:1.5px solid currentColor;color:var(--muted);background:transparent;display:inline-flex;align-items:center;justify-content:center;flex:none;cursor:pointer;padding:1px 0 0;margin:0;font-style:normal;vertical-align:middle;position:relative}
+.info::after{content:"";position:absolute;inset:-10px}
+.info:hover{color:var(--ink)}
+.info[aria-expanded="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+h2 .info{width:20px;height:20px;font-size:12.5px}
+#h-matrix{display:flex;align-items:center;gap:7px}
 .info-pop{background:var(--surface);border:1px solid var(--accent);border-radius:8px;padding:12px 14px;font-size:14px;max-width:560px;display:flex;flex-direction:column;gap:6px}
 .info-head{display:flex;justify-content:space-between;align-items:center;gap:12px}
 .info-pop ul{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:3px}
@@ -297,7 +302,7 @@ footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);paddin
     </div>
 
     <section style="display:flex;flex-direction:column;gap:10px" aria-labelledby="h-matrix">
-      <div class="sec-head"><h2 id="h-matrix"><span id="h-picks-t">燈號排序</span><button type="button" class="info" id="pick-info-btn" aria-expanded="false" aria-controls="pick-info" aria-label="怎麼比較與排序">i</button></h2><p id="range-text"></p></div>
+      <div class="sec-head"><h2 id="h-matrix"><span id="h-picks-t">燈號排序</span><button type="button" class="info" id="pick-info-btn" aria-expanded="false" aria-controls="pick-info" aria-label="怎麼比較與排序">i</button></h2></div>
       <div class="info-pop" id="pick-info" hidden>
         <div class="info-head"><b id="pick-info-t">怎麼比較與排序？</b><button type="button" class="info-x" id="pick-info-x" aria-label="關閉說明">×</button></div>
         <div id="pick-info-body"></div>

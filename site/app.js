@@ -27,10 +27,6 @@ const beaufort = ws => BF.reduce((b, v, i) => ws >= v ? i : b, 0);
 const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));  // 外部資料（氣象署文字）放進畫面前先轉義
 const sortedSlots = () => [...state.slots].sort((a,b)=>a-b);
 const DEF_SLOTS = [6,9];                                    // 預設登山時段 06–12
-const slotRange = () => {                                   // 相連的時段合併，例如 06–09、09–12 → 06–12
-  const out = []; for (const h of sortedSlots()){ const l = out[out.length-1]; if (l && l[1] === h) l[1] = h+3; else out.push([h, h+3]); }
-  return out.map(([a,b]) => `${pad(a)}–${pad(b)}`).join('、');
-};
 const store = {                                             // 瀏覽器儲存：讀寫失敗時不影響畫面
   raw(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } },
   get(k, fb){ const v = this.raw(k); if (v == null) return fb; try{ return JSON.parse(v); }catch(e){ return v; } },
@@ -176,7 +172,6 @@ function render(){
   const title = week ? `一週 ${fmtH(dayAt(0))} – ${fmtH(dayAt(6))}` : `${MODES[state.mode].name} ${fmtH(d0)} 逐 3 小時預報`;
   $('h-picks-t').textContent = (week ? '這週' : MODES[state.mode].name) + '燈號排序';
   $('pick-info-body').innerHTML = pickInfo(week);
-  $('range-text').innerHTML = `${title}・<span class="nw">${esc(placeText())}</span>・<span class="nw">登山 ${slotRange()}</span>`;   // 篩選都收在「篩選」裡，這裡寫出目前的地點與登山時段
   document.querySelectorAll('#seg .sd').forEach((e, i) => { const d = dayAt(i); e.textContent = fmt(d); e.classList.toggle('we', isWE(d)); });
   const md = d => `${d.getMonth()+1}/${d.getDate()}`;
   $('seg-week').textContent = `${md(dayAt(0))}–${md(dayAt(6))}`;   // 一週預報按鈕下方寫日期區間
@@ -280,7 +275,6 @@ function chipGroup(box, attr, set, {allId, parse = v => v, keepOne, onChange}){
   return sync;
 }
 const sameSet = (set, arr) => set.size === arr.length && arr.every(x => set.has(x));
-const placeText = () => !state.counties.size ? '全台' : state.counties.size <= 2 ? [...state.counties].join('、') : state.counties.size + ' 個縣市';
 
 // ---------- 啟動與事件 ----------
 (function init(){
