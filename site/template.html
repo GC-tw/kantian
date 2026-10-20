@@ -168,6 +168,7 @@ table.matrix{border-collapse:separate;border-spacing:0;width:100%;font-variant-n
 .lamp.y{background:var(--warn-soft);color:var(--warn);border-color:var(--warn)}
 .lamp.r{background:var(--stop-soft);color:var(--stop);border-color:var(--stop)}
 .lamp.ref{border-style:dashed;opacity:.85}
+.lamp.dash{background:transparent;border-color:var(--muted)}   /* 圖例的虛線範例：不寫字、不上色 */
 .lamp.past{opacity:.35}
 .seg{display:grid;grid-template-columns:repeat(5,1fr);gap:0;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--surface);max-width:720px}
 .seg button{font:inherit;font-weight:700;font-size:16px;background:none;border:0;border-left:1px solid var(--line);color:var(--muted);padding:10px 8px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:0}
@@ -316,7 +317,7 @@ footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);paddin
 
     <div style="display:flex;flex-direction:column;gap:10px">
       <div class="legend">
-          <span><i class="lamp sm g p">A</i>讚</span><span><i class="lamp sm g">B</i>可</span><span><i class="lamp sm y">C</i>注意</span><span><i class="lamp sm r">D</i>不建議</span><span><i class="lamp sm na">—</i>已過或無資料</span><span id="lg-ref" class="lg-ref"><i class="lamp sm g ref">B</i>虛線＝第 4–7 天，僅供參考<button type="button" class="info" id="info-btn" aria-expanded="false" aria-controls="info-ref" aria-label="為什麼第 4–7 天只供參考"><svg viewBox="0 0 20 20" aria-hidden="true"><circle class="ring" cx="10" cy="10" r="9.1"/><circle cx="10" cy="6.1" r="1.2"/><rect x="9.2" y="8.5" width="1.6" height="6.6" rx=".8"/></svg></button></span>
+          <span><i class="lamp sm g p">A</i>讚</span><span><i class="lamp sm g">B</i>可</span><span><i class="lamp sm y">C</i>注意</span><span><i class="lamp sm r">D</i>不建議</span><span><i class="lamp sm na">—</i>已過或無資料</span><span id="lg-ref" class="lg-ref"><i class="lamp sm ref dash" aria-hidden="true"></i>虛線＝第 4–7 天，僅供參考<button type="button" class="info" id="info-btn" aria-expanded="false" aria-controls="info-ref" aria-label="為什麼第 4–7 天只供參考"><svg viewBox="0 0 20 20" aria-hidden="true"><circle class="ring" cx="10" cy="10" r="9.1"/><circle cx="10" cy="6.1" r="1.2"/><rect x="9.2" y="8.5" width="1.6" height="6.6" rx=".8"/></svg></button></span>
         </div>
       <div class="info-pop" id="info-ref" hidden>
         <div class="info-head"><b>為什麼第 4–7 天只供參考？</b><button type="button" class="info-x" id="info-x" aria-label="關閉說明">×</button></div>
@@ -344,7 +345,7 @@ footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);paddin
 
   <main id="view-fav" hidden style="display:flex;flex-direction:column;gap:10px">
     <div class="sec-head"><h2 id="h-favs">我的收藏</h2></div>
-    <div class="legend"><span><i class="lamp sm g p">A</i>讚</span><span><i class="lamp sm g">B</i>可</span><span><i class="lamp sm y">C</i>注意</span><span><i class="lamp sm r">D</i>不建議</span><span><i class="lamp sm na">—</i>已過或無資料</span><span class="lg-ref"><i class="lamp sm g ref">B</i>虛線＝第 4–7 天，僅供參考</span></div>
+    <div class="legend"><span><i class="lamp sm g p">A</i>讚</span><span><i class="lamp sm g">B</i>可</span><span><i class="lamp sm y">C</i>注意</span><span><i class="lamp sm r">D</i>不建議</span><span><i class="lamp sm na">—</i>已過或無資料</span><span class="lg-ref"><i class="lamp sm ref dash" aria-hidden="true"></i>虛線＝第 4–7 天，僅供參考</span></div>
     <div class="matrix-box" id="fav-box"><table class="matrix" id="fav-matrix"><thead></thead><tbody></tbody></table><div class="cards" id="fav-cards"></div></div>
     <div class="fav-empty" id="fav-empty">還沒有收藏。到「找山」點山名旁的 ♡，就能把山加到這裡，快速查看它們的天氣。</div>
   </main>
