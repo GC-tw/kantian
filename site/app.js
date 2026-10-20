@@ -205,7 +205,7 @@ function render(){
   $('pick-info-body').innerHTML = pickInfo(week); gradeChips($('pick-info-body'));
   document.querySelectorAll('#seg .sd').forEach((e, i) => { const d = dayAt(i); e.innerHTML = `${d.getMonth()+1}/${d.getDate()}<span class="sw">週${WD[d.getDay()]}</span>`; e.classList.toggle('we', isWE(d)); });
   const md = d => `${d.getMonth()+1}/${d.getDate()}`;
-  $('seg-week').textContent = `${md(dayAt(0))}–${md(dayAt(6))}`;   // 一週按鈕下方寫日期區間
+  $('seg-week').innerHTML = `${md(dayAt(0))}–<span class="sw">${md(dayAt(6))}</span>`;   // 一週按鈕下方寫日期區間：起始日、結束日各一行
   ['matrix','fav-matrix'].forEach(id => $(id).style.setProperty('--n', cols.length));
   document.querySelectorAll('.lg-ref').forEach(e => e.hidden = !week);
   if (!week) setInfo(false);
