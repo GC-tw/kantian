@@ -224,17 +224,9 @@ footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);paddin
   header.top h1{font-size:22px}
   header.top h1 small{font-size:11px;margin-top:1px}
   header.top .hl{color:var(--bar-muted);font-size:12px}
-  /* 往下滑：只留「今天／明天／後天／一週預報」；收起的部分用 grid 0fr→1fr 做高度動畫 */
-  .hd-more{display:grid;grid-template-rows:1fr;transition:grid-template-rows .2s ease,opacity .2s ease,margin .2s ease}
-  .hd-more>.hd-in{overflow:hidden;min-height:0}
-  header.top{transition:padding .2s ease}
-  header.top.compact{padding-top:calc(8px + env(safe-area-inset-top,0px));padding-bottom:8px}
-  header.top.compact .hd-more{grid-template-rows:0fr;opacity:0;margin-bottom:-10px}
-  /* 標題列裡的時段按鈕：深色底 */
-  header.top .seg{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.2)}
-  header.top .seg button{color:var(--bar-muted);border-left-color:rgba(255,255,255,.2)}
-  header.top .seg button[aria-selected="true"]{background:var(--bar-ink);color:var(--bar)}
-  header.top .seg button[aria-selected="true"] small.we{color:var(--bar)}
+  /* 往下滑：整個標題列往上收起，往上滑再出現（只移動畫面，不改版面高度，所以不會跳動） */
+  header.top{transition:transform .2s ease,box-shadow .2s ease}
+  header.top.compact{transform:translateY(-100%);box-shadow:none}
   .search.open input{font-size:16px}
   /* 手機寬度放不下文字：進階篩選只留圖示，地區按鈕縮小，整排不需左右滑動 */
   .filter-btn{display:inline-flex;align-items:center;gap:2px;height:34px;padding:0 7px 0 9px;font-size:13px;white-space:nowrap}
@@ -260,7 +252,7 @@ footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);paddin
 
 <div class="wrap">
   <header class="top">
-    <!-- 標題列（2026-10-20）：標題＋搜尋／進階 → 地點 → 登山時段 → 今天／明天／後天／一週預報；手機往下滑時只留最後一排 -->
+    <!-- 標題列（2026-10-20）：標題＋搜尋／進階 → 地點 → 登山時段；手機往下滑時整列收起，往上滑再出現 -->
     <div class="hd-more"><div class="hd-in">
     <div class="row1">
     <!-- 圖示為暫定示意（方向 A），之後再重新設計 -->
@@ -273,12 +265,6 @@ footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);paddin
     <div class="hrow"><span class="hl">地點：</span><div class="chips regions" id="f-region" role="group" aria-label="地點"></div></div>
     <div class="hrow find-only"><span class="hl">登山時段：</span><div class="chips" id="f-slots" role="group" aria-label="登山時段（可多選；其他時段在進階篩選）" title="可多選；00–03、18–21、21–24 在進階篩選"></div></div>
     </div></div>
-    <div class="seg find-only" role="tablist" aria-label="預報時段" id="seg">
-      <button type="button" role="tab" data-mode="today" aria-selected="true">今天<small class="sd">逐 3 小時預報</small></button>
-      <button type="button" role="tab" data-mode="tmr" aria-selected="false">明天<small class="sd">逐 3 小時預報</small></button>
-      <button type="button" role="tab" data-mode="d2" aria-selected="false">後天<small class="sd">逐 3 小時預報</small></button>
-      <button type="button" role="tab" data-mode="week" aria-selected="false">一週預報<small id="seg-week">7 天</small></button>
-    </div>
   </header>
 
   <div class="notice" id="status" role="status" hidden></div>
@@ -288,6 +274,13 @@ footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);paddin
     <button role="tab" id="tab-fav" aria-selected="false" data-view="fav"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7.5-4.6-7.5-10.1A4.2 4.2 0 0 1 12 7.6a4.2 4.2 0 0 1 7.5 2.3C19.5 15.4 12 20 12 20z"/></svg><span>我的收藏</span><span id="fav-tab-n" class="cnt badge"></span></button>
     <button role="tab" id="tab-rules" aria-selected="false" data-view="rules"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v16H5z"/><path d="M9 9h6M9 13h6M9 17h3"/></svg><span>排序規則<span class="full">與說明</span></span></button>
   </nav>
+
+  <div class="seg find-only" role="tablist" aria-label="預報時段" id="seg">
+    <button type="button" role="tab" data-mode="today" aria-selected="true">今天<small class="sd">逐 3 小時預報</small></button>
+    <button type="button" role="tab" data-mode="tmr" aria-selected="false">明天<small class="sd">逐 3 小時預報</small></button>
+    <button type="button" role="tab" data-mode="d2" aria-selected="false">後天<small class="sd">逐 3 小時預報</small></button>
+    <button type="button" role="tab" data-mode="week" aria-selected="false">一週預報<small id="seg-week">7 天</small></button>
+  </div>
 
   <main id="view-find" style="display:flex;flex-direction:column;gap:18px">
     <form class="panel-search" id="q" autocomplete="off" aria-label="進階篩選">
