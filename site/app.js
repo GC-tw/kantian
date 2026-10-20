@@ -282,9 +282,12 @@ const sameSet = (set, arr) => set.size === arr.length && arr.every(x => set.has(
   $('f-county').innerHTML = `<button type="button" class="chip reset" id="c-all" aria-pressed="true">全部</button>` + counties.map(c=>`<button type="button" class="chip" data-co="${esc(c)}" aria-pressed="false">${esc(c)}</button>`).join('');
   $('f-slots').innerHTML = SLOTS.map(h=>`<button type="button" class="chip mono" data-h="${h}">${slotLabel(h)}</button>`).join('');
 
-  chipGroup($('f-county'), 'data-co', state.counties, {allId:'c-all', onChange: refilter});
-  chipGroup($('f-cat'), 'data-c', state.cats, {allId:'cat-all', onChange: refilter});
-  const onSlots = {parse: Number, keepOne: true, onChange(){ store.set('slots', [...state.slots]); refresh(); }};
+  // 篩選面板裡的選擇先記下，按「完成」（或關閉面板）時才一次重新計算、排序，並回到列表最上面
+  let pending = false;
+  const onPick = () => { pending = true; $('filter-n').textContent = (state.cats.size + state.counties.size + (sameSet(state.slots, DEF_SLOTS) ? 0 : 1)) || ''; };
+  chipGroup($('f-county'), 'data-co', state.counties, {allId:'c-all', onChange: onPick});
+  chipGroup($('f-cat'), 'data-c', state.cats, {allId:'cat-all', onChange: onPick});
+  const onSlots = {parse: Number, keepOne: true, onChange(){ store.set('slots', [...state.slots]); onPick(); }};
   chipGroup($('f-slots'), 'data-h', state.slots, onSlots);
   store.set('slots', [...state.slots]);
 
@@ -298,7 +301,10 @@ const sameSet = (set, arr) => set.size === arr.length && arr.every(x => set.has(
   $('s-btn').onclick = () => setSearch(!$('search').classList.contains('open'));
   $('s-x').onclick = () => { const f = $('f-name'); if (f.value){ f.value = ''; f.dispatchEvent(new Event('input')); } setSearch(false); $('s-btn').focus(); };
   $('f-name').addEventListener('blur', () => setTimeout(() => { if (!$('search').contains(document.activeElement)) setSearch(false); }, 150));   // 離開搜尋框就收起（已輸入的字保留，放大鏡會變深色）
-  const setFilter = open => { $('q').classList.toggle('open', open); $('f-scrim').hidden = !open; $('filter-btn').setAttribute('aria-expanded', open); };
+  const setFilter = open => {
+    $('q').classList.toggle('open', open); $('f-scrim').hidden = !open; $('filter-btn').setAttribute('aria-expanded', open);
+    if (!open && pending){ pending = false; state.shown = PAGE; refresh(); window.scrollTo(0, 0); }
+  };
   $('filter-btn').onclick = () => { if (!$('view-find').hidden || !$('view-fav').hidden) setFilter(!$('q').classList.contains('open')); else { $('tab-find').click(); setFilter(true); } };
   $('filter-done').onclick = $('f-scrim').onclick = () => setFilter(false);
   document.addEventListener('keydown', e => { if (e.key === 'Escape'){ setFilter(false); setSearch(false); } });
