@@ -36,8 +36,8 @@
   "records": {
     "location": [
       {
-        "locationName": "苗栗縣",
-        "geocode": 10005,
+        "locationName": "新北市",
+        "geocode": 65,
         "hazardConditions": {
           "hazards": [
             {
@@ -55,8 +55,8 @@
         }
       },
       {
-        "locationName": "臺中市",
-        "geocode": 66,
+        "locationName": "金門縣",
+        "geocode": 9020,
         "hazardConditions": {
           "hazards": [
             {
