@@ -252,6 +252,12 @@ async function main(){
       }
     }
   }catch(e){ warn('警特報抓取失敗：' + e.message); }
+  // 特報內容與影響區域（W-C0033-002）：只存完整原始資料，用來確認是否有鄉鎮層級的影響範圍（2026-10-20 調查用，不影響燈號）
+  if (!FIXTURES) try{
+    const j2 = await getDataset('W-C0033-002');
+    fs.mkdirSync(SAMPLES_DIR, {recursive: true});
+    fs.writeFileSync(path.join(SAMPLES_DIR, 'alerts-detail.json'), JSON.stringify(j2, null, 1));
+  }catch(e){ console.log('（調查用）W-C0033-002 抓取失敗：' + e.message); }
 
   fs.mkdirSync(path.dirname(OUT), {recursive: true});
   fs.writeFileSync(OUT, JSON.stringify(result));
