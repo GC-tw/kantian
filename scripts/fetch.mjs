@@ -253,6 +253,12 @@ async function main(){
     }
   }catch(e){ warn('警特報抓取失敗：' + e.message); }
 
+  // 4. 颱風資料（試抓，先存樣本核對格式；2026-10-20）
+  if (!FIXTURES) for (const id of ['W-C0034-005', 'W-C0034-001']){
+    try{ const j = await getDataset(id, {}, {tries: 2, timeout: 30000}); fs.mkdirSync(SAMPLES_DIR, {recursive: true}); fs.writeFileSync(path.join(SAMPLES_DIR, 'typhoon-' + id + '.json'), JSON.stringify(j, null, 2)); }
+    catch(e){ console.log('颱風資料試抓失敗 ' + id + '：' + e.message); fs.writeFileSync(path.join(SAMPLES_DIR, 'typhoon-' + id + '.json'), JSON.stringify({error: e.message.replace(/Authorization=[^&\s]+/g, 'Authorization=***')})); }
+  }
+
   fs.mkdirSync(path.dirname(OUT), {recursive: true});
   fs.writeFileSync(OUT, JSON.stringify(result));
   const n = Object.values(result.points);
