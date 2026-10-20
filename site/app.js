@@ -168,8 +168,7 @@ const pickHead = () => cols.map(c => `<span class="ph${c.peak?' peak':''}${c.wkd
 const pickCard = (r, head) => `<div class="pick" data-k="${r.k}" tabindex="0" role="button"><div class="p1"><span class="nm">${esc(r.m.n)}</span><span class="meta">${sub(r.m)}</span>${star(r.k)}</div><div class="p2"><span class="lights" style="--n:${cols.length}">${head}${r.cells.map(c=>lamp(c,true)).join('')}</span></div></div>`;
 
 function render(){
-  const week = state.mode === 'week', d0 = cols[0].date;
-  const title = week ? `一週 ${fmtH(dayAt(0))} – ${fmtH(dayAt(6))}` : `${MODES[state.mode].name} ${fmtH(d0)} 逐 3 小時預報`;
+  const week = state.mode === 'week';
   $('h-picks-t').textContent = (week ? '這週' : MODES[state.mode].name) + '燈號排序';
   $('pick-info-body').innerHTML = pickInfo(week);
   document.querySelectorAll('#seg .sd').forEach((e, i) => { const d = dayAt(i); e.textContent = fmt(d); e.classList.toggle('we', isWE(d)); });
@@ -182,7 +181,6 @@ function render(){
   const head = headRow();
   $('fav-tab-n').textContent = favRows.length || '';
   $('filter-n').textContent = (state.cats.size + state.counties.size + (sameSet(state.slots, DEF_SLOTS) ? 0 : 1)) || '';   // 「篩選」按鈕：改了幾項（登頂時段不是預設算 1 項）
-  $('fav-count').innerHTML = favRows.length ? `${title}・${favRows.length} 座，依燈號排序` : '';
   $('fav-box').hidden = !favRows.length; $('fav-empty').hidden = !!favRows.length;
   $('fav-matrix').tHead.innerHTML = head;
   $('fav-matrix').tBodies[0].innerHTML = favRows.map(bodyRow).join('');
