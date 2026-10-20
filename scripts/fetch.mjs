@@ -235,10 +235,10 @@ async function main(){
   const missingTown = [...townsNeeded].filter(t => !result.points[t]);
   if (missingTown.length) warn('鄉鎮預報缺少：' + missingTown.join('、'));
 
-  // 3. 天氣警特報：保留颱風、豪雨、大雨（列入燈號）與陸上強風、低溫、濃霧（只在詳情顯示）；燈號等級由網頁的 ALERT_LV 決定
+  // 3. 天氣警特報：保留颱風、豪雨、大雨（列入燈號）與低溫、濃霧（只在詳情顯示）；燈號等級由網頁的 ALERT_LV 決定
   try{
     const j = await getDataset(ALERT_ID); saveSample('alerts', j);
-    const LV = [[/颱風|豪雨|大雨|陸上強風/, 2], [/低溫|濃霧/, 1]];
+    const LV = [[/颱風|豪雨|大雨/, 2], [/低溫|濃霧/, 1]];   // 陸上強風不收集（2026-10-20：只到縣市層級，改看各山風速預報）
     const locs = [].concat(pick(j.records || j, 'location', 'Location') || []);
     for (const loc of locs){
       const county = pick(loc, 'locationName', 'LocationName');

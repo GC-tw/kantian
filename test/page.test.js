@@ -89,11 +89,11 @@ let fails = 0; const ok = (c, m) => { console.log((c ? '✓ ' : '✗ ') + m); if
   const inp = d.getElementById('f-name'); inp.value = '鹿山'; inp.dispatchEvent(new w.Event('input', {bubbles: true}));
   ok(lamps().length && lamps().every(x => x === 'na'), '缺少資料的預報點顯示「無資料」');
   inp.value = ''; inp.dispatchEvent(new w.Event('input', {bubbles: true}));
-  // 特報：宜蘭縣今天陸上強風
+  // 特報：宜蘭縣今天陸上強風（不採用）
   click(w, d.querySelector('#seg [data-mode="today"]'));
   inp.value = '南湖北山'; inp.dispatchEvent(new w.Event('input', {bubbles: true}));
   click(w, d.querySelector('#matrix tbody tr td'));
-  ok(/陸上強風特報・不列入燈號/.test(d.getElementById('drawer').innerHTML) && !/陸上強風/.test([...d.querySelectorAll('#drawer td.why')].map(x => x.textContent).join()), '陸上強風特報顯示在詳情，但不列入燈號原因');
+  ok(!/陸上強風/.test(d.getElementById('drawer').innerHTML), '陸上強風特報不顯示，也不列入燈號');
   click(w, d.getElementById('d-close'));
   // 豪雨特報：屏東縣的山今天未過的時段都是 C
   inp.value = '笠頂山'; inp.dispatchEvent(new w.Event('input', {bubbles: true}));

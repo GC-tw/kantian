@@ -40,8 +40,9 @@ function useForecast(data){
   FC = data; fcIndex = new Map();
   for (const [key, p] of Object.entries(data.points || {}))
     fcIndex.set(key, {h3: new Map((p.h3 || []).map(r => [r.s, r])), week: new Map((p.week || []).map(r => [r.s, r]))});
-  // 特報：只有颱風、豪雨、大雨列入燈號（C）；陸上強風、低溫、濃霧只在詳情顯示（2026-10-20 使用者決定，山岳／鄉鎮預報的風速、氣溫、天氣描述已反映）
-  FC.alerts = (data.alerts || []).map(a => ({...a, lv: ALERT_LV(a.type)})).sort((a, b) => b.lv - a.lv);
+  // 特報：只有颱風、豪雨、大雨列入燈號（C）；低溫、濃霧只在詳情顯示（山岳／鄉鎮預報的氣溫、天氣描述已反映）
+  // 陸上強風特報不顯示：氣象署資料只到縣市層級，無法對應到鄉鎮；風大小看各山的風速預報（2026-10-20 使用者決定）
+  FC.alerts = (data.alerts || []).filter(a => !/陸上強風/.test(a.type || '')).map(a => ({...a, lv: ALERT_LV(a.type)})).sort((a, b) => b.lv - a.lv);
 }
 function slotForecast(p, di, hr){                           // 逐 3 小時：沒有資料時回傳 null
   return fcIndex.get(p.key)?.h3.get(dayAt(di).getTime() + hr*H) || null;
