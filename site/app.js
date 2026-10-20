@@ -265,7 +265,8 @@ function pickInfo(week){
     + '<h4>排序</h4>' + ul([score]) + '<p class="ip">依序比較：</p>' + ol(['登頂時段的總分，高的在前', '登頂時段中 A+ 的數量，多的在前', '登頂時段中 C 的數量，少的在前', '當天所有時段的總分，高的在前']) + ul(['登頂時段都過了，就改看當天剩下的時段。', nodata, tie]);
 }
 // 說明文字中的燈號（A+、A、B、C、—）換成小燈號方塊，顏色與列表一致（2026-10-20 使用者選「選項 1」）
-const GRADE_RE = /A\+|—|(?<![A-Za-z0-9])[ABC](?![A-Za-z])/g, GRADE_CLS = {'A+':'g p', 'A':'g', 'B':'y', 'C':'r', '—':'na'};
+const GRADE_RE = /A\+|—|(?<![A-Za-z0-9°])[ABC](?![A-Za-z])/g,   // 「°C」的 C 不是燈號（2026-10-20）
+ GRADE_CLS = {'A+':'g p', 'A':'g', 'B':'y', 'C':'r', '—':'na'};
 function gradeChips(root){
   if (!root) return;
   const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT), nodes = [];
