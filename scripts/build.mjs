@@ -6,7 +6,16 @@ import path from 'node:path';
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
 const read = f => fs.readFileSync(path.join(ROOT, f), 'utf8');
 const mountains = JSON.parse(read('data/mountains.json'));
-const js = read('site/app.js').replace('__DATA__', () => JSON.stringify(mountains));
+import {BF} from '../site/beaufort.mjs';
+// 網頁只放用得到的欄位：cn（氣象署原始名稱，只給 fetch.mjs 比對用）不放；空白的鄉鎮、備註、別名，以及和山名相同的預報點名稱也省略
+const slim = mountains.map(({cn, ...m}) => {
+  if (m.pt === m.n) delete m.pt;
+  if (!m.tw?.length) delete m.tw;
+  if (!m.note) delete m.note;
+  if (!m.al?.length) delete m.al;
+  return m;
+});
+const js = read('site/app.js').replace('__DATA__', () => JSON.stringify(slim)).replace('__BF__', () => JSON.stringify(BF));
 const tpl = read('site/template.html');
 const cut = tpl.indexOf('<style>');                                  // 標題與字型連結放進 <head>
 const head = tpl.slice(0, cut).replace(/<meta name="claude:[^>]*>\s*/g, '');

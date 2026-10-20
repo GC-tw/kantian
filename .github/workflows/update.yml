@@ -9,9 +9,9 @@ on:
     - cron: '7 10 * * *'   # 台灣 18:07
     - cron: '7 16 * * *'   # 台灣 00:07
   workflow_dispatch: {}    # 也可以在 GitHub 上手動按「Run workflow」（會重新抓資料）
-  push:                    # 只改網頁時：沿用網站上最新的天氣資料，不重新抓氣象署（較快）
+  push:                    # 只改網頁時：沿用網站上最新的天氣資料（較快）；改到山岳資料或抓資料程式時：自動重新抓資料
     branches: [main]
-    paths: ['site/**', 'scripts/build.mjs']
+    paths: ['site/**', 'scripts/**', 'data/mountains.json']
 
 permissions:
   contents: write          # 存回資料集代碼與格式樣本
@@ -31,6 +31,8 @@ jobs:
       url: ${{ steps.deploy.outputs.page_url }}
     steps:
       - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0           # 需要歷史紀錄，才能比對這次 push 改了哪些檔案
       - uses: actions/setup-node@v7
         with:
           node-version: 22
@@ -40,6 +42,10 @@ jobs:
         if: github.event_name == 'push'
         run: |
           mkdir -p dist
+          # 改到山岳資料、抓資料程式或共用的風級表：一定重新抓資料
+          if ! git diff --name-only "${{ github.event.before }}" "${{ github.sha }}" > "$RUNNER_TEMP/changed.txt" 2>/dev/null || grep -qE '^(data/mountains\.json|scripts/fetch\.mjs|site/beaufort\.mjs)$' "$RUNNER_TEMP/changed.txt"; then
+            echo "ok=false" >> "$GITHUB_OUTPUT"; echo "改到資料或抓資料程式，重新抓取"; exit 0
+          fi
           url="https://$(echo '${{ github.repository_owner }}' | tr 'A-Z' 'a-z').github.io/${{ github.event.repository.name }}/forecast.json"
           # 下載成功且資料在 9 小時內才沿用，否則改為重新抓取
           if curl -fsSL "$url" -o dist/forecast.json && node -e "const f=require('./dist/forecast.json'); process.exit(Date.now()-Date.parse(f.fetchedAt) < 9*3600e3 ? 0 : 1)"; then

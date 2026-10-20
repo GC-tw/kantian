@@ -7,7 +7,7 @@ const WD = ['日','一','二','三','四','五','六'];
 const SLOTS = [0,3,6,9,12,15,18,21];                       // 每段 3 小時的開始時刻
 const MODES = {today:{di:0,name:'今天'}, tmr:{di:1,name:'明天'}, d2:{di:2,name:'後天'}, d3:{di:3,name:'大後天'}, week:{name:'一週'}};
 const COUNTY_ORDER = ['基隆市','臺北市','新北市','桃園市','新竹市','新竹縣','苗栗縣','臺中市','彰化縣','南投縣','雲林縣','嘉義市','嘉義縣','臺南市','高雄市','屏東縣','宜蘭縣','花蓮縣','臺東縣','澎湖縣','金門縣','連江縣'];
-const BF = [0,0.3,1.6,3.4,5.5,8.0,10.8,13.9,17.2,20.8,24.5];  // 蒲福風級下限（公尺／秒）
+const BF = __BF__;                                         // 蒲福風級下限（公尺／秒）；由 build.mjs 從 site/beaufort.mjs 放入
 // 燈號名稱（2026-10-20 使用者定案）：A 佳（晴）、B 可、C 注意、D 不建議。內部等級 lv 仍是 0／1／2，plus 表示 A
 const SYM = ['B','C','D','—'], CLS = ['g','y','r','na'], WORD = ['可','注意','不建議','已過或無資料'];
 const LV = lv => lv < 0 ? 3 : lv;                                // 燈號等級 -1 代表沒有資料
@@ -22,13 +22,12 @@ const slotLabel = h => `${pad(h)}–${pad(h+3)}`;
 const isoDate = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
 const fmt = d => `${d.getMonth()+1}/${d.getDate()}（${WD[d.getDay()]}）`;
 const isWE = d => d.getDay() % 6 === 0;                      // 週六、週日
-const fmtH = d => isWE(d) ? `<span class="we">${fmt(d)}</span>` : fmt(d);   // 週末上紅色（放進 innerHTML 用）
 const dayAt = i => { const d = new Date(); d.setHours(0,0,0,0); d.setDate(d.getDate()+i); return d; };
 const beaufort = ws => BF.reduce((b, v, i) => ws >= v ? i : b, 0);
 const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));  // 外部資料（氣象署文字）放進畫面前先轉義
 const sortedSlots = () => [...state.slots].sort((a,b)=>a-b);
-const DEF_SLOTS = [9];
-const HT_BAND = h => h == null ? -1 : h < 1000 ? 0 : h < 2000 ? 1 : h < 3000 ? 2 : 3;   // 標高篩選：0＝1,000 m 以下、1＝1,000–2,000、2＝2,000–3,000、3＝3,000 m 以上（2026-10-20）                                      // 預設登頂時段 09–12（2026-10-20 由 06–12 改）
+const DEF_SLOTS = [9];                                      // 預設登頂時段 09–12（2026-10-20 由 06–12 改）
+const HT_BAND = h => h == null ? -1 : h < 1000 ? 0 : h < 2000 ? 1 : h < 3000 ? 2 : 3;   // 標高篩選：0＝1,000 m 以下、1＝1,000–2,000、2＝2,000–3,000、3＝3,000 m 以上（2026-10-20）
 const store = {                                             // 瀏覽器儲存：讀寫失敗時不影響畫面
   raw(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } },
   get(k, fb){ const v = this.raw(k); if (v == null) return fb; try{ return JSON.parse(v); }catch(e){ return v; } },
@@ -38,11 +37,20 @@ const fmtTime = ms => { const d = new Date(ms); return `${d.getMonth()+1}/${d.ge
 
 // ---------- 預報資料（forecast.json；格式見 scripts/fetch.mjs）----------
 let FC = null, fcIndex = new Map(), loadError = '';
+// version 2 是精簡格式（每筆是陣列，見 fetch.mjs 的 compact()），還原成 {s, pop, ws, bf, t, at, wx}；舊格式直接使用
+function decodeRows(rows, base, step, wx){
+  return (rows || []).map(r => {
+    if (!Array.isArray(r)) return r;
+    const [i, pop = null, ws = null, t = null, at = null, w = null, bf] = r;
+    return {s: base + i*step, pop, ws, bf: bf ?? (ws != null ? beaufort(ws) : null), t, at, wx: w == null ? null : wx[w]};
+  });
+}
 function useForecast(data){
   FC = data; fcIndex = new Map();
+  const t0 = data.t0, wx = data.wx || [];
   for (const [key, p] of Object.entries(data.points || {}))
-    fcIndex.set(key, {h3: new Map((p.h3 || []).map(r => [r.s, r])), week: new Map((p.week || []).map(r => [r.s, r]))});
-  // 特報：只採用颱風、豪雨、大雨（列入燈號，C）。陸上強風、低溫、高溫、濃霧特報不採用、不顯示：
+    fcIndex.set(key, {h3: new Map(decodeRows(p.h3, t0, 3*H, wx).map(r => [r.s, r])), week: new Map(decodeRows(p.week, t0 - 6*H, 12*H, wx).map(r => [r.s, r]))});
+  // 特報：只採用颱風、豪雨、大雨（列入燈號，D）。陸上強風、低溫、高溫、濃霧特報不採用、不顯示：
   // 氣象署資料只到縣市層級，無法對應到每座山；改看各山的風速、氣溫、天氣描述預報（2026-10-20 使用者決定）
   FC.alerts = (data.alerts || []).filter(a => ALERT_LV(a.type) > 0).map(a => ({...a, lv: ALERT_LV(a.type)})).sort((a, b) => b.lv - a.lv);
 }
@@ -76,8 +84,8 @@ function alertFor(p, start, end){                           // 列入燈號的�
   return alertHits(p, start, end).find(a => a.lv > 0) || null;
 }
 
-// 第 4–7 天（沒有降雨機率）雨的分級（2026-10-20 使用者決定）：「局部」「短暫」的雨為 B；
-// 其他的雨（陣雨、有雨、雨天、雨或雪等）為 C。描述中每個「雨」分別判斷，取最重的。
+// 第 4–7 天（沒有降雨機率）雨的分級（2026-10-20 使用者決定）：「局部」「短暫」的雨為 C（注意）；
+// 其他的雨（陣雨、有雨、雨天、雨或雪等）為 D（不建議）。描述中每個「雨」分別判斷，取最重的。
 const RAIN_RE = /(局部短暫陣|局部短暫|局部陣|局部|短暫陣|短暫|)雨/g;
 const rainLv = wx => Math.max(0, ...[...(wx || '').matchAll(RAIN_RE)].map(m => m[1] ? 1 : 2));
 
@@ -105,21 +113,24 @@ const MOUNTAINS = M.map(m => {
   const counties = m.co.split('、');
   const pts = m.pid
     ? [{key:m.pid, label:'氣象署登山預報點「'+(m.pt||m.n)+'」', code:m.pid, county:counties[0], counties}]
-    : m.tw.map(t => ({key:t, label:t+' 鄉鎮預報', code:'', county:t.slice(0,3), counties:[t.slice(0,3)]}));
+    : (m.tw || []).map(t => ({key:t, label:t+' 鄉鎮預報', code:'', county:t.slice(0,3), counties:[t.slice(0,3)]}));
   return {m, k:m.c+m.no, pts, counties, low: m.h!=null && m.h<1000, ht: HT_BAND(m.h), search: [m.n, ...(m.al||[]), m.note||''].join('\n')};
 });
 
 // ---------- 狀態 ----------
+// 篩選條件會記住（2026-10-20 使用者決定）：使用者沒改就維持上次設定，重新整理也一樣；讀到不合法的值就略過
+function loadFilters(){
+  const f = (v => v && typeof v === 'object' ? v : {})(store.get('filters'));
+  const ok = (a, test) => new Set(Array.isArray(a) ? a.filter(test) : []);
+  return {cats: ok(f.cats, v => ['百岳','小百岳','其他山岳'].includes(v)),
+    counties: ok(f.counties, v => typeof v === 'string' && M.some(m => m.co.split('、').includes(v))),
+    hts: ok(f.hts, v => [0,1,2,3].includes(v))};
+}
 const state = {
-  mode: MODES[store.get('mode')] ? store.get('mode') : 'today',
+  mode: (m => MODES[m] ? m : 'today')(store.get('mode')),
   slots: new Set((a => Array.isArray(a) && a.length ? a : DEF_SLOTS)(store.get('peak'))),   // 儲存名稱改為 peak：預設改 09–12 時，讓舊的 06–12 設定一起換成新預設
   name: '', shown: PAGE,
-  // 篩選條件會記住（2026-10-20 使用者決定）：使用者沒改就維持上次設定，重新整理也一樣
-  ...(f => ({cats: new Set(f.cats), counties: new Set(f.counties), hts: new Set(f.hts)}))((f => {
-    const ok = (a, test) => Array.isArray(a) ? a.filter(test) : [];
-    f = f && typeof f === 'object' ? f : {};
-    return {cats: ok(f.cats, v => ['百岳','小百岳','其他山岳'].includes(v)), counties: ok(f.counties, v => typeof v === 'string' && M.some(m => m.co.split('、').includes(v))), hts: ok(f.hts, v => [0,1,2,3].includes(v))};
-  })(store.get('filters')))
+  ...loadFilters()
 };
 const filterCount = () => state.cats.size + state.counties.size + state.hts.size + (sameSet(state.slots, DEF_SLOTS) ? 0 : 1);   // 「篩選」按鈕：改了幾項（登頂時段不是預設算 1 項）
 const saveFilters = () => { store.set('peak', [...state.slots]); store.set('filters', {cats:[...state.cats], counties:[...state.counties], hts:[...state.hts]}); };
@@ -192,7 +203,6 @@ const star = k => { const on = favs.has(k), t = on ? '取消收藏' : '加入收
 const lamp = (c, sm) => { const t = c.plus ? 'A' : SYM[LV(c.lv)];
   return `<i class="lamp ${CLS[LV(c.lv)]}${c.plus?' p':''}${c.ref?' ref':''}${c.past?' past':''}${sm?' sm':''}" title="${c.plus ? 'A 佳（晴）' : SYM[LV(c.lv)] + ' ' + WORD[LV(c.lv)]}${c.ref?'（參考）':''}${c.past?'（已過）':''}">${t}</i>`; };
 const sub = m => `${m.h ? m.h.toLocaleString()+' m' : '標高待補'}・${m.c}・${esc(m.co)}`;   // 標高、類別、縣市（不顯示編號）
-const peaksLeft = () => cols.filter(c => c.peak && !c.past).length;
 // 列表與卡片都不顯示比較結果（段數、A 天數；2026-10-20 拿掉），排序仍照規則
 const headRow = () => `<tr><th class="mt">山岳</th>${cols.map(c=>`<th class="${c.ref?'ref ':''}${c.peak?'peak ':''}${c.wkd?'we':''}"><span class="dt"><span class="lg">${c.head||c.label}</span><span class="st">${c.short}</span></span>${c.sub}</th>`).join('')}</tr>`;
 const bodyRow = r => `<tr data-k="${r.k}" tabindex="0"><th class="mt" scope="row"><div class="mt-in"><span class="nm">${esc(r.m.n)}</span><span class="sub">${sub(r.m)}</span>${star(r.k)}</div></th>${r.cells.map(c=>`<td>${lamp(c)}</td>`).join('')}</tr>`;
@@ -220,7 +230,7 @@ function render(){
   $('fav-matrix').tBodies[0].innerHTML = favRows.map(bodyRow).join('');
   $('fav-cards').innerHTML = favRows.map(r => pickCard(r, ph)).join('');
   $('matrix').tHead.innerHTML = head;
-  $('matrix').tBodies[0].innerHTML = rows.slice(0,state.shown).map(bodyRow).join('') || `<tr><td class="empty" colspan="${cols.length+(week?2:1)}">沒有符合條件的山。</td></tr>`;
+  $('matrix').tBodies[0].innerHTML = rows.slice(0,state.shown).map(bodyRow).join('') || `<tr><td class="empty" colspan="${cols.length+1}">沒有符合條件的山。</td></tr>`;
   $('matrix-cards').innerHTML = rows.slice(0,state.shown).map(r => pickCard(r, ph)).join('') || '<div class="empty">沒有符合條件的山。</div>';
   $('more-box').hidden = rows.length <= state.shown;
   $('more').textContent = `顯示更多（還有 ${rows.length-state.shown} 座）`;
@@ -232,7 +242,7 @@ const refilter = () => { state.shown = PAGE; fresh() ? applyFilters() : evaluate
 function openDetail(k){
   const r = byKey.get(k); if (!r) return;
   const week = state.mode === 'week', pts = r.pts;
-  const alerts = [...new Map(r.pts.flatMap(p => alertHits(p, cols[0].ws, cols[cols.length-1].we)).map(a => [a.county+a.type, a])).values()];   // 詳情列出所有生效中的特報（含不列入燈號的）
+  const alerts = [...new Map(r.pts.flatMap(p => alertHits(p, cols[0].ws, cols[cols.length-1].we)).map(a => [a.county+a.type, a])).values()];   // 詳情列出所有生效中的特報（颱風、豪雨、大雨）
   const v = (x, f) => x == null ? '—' : f(x);
   // 詳情表格：時段橫排（tenki.jp 做法，2026-10-20 使用者選「選項 1」）。欄是時段、列是項目，手機也不需左右滑動；
   // C、D 的原因列在表格下方
@@ -240,7 +250,7 @@ function openDetail(k){
     const cl = (c, col) => [c.ref ? 'ref' : '', c.past ? 'past' : '', col.peak ? 'peak' : '', week && col.wkd ? 'we' : ''].filter(Boolean).join(' ');
     const head = cols.map((col, j) => `<th class="${cl(r.cells[j], col)}">${week ? `${col.date.getMonth()+1}/${col.date.getDate()}<span class="wd">週${WD[col.date.getDay()]}</span>` : col.short}</th>`).join('');
     const row = (name, f, cls = '') => `<tr class="${cls}"><th scope="row">${name}</th>${r.cells.map((c, j) => `<td class="${cl(c, cols[j])}">${f(c.per[k], c)}</td>`).join('')}</tr>`;
-    const whys = r.cells.map((c, j) => { const x = c.per[k]; return x.j.lv > 0 ? `<li><b>${week ? cols[j].label : cols[j].label}</b>${lamp({lv:x.j.lv, ref:c.ref, past:c.past}, true)}${esc(x.j.why.join('、'))}</li>` : ''; }).join('');
+    const whys = r.cells.map((c, j) => { const x = c.per[k]; return x.j.lv > 0 ? `<li><b>${cols[j].label}</b>${lamp({lv:x.j.lv, ref:c.ref, past:c.past}, true)}${esc(x.j.why.join('、'))}</li>` : ''; }).join('');
     return `<div class="pt"><h3>${esc(p.label)}・${week ? '一週預報' : MODES[state.mode].name+'逐 3 小時預報'}</h3>
       <table class="vt" style="--n:${cols.length}"><thead><tr><th></th>${head}</tr></thead><tbody>
       ${row('燈號', (x, c) => lamp({lv:x.j.lv, plus:x.j.plus, ref:c.ref, past:c.past}, true), 'lr')}
@@ -257,7 +267,7 @@ function openDetail(k){
     <div class="src"><span><b>採用預報</b>：${esc(pts.map(p=>p.label+(p.code?'（'+p.code+'）':'')).join('、'))}</span>
       <span>${pts.length>1?'跨多個鄉鎮，各自列出；燈號取最差的鄉鎮。':''}${r.low?'標高 1,000 公尺以下，另判斷高溫。':''}</span>
       <span class="issued">資料來源：交通部中央氣象署・本站更新 ${FC ? fmtTime(Date.parse(FC.fetchedAt)) : '—'}</span></div>
-    ${alerts.map(a=>`<div class="alert"><b>${esc(a.type)}・${a.lv > 0 ? SYM[a.lv] : '不列入燈號'}</b>　${esc(a.county)}${a.end?`，有效至 ${fmtTime(a.end)}`:''}</div>`).join('')}
+    ${alerts.map(a=>`<div class="alert"><b>${esc(a.type)}・${SYM[a.lv]}</b>　${esc(a.county)}${a.end?`，有效至 ${fmtTime(a.end)}`:''}</div>`).join('')}
     ${r.m.al?.length?`<div class="note">別名：${esc(r.m.al.join('、'))}</div>`:''}
     ${r.m.note?`<div class="note">備註：${esc(r.m.note)}</div>`:''}
     ${pts.map(table).join('')}
@@ -266,8 +276,7 @@ function openDetail(k){
   $('d-close').focus();
 }
 function closeDetail(){ $('drawer').hidden = true; $('scrim').hidden = true; }
-// 燈號排序旁的 i：依目前模式說明比較標準與排序
-// 燈號排序旁的 i：用字與「排序規則與說明」頁一致（2026-10-20）
+// 燈號排序旁的 i：依目前模式說明比較標準與排序，用字與「排序規則與說明」頁一致（2026-10-20）
 function pickInfo(week){
   const slots = sortedSlots().map(slotLabel).join('、');
   const ul = a => '<ul>' + a.map(x => '<li>' + x + '</li>').join('') + '</ul>', ol = a => '<ol>' + a.map(x => '<li>' + x + '</li>').join('') + '</ol>';

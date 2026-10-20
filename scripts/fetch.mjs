@@ -3,6 +3,7 @@
 // 不需要安裝任何套件（Node 22 以上）。
 import fs from 'node:fs';
 import path from 'node:path';
+import {beaufort} from '../site/beaufort.mjs';
 
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
 const args = Object.fromEntries(process.argv.slice(2).reduce((a, v, i, arr) => (v.startsWith('--') ? [...a, [v.slice(2), arr[i+1] && !arr[i+1].startsWith('--') ? arr[i+1] : true]] : a), []));
@@ -15,6 +16,7 @@ const DATASETS_FILE = path.join(ROOT, 'data/datasets.json');                  //
 const SAMPLES_DIR = path.join(ROOT, 'data/samples');                          // 每種資料各存一小段樣本，方便核對格式
 const MOUNTAINS = JSON.parse(fs.readFileSync(path.join(ROOT, 'data/mountains.json'), 'utf8'));
 const warnings = [];
+let summary = null, errCause = '';                      // 寫進 data/last-run.json
 const warn = m => { warnings.push(m); console.warn('⚠ ' + m); };
 
 // 鄉鎮預報：各縣市資料集（n 為 3 天逐 3 小時、n+2 為一週逐 12 小時）；F-D0047-089／091 只到縣市層級，不使用
@@ -113,8 +115,6 @@ function merge(recs, S, len){
   }
   return hit ? v : null;
 }
-const BF = [0,0.3,1.6,3.4,5.5,8.0,10.8,13.9,17.2,20.8,24.5];
-const beaufort = ws => BF.reduce((b, x, i) => ws >= x ? i : b, 0);
 function normalize(v, daily){
   if (!v) return null;
   const ws = num(v.WindSpeed);
@@ -174,14 +174,20 @@ async function mountainDatasets(){
   return known;
 }
 
-function saveSample(name, j){                            // 只存第一個地點，檔案很小
+// 格式樣本：只存第一個地點（檔案很小），而且只在氣象署的格式（欄位結構）改變時才存，
+// 避免每次更新都因為天氣數值不同而重存（2026-10-20）
+const shape = v => Array.isArray(v) ? '[' + (v.length ? shape(v[0]) : '') + ']'
+  : v && typeof v === 'object' ? '{' + Object.keys(v).sort().map(k => k + ':' + shape(v[k])).join(',') + '}' : typeof v;
+function saveSample(name, j){
   if (FIXTURES) return;
-  fs.mkdirSync(SAMPLES_DIR, {recursive: true});
   const c = JSON.parse(JSON.stringify(j));
   const g = findNode(c, /^locations$/i);
   if (Array.isArray(g)) g.splice(1);
   const loc = findNode(c, /^location$/i); if (Array.isArray(loc)) loc.splice(2);
-  fs.writeFileSync(path.join(SAMPLES_DIR, name + '.json'), JSON.stringify(c, null, 2));
+  const f = path.join(SAMPLES_DIR, name + '.json');
+  try{ if (shape(JSON.parse(fs.readFileSync(f, 'utf8'))) === shape(c)) return; }catch{}
+  fs.mkdirSync(SAMPLES_DIR, {recursive: true});
+  fs.writeFileSync(f, JSON.stringify(c, null, 2));
 }
 
 // ---------- 颱風 ----------
@@ -192,12 +198,11 @@ const tyScale = ws => ws >= 51 ? '強烈颱風' : ws >= 32.7 ? '中度颱風' : 
 async function typhoons(){
   const out = [];
   const track = await getDataset('W-C0034-005', {}, {tries: 2, timeout: 30000});
-  const keep = (n, j) => { if (!FIXTURES){ fs.mkdirSync(SAMPLES_DIR, {recursive: true}); fs.writeFileSync(path.join(SAMPLES_DIR, n + '.json'), JSON.stringify(j, null, 2)); } };
-  keep('typhoon-track', track);
+  saveSample('typhoon-track', track);
   const tcs = [].concat(pick(pick(track.records || track, 'TropicalCyclones') || {}, 'TropicalCyclone') || []);
   let warns = [];
   try{
-    const w = await getDataset('W-C0034-001', {}, {tries: 2, timeout: 30000}); keep('typhoon-warning', w);
+    const w = await getDataset('W-C0034-001', {}, {tries: 2, timeout: 30000}); saveSample('typhoon-warning', w);
     const infos = []; (function walk(o){ if (!o || typeof o !== 'object') return; if (Array.isArray(o)) return o.forEach(walk); if ('headline' in o && 'expires' in o) infos.push(o); else Object.values(o).forEach(walk); })(w.records || w);
     const now = Date.now();
     warns = infos.filter(i => Date.parse(i.expires) > now && !/解除/.test(i.headline || '') && !JSON.stringify(i['typhoon-info'] || '').includes('"END"'))
@@ -226,7 +231,7 @@ async function typhoons(){
 
 // ---------- 主流程 ----------
 async function main(){
-  const result = {version: 1, fetchedAt: new Date().toISOString(), datasets: {}, issued: null, points: {}, alerts: [], typhoons: [], warnings};
+  const result = {version: 2, fetchedAt: new Date().toISOString(), datasets: {}, issued: null, points: {}, alerts: [], typhoons: [], warnings};
   const nameToPid = new Map(MOUNTAINS.filter(m => m.pid).map(m => [m.cn, m.pid]));
   const pids = new Set(nameToPid.values());
   const townsNeeded = new Set(MOUNTAINS.flatMap(m => m.tw || []));
@@ -298,7 +303,7 @@ async function main(){
   try{ result.typhoons = await typhoons(); }catch(e){ warn('颱風資料抓取失敗：' + e.message); }
 
   fs.mkdirSync(path.dirname(OUT), {recursive: true});
-  fs.writeFileSync(OUT, JSON.stringify(result));
+  fs.writeFileSync(OUT, JSON.stringify(compact(result)));
   const n = Object.values(result.points);
   console.log(`完成：${n.length} 個預報點（3 小時資料 ${n.filter(p=>p.h3?.length).length}、一週資料 ${n.filter(p=>p.week?.length).length}），特報 ${result.alerts.length} 則，警告 ${warnings.length} 則`);
   const d4 = twMidnight(Date.now()) + 3*24*H, wxCount = (pick) => Object.fromEntries(Object.entries(n.flatMap(p => (p.week || []).filter(pick).map(x => x.wx)).reduce((m, w) => (m[w] = (m[w] || 0) + 1, m), {})).sort((a, b) => b[1] - a[1]));
@@ -307,8 +312,23 @@ async function main(){
   if (!n.some(p => p.h3?.length)) throw new Error('沒有任何可用的預報資料，停止更新網站');
   try{ logWx(n, result.alerts); }catch(e){ warn('天氣用語紀錄失敗：' + e.message); }
 }
+// 網站用的精簡格式（version 2，2026-10-20）：每筆是陣列 [時段序號, 降雨機率, 風速, 氣溫, 體感, 天氣描述序號, 風級]，
+// 結尾沒有資料的項目省略；時段序號從 t0（今天 0 時）起算，逐 3 小時每格 3 小時、一週每格 12 小時（從 t0 − 6 小時起）；
+// 天氣描述放在共用清單 wx；風級只在和風速換算結果不同時才寫。網頁的 useForecast() 會還原成原本的欄位
+function compact(result){
+  const t0 = twMidnight(Date.now()), wx = [], wi = new Map();
+  const wxIdx = w => { if (w == null) return null; if (!wi.has(w)){ wi.set(w, wx.length); wx.push(w); } return wi.get(w); };
+  const enc = (rows, base, step) => (rows || []).map(r => {
+    const a = [(r.s - base) / step, r.pop, r.ws, r.t, r.at, wxIdx(r.wx)];
+    if (r.bf != null && (r.ws == null || beaufort(r.ws) !== r.bf)) a.push(r.bf);
+    while (a.length > 1 && a[a.length - 1] == null) a.pop();
+    return a;
+  });
+  const points = Object.fromEntries(Object.entries(result.points).map(([k, p]) => [k, {h3: enc(p.h3, t0, 3*H), week: enc(p.week, t0 - 6*H, 12*H)}]));
+  return {...result, t0, wx, points};
+}
 // 天氣用語紀錄 data/wx-log.json：累積每次執行出現的天氣描述，搭配當時有效的特報，
-// 用來觀察颱風、豪雨期間的用語，再決定「大雨、豪雨、霧、雪」的燈號規則（只紀錄，不影響燈號）
+// 用來觀察颱風、豪雨期間的用語，以及霧、雪、雨的燈號規則實際觸發的頻率（只紀錄，不影響燈號）
 function logWx(points, alerts){
   if (FIXTURES) return;
   const file = path.join(ROOT, 'data/wx-log.json'), now = Date.now(), day = new Date(now + TZ).toISOString().slice(0, 10);
@@ -329,5 +349,4 @@ function logWx(points, alerts){
 }
 // 每次執行結果寫進 data/last-run.json（會存回 GitHub），方便從專案直接看到成功或失敗原因
 const record = (ok, error) => { if (FIXTURES) return; fs.writeFileSync(path.join(ROOT, 'data/last-run.json'), JSON.stringify({time: new Date().toISOString(), ok, error: error || null, cause: error ? String(errCause || '') : null, warnings, summary}, null, 2)); };
-let errCause = '', summary = null;
 main().then(() => record(true)).catch(e => { errCause = e.cause?.code || e.cause?.message || ''; console.error('✖ ' + e.message, errCause); record(false, e.message); process.exit(1); });

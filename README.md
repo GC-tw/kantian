@@ -44,10 +44,11 @@
 | `data/samples/` | 每種資料各存一小段樣本，用來核對格式 |
 | `scripts/fetch.mjs` | 抓氣象署資料、整理成 `forecast.json` |
 | `scripts/build.mjs` | 組合網頁 `index.html` |
-| `site/` | 網頁本體（版面與程式） |
+| `site/` | 網頁本體（版面與程式；`beaufort.mjs` 是和抓資料程式共用的風級表） |
 | `.github/workflows/update.yml` | 自動排程 |
 | `test/` | 測試資料與網頁測試（`quick.mjs` 快速檢查、`page.test.js` 完整測試） |
 | `docs/HANDOFF.md` | 交接文件：規則、決定、流程與待辦 |
+| `docs/CHANGELOG.md` | 過去的完成紀錄（只供查歷史） |
 
 ## 使用的氣象署資料
 - 登山預報：F-B0053-035（3 天逐 3 小時）、F-B0053-033（一週逐 12 小時），從檔案下載介面取得；代碼記在 `data/datasets.json`，刪掉這個檔案就會重新探查

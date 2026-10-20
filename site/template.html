@@ -34,10 +34,8 @@ body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:1
   background-attachment:fixed}
 .wrap{max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px;display:flex;flex-direction:column;gap:18px}
 header.top{display:flex;flex-direction:column;gap:10px}
-.hd-in{display:flex;flex-direction:column;gap:10px}
 .row1{display:flex;align-items:center;justify-content:space-between;gap:12px;position:relative;min-width:0}
 .tools{display:flex;align-items:center;gap:6px;flex:none}
-.hl{flex:none;font-size:13px;font-weight:700;color:var(--muted);white-space:nowrap}
 body[data-view="rules"] .find-only{display:none}
 h1 .brand{display:inline-flex;align-items:center;gap:.28em;color:inherit;text-decoration:none;cursor:pointer}   /* 點標題：回到最上方 */
 h1 .logo{width:1.05em;height:1.05em;flex:none}
@@ -141,8 +139,6 @@ h2 .info{width:17px;height:17px;top:1.5px}
 .pick .ph.peak.we{color:var(--accent-ink)}
 .pick .ph.ref{color:var(--muted)}
 .pick .ph.we{color:var(--we)}
-.nw{white-space:nowrap}
-.pick .rank{flex:none;font-family:var(--f-mono);font-size:12px;line-height:24px;color:var(--muted)}
 .sec-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:6px 16px}
 .sec-head p{margin:0;color:var(--muted);font-size:13px}
 /* 「○○燈號排序」同一行靠右：篩選＋重新整理（圖示）（2026-10-20 由標題列移來） */
@@ -209,7 +205,6 @@ aside.drawer{position:fixed;top:0;right:0;bottom:0;width:min(520px,100%);backgro
 .alert{background:var(--stop-soft);border:1px solid var(--stop);color:var(--ink);border-radius:6px;padding:8px 12px;font-size:13px}
 .alert b{color:var(--stop)}
 .pt h3{font-size:15px;margin:0 0 6px;font-weight:700}
-.vt-box{overflow-x:auto}
 /* 詳情表格：時段橫排（欄＝時段、列＝項目），手機 360 寬也放得下 8 欄（2026-10-20） */
 table.vt{border-collapse:collapse;width:100%;table-layout:fixed;font-variant-numeric:tabular-nums;margin-top:4px}
 .vt th,.vt td{padding:5px 1px;border-bottom:1px solid var(--line);text-align:center;vertical-align:middle}
@@ -271,7 +266,6 @@ footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);paddin
   header.top .search.open .s-x{color:var(--bar-muted)}
   header.top h1{font-size:22px}
   header.top h1 small{font-size:11px;margin-top:1px}
-  header.top .hl{color:var(--bar-muted);font-size:12px}
   .search.open input{font-size:16px}
   /* 手機：篩選按鈕縮小 */
   .filter-btn{display:inline-flex;align-items:center;gap:2px;height:34px;padding:0 7px 0 9px;font-size:13px;white-space:nowrap}

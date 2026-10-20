@@ -13,7 +13,7 @@ let fails = 0;
 const ok = (c, m) => { console.log((c ? '✓ ' : '✗ ') + m); if (!c) fails++; };
 ok(scripts.length > 0, '網頁含有程式');
 for (const s of scripts){ try{ new Function(s); ok(true, '程式沒有語法錯誤'); }catch(e){ ok(false, '程式語法錯誤：' + e.message); } }
-ok(!/__DATA__|__JS__/.test(html), '山岳資料與程式都已放進網頁');
+ok(!/__DATA__|__JS__|__BF__/.test(html), '山岳資料與程式都已放進網頁');
 const ids = [...html.matchAll(/\bid="([^"]+)"/g)].map(m => m[1]);
 const dup = ids.filter((x, i) => ids.indexOf(x) !== i);
 ok(dup.length === 0, '沒有重複的元素 id' + (dup.length ? '：' + dup.join('、') : ''));
