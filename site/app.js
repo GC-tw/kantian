@@ -8,10 +8,10 @@ const SLOTS = [0,3,6,9,12,15,18,21];                       // 每段 3 小時的
 const MODES = {today:{di:0,name:'今天'}, tmr:{di:1,name:'明天'}, d2:{di:2,name:'後天'}, d3:{di:3,name:'大後天'}, week:{name:'一週'}};
 const COUNTY_ORDER = ['基隆市','臺北市','新北市','桃園市','新竹市','新竹縣','苗栗縣','臺中市','彰化縣','南投縣','雲林縣','嘉義市','嘉義縣','臺南市','高雄市','屏東縣','宜蘭縣','花蓮縣','臺東縣','澎湖縣','金門縣','連江縣'];
 const BF = [0,0.3,1.6,3.4,5.5,8.0,10.8,13.9,17.2,20.8,24.5];  // 蒲福風級下限（公尺／秒）
-// 燈號名稱（2026-10-20 使用者定案）：A 讚（晴）、B 可、C 注意、D 不建議。內部等級 lv 仍是 0／1／2，plus 表示 A
+// 燈號名稱（2026-10-20 使用者定案）：A 佳（晴）、B 可、C 注意、D 不建議。內部等級 lv 仍是 0／1／2，plus 表示 A
 const SYM = ['B','C','D','—'], CLS = ['g','y','r','na'], WORD = ['可','注意','不建議','已過或無資料'];
 const LV = lv => lv < 0 ? 3 : lv;                                // 燈號等級 -1 代表沒有資料
-// A（讚）：等級 0 且天氣描述剛好是「晴」（plus）；畫面上寫 A，class 多加 p
+// A（佳）：等級 0 且天氣描述剛好是「晴」（plus）；畫面上寫 A，class 多加 p
 const PAGE = 10;                                           // 山岳列表一次顯示幾座
 const H = 3600e3, STALE = 9*H;                              // 超過 9 小時沒更新就提醒
 
@@ -190,7 +190,7 @@ function applyFilters(){                                    // 篩選不需重�
 const star = k => { const on = favs.has(k), t = on ? '取消收藏' : '加入收藏';
   return `<button type="button" class="star" data-fav="${k}" aria-pressed="${on}" aria-label="${t}" title="${t}">${on?'♥':'♡'}</button>`; };
 const lamp = (c, sm) => { const t = c.plus ? 'A' : SYM[LV(c.lv)];
-  return `<i class="lamp ${CLS[LV(c.lv)]}${c.plus?' p':''}${c.ref?' ref':''}${c.past?' past':''}${sm?' sm':''}" title="${c.plus ? 'A 讚（晴）' : SYM[LV(c.lv)] + ' ' + WORD[LV(c.lv)]}${c.ref?'（參考）':''}${c.past?'（已過）':''}">${t}</i>`; };
+  return `<i class="lamp ${CLS[LV(c.lv)]}${c.plus?' p':''}${c.ref?' ref':''}${c.past?' past':''}${sm?' sm':''}" title="${c.plus ? 'A 佳（晴）' : SYM[LV(c.lv)] + ' ' + WORD[LV(c.lv)]}${c.ref?'（參考）':''}${c.past?'（已過）':''}">${t}</i>`; };
 const sub = m => `${m.h ? m.h.toLocaleString()+' m' : '標高待補'}・${m.c}・${esc(m.co)}`;   // 標高、類別、縣市（不顯示編號）
 const peaksLeft = () => cols.filter(c => c.peak && !c.past).length;
 // 列表與卡片都不顯示比較結果（段數、A 天數；2026-10-20 拿掉），排序仍照規則
@@ -271,7 +271,7 @@ function closeDetail(){ $('drawer').hidden = true; $('scrim').hidden = true; }
 function pickInfo(week){
   const slots = sortedSlots().map(slotLabel).join('、');
   const ul = a => '<ul>' + a.map(x => '<li>' + x + '</li>').join('') + '</ul>', ol = a => '<ol>' + a.map(x => '<li>' + x + '</li>').join('') + '</ol>';
-  const std = ['A：讚，各項都適合，且天氣描述是「晴」；B：可，各項都適合；C：注意；D：不建議。',
+  const std = ['A：佳，各項都適合，且天氣描述是「晴」；B：可，各項都適合；C：注意；D：不建議。',
     '依氣象署預報檢查降雨機率、天氣描述（霧、雪、雷）、平均風速，以及颱風、豪雨、大雨特報；標高 1,000 公尺以下另看高溫。以最差的一項作為燈號。',
     '跨多個鄉鎮的山，取最差的鄉鎮。'];
   const score = '計分：A 3 分、B 2 分、C 1 分、D 0 分。已過的時段和無資料不計分。';

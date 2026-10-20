@@ -144,9 +144,9 @@ let fails = 0; const ok = (c, m) => { console.log((c ? '✓ ' : '✗ ') + m); if
   ok([...d.querySelectorAll('#matrix tbody .lamp:not(.past)')].every(x => x.classList.contains('r')), '豪雨特報期間，涵蓋縣市的山判 C');
   click(w, d.querySelector('#matrix tbody tr td'));
   ok(/豪雨特報・D/.test(d.getElementById('drawer').innerHTML), '詳情顯示豪雨特報・D');
-  { // 燈號名稱（2026-10-20 定案）：A 讚、B 可、C 注意、D 不建議；說明頁的字母換成小燈號方塊，°C 不上色
+  { // 燈號名稱（2026-10-20 定案）：A 佳、B 可、C 注意、D 不建議；說明頁的字母換成小燈號方塊，°C 不上色
     const lg = d.querySelector('.legend').textContent;
-    ok(/A讚/.test(lg) && /B可/.test(lg) && /C注意/.test(lg) && /D不建議/.test(lg) && !/A\+/.test(d.body.textContent), '圖例為 A 讚、B 可、C 注意、D 不建議，畫面上沒有 A+');
+    ok(/A佳/.test(lg) && /B可/.test(lg) && /C注意/.test(lg) && /D不建議/.test(lg) && !/A\+/.test(d.body.textContent), '圖例為 A 佳、B 可、C 注意、D 不建議，畫面上沒有 A+');
     const chips = [...d.querySelectorAll('article.doc .lamp.chip')];
     ok(chips.some(x => x.textContent === 'D' && x.classList.contains('r')) && chips.some(x => x.textContent === 'A' && x.classList.contains('p')) && /36°C/.test(d.querySelector('article.doc').textContent), '說明頁的 A–D 換成小燈號方塊，36°C 不受影響');
   }
