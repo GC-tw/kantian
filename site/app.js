@@ -360,7 +360,7 @@ const sameSet = (set, arr) => set.size === arr.length && arr.every(x => set.has(
   const setSearch = open => { $('search').classList.toggle('open', open); $('search').closest('.row1').classList.toggle('searching', open); $('s-btn').setAttribute('aria-expanded', open); if (open) $('f-kw').focus(); };
   $('s-btn').onclick = () => setSearch(!$('search').classList.contains('open'));
   $('s-x').onclick = () => { const f = $('f-kw'); if (f.value){ f.value = ''; f.dispatchEvent(new Event('input')); } setSearch(false); $('s-btn').focus(); };
-  $('f-kw').addEventListener('blur', () => setTimeout(() => { if (!$('search').contains(document.activeElement)) setSearch(false); }, 150));   // 離開搜尋框就收起（已輸入的字保留，放大鏡會變深色）
+  $('f-kw').addEventListener('blur', () => setTimeout(() => { if (!$('search').contains(document.activeElement) && !state.name.trim()) setSearch(false); }, 150));   // 離開搜尋框時：沒有打字才收起；有打字就維持展開（2026-10-20 使用者決定）
   const setFilter = open => {
     $('q').classList.toggle('open', open); $('f-scrim').hidden = !open; $('filter-btn').setAttribute('aria-expanded', open);
     if (!open && pending){ pending = false; saveFilters(); state.shown = PAGE; refresh(); window.scrollTo(0, 0); }   // 按「完成」才套用並記住
