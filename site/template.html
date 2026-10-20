@@ -209,12 +209,26 @@ aside.drawer{position:fixed;top:0;right:0;bottom:0;width:min(520px,100%);backgro
 .alert b{color:var(--stop)}
 .pt h3{font-size:15px;margin:0 0 6px;font-weight:700}
 .vt-box{overflow-x:auto}
-table.vt{border-collapse:collapse;width:100%;font-size:13px;font-variant-numeric:tabular-nums}
-.vt th,.vt td{padding:6px 6px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}
-.vt th{font-size:12px;color:var(--muted);font-weight:700}
-.vt td.num{font-family:var(--f-mono);text-align:right}
-.vt tr.ref td{color:var(--muted)}
-.vt td.w,.vt td.why{white-space:normal;min-width:4em}   /* 天氣描述與原因可換行，電腦版詳情也不需左右滑動 */
+/* 詳情表格：時段橫排（欄＝時段、列＝項目），手機 360 寬也放得下 8 欄（2026-10-20） */
+table.vt{border-collapse:collapse;width:100%;table-layout:fixed;font-variant-numeric:tabular-nums;margin-top:4px}
+.vt th,.vt td{padding:5px 1px;border-bottom:1px solid var(--line);text-align:center;vertical-align:middle}
+.vt thead th{font-family:var(--f-mono);font-size:12px;font-weight:600;line-height:1.25;color:var(--ink);border-radius:3px 3px 0 0}
+.vt thead th .wd{display:block;font-family:var(--f-body);font-size:10.5px;font-weight:500}
+.vt thead th.peak{background:var(--accent);color:var(--accent-ink)}
+.vt tbody th{width:44px;text-align:left;font-size:12px;font-weight:700;color:var(--muted);white-space:nowrap;line-height:1.2}
+.vt tbody th small{display:block;font-size:10px;font-weight:500}
+.vt thead th:first-child{width:44px}
+.vt td{font-family:var(--f-mono);font-size:13px}
+.vt tr.wx td{font-family:var(--f-body);font-size:11.5px;line-height:1.3;word-break:break-all;vertical-align:top}
+.vt tr.lr td .lamp{width:100%;max-width:30px}
+.vt td.ref,.vt td.past,.vt thead th.ref,.vt thead th.past{color:var(--muted)}
+.vt thead th.we{color:var(--we)}.vt thead th.peak.we{color:var(--accent-ink)}   /* 週末紅色（第 4–7 天也是） */
+.whys{margin-top:10px}
+.whys h4{margin:0 0 4px;font-size:13px}
+.whys ul{margin:0;padding:0;list-style:none;font-size:13px;line-height:1.5}
+.whys li{display:flex;gap:6px;align-items:baseline;padding:2px 0}
+.whys li b{font-family:var(--f-mono);font-weight:600;flex:none;min-width:3.6em}
+.whys li .lamp{flex:none;position:relative;top:3px}
 .why{font-size:12px;color:var(--muted);white-space:normal;min-width:130px}
 .issued{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
 /* rules page */
@@ -231,19 +245,7 @@ footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);paddin
 @media (prefers-reduced-motion:no-preference){aside.drawer{animation:slide .18s ease-out}@keyframes slide{from{transform:translateX(24px);opacity:.6}to{transform:none;opacity:1}}}
 /* 手機：燈號排序列表、我的收藏改用卡片（時段標示在每張卡裡，和小燈號對齊） */
 @media (max-width:640px){
-  /* 詳情表格：手機改成每個時段一個區塊（時段＋燈號在左，天氣、數值、C／D 原因在右），不需左右滑動（2026-10-20） */
-  .vt-box{overflow:visible}
-  table.vt,.vt tbody{display:block}
-  .vt thead{display:none}
-  .vt tr{display:grid;grid-template-columns:62px repeat(4,minmax(0,1fr));column-gap:6px;row-gap:2px;padding:8px 0;border-bottom:1px solid var(--line)}
-  .vt td{border:0;padding:0;white-space:normal}
-  .vt td.t{grid-column:1;grid-row:1;font-weight:700}
-  .vt td.l{grid-column:1;grid-row:2 / span 2;align-self:start}
-  .vt td.w{grid-column:2 / -1;grid-row:1;font-weight:700}
-  .vt td.num{grid-row:2;text-align:left;font-size:12.5px;white-space:nowrap}
-  .vt td.num::before{content:attr(data-l) " ";font-family:var(--f-body);color:var(--muted);font-size:11.5px}
-  .vt td.why{grid-column:2 / -1;grid-row:3;font-size:12.5px}
-  .vt td.why.none{display:none}
+  .vt thead th{font-size:10.5px;letter-spacing:-.04em}   /* 一週的日期在 360 寬時不黏在一起 */
   .matrix-box{overflow-x:visible;background:none;border:0;border-radius:0}
   .matrix-box table.matrix{display:none}
   .matrix-box .cards{display:flex}

@@ -234,11 +234,23 @@ function openDetail(k){
   const week = state.mode === 'week', pts = r.pts;
   const alerts = [...new Map(r.pts.flatMap(p => alertHits(p, cols[0].ws, cols[cols.length-1].we)).map(a => [a.county+a.type, a])).values()];   // 詳情列出所有生效中的特報（含不列入燈號的）
   const v = (x, f) => x == null ? '—' : f(x);
-  // 詳情表格：手機上每個時段排成兩三行，不需左右滑動（2026-10-20）；原因只列 C、D（以及無資料）
-  const table = (p, k) => `<div class="pt"><h3>${esc(p.label)}・${week ? '一週預報' : MODES[state.mode].name+'逐 3 小時預報'}</h3><div class="vt-box"><table class="vt"><thead><tr><th>${week?'日期':'時段'}</th><th>燈號</th><th>天氣現象</th><th>降雨機率</th><th>風速</th><th>氣溫</th><th>體感</th><th>C、D燈號原因</th></tr></thead><tbody>
-      ${r.cells.map((c,j) => { const x = c.per[k], col = cols[j], why = x.j.lv !== 0 ? x.j.why.join('、') : '';
-        return `<tr class="${c.ref||c.past?'ref':''}"><td class="t">${week?fmtH(col.date):col.label}</td><td class="l">${lamp({lv:x.j.lv,plus:x.j.plus,ref:c.ref,past:c.past},true)}</td><td class="w">${v(x.fc?.wx, esc)}</td><td class="num" data-l="降雨">${v(x.fc?.pop, n=>n+'%')}</td><td class="num" data-l="風">${v(x.fc?.bf ?? (x.fc?.ws != null ? beaufort(x.fc.ws) : null), n=>n+' 級')}</td><td class="num" data-l="氣溫">${v(x.fc?.t, n=>n+'°C')}</td><td class="num" data-l="體感">${v(x.fc?.at, n=>n+'°C')}</td><td class="why${why?'':' none'}">${esc(why||'—')}</td></tr>`; }).join('')}
-      </tbody></table></div></div>`;
+  // 詳情表格：時段橫排（tenki.jp 做法，2026-10-20 使用者選「選項 1」）。欄是時段、列是項目，手機也不需左右滑動；
+  // C、D 的原因列在表格下方
+  const table = (p, k) => {
+    const cl = (c, col) => [c.ref ? 'ref' : '', c.past ? 'past' : '', col.peak ? 'peak' : '', week && col.wkd ? 'we' : ''].filter(Boolean).join(' ');
+    const head = cols.map((col, j) => `<th class="${cl(r.cells[j], col)}">${week ? `${col.date.getMonth()+1}/${col.date.getDate()}<span class="wd">週${WD[col.date.getDay()]}</span>` : col.short}</th>`).join('');
+    const row = (name, f, cls = '') => `<tr class="${cls}"><th scope="row">${name}</th>${r.cells.map((c, j) => `<td class="${cl(c, cols[j])}">${f(c.per[k], c)}</td>`).join('')}</tr>`;
+    const whys = r.cells.map((c, j) => { const x = c.per[k]; return x.j.lv > 0 ? `<li><b>${week ? cols[j].label : cols[j].label}</b>${lamp({lv:x.j.lv, ref:c.ref, past:c.past}, true)}${esc(x.j.why.join('、'))}</li>` : ''; }).join('');
+    return `<div class="pt"><h3>${esc(p.label)}・${week ? '一週預報' : MODES[state.mode].name+'逐 3 小時預報'}</h3>
+      <table class="vt" style="--n:${cols.length}"><thead><tr><th></th>${head}</tr></thead><tbody>
+      ${row('燈號', (x, c) => lamp({lv:x.j.lv, plus:x.j.plus, ref:c.ref, past:c.past}, true), 'lr')}
+      ${row('天氣', x => v(x.fc?.wx, esc), 'wx')}
+      ${row('降雨<small>%</small>', x => v(x.fc?.pop, n => n))}
+      ${row('風<small>級</small>', x => v(x.fc?.bf ?? (x.fc?.ws != null ? beaufort(x.fc.ws) : null), n => n))}
+      ${row('氣溫<small>°C</small>', x => v(x.fc?.t, n => n))}
+      ${row('體感<small>°C</small>', x => v(x.fc?.at, n => n))}
+      </tbody></table>${whys ? `<div class="whys"><h4>C、D燈號原因</h4><ul>${whys}</ul></div>` : ''}</div>`;
+  };
   const dr = $('drawer');
   dr.innerHTML = `
     <div class="d-head"><div><h2 id="d-title">${esc(r.m.n)}${star(r.k)}</h2><div class="sub">${sub(r.m)}</div></div><button class="close" type="button" id="d-close" aria-label="關閉">×</button></div>
