@@ -174,7 +174,7 @@ const pickCard = (r, head) => `<div class="pick" data-k="${r.k}" tabindex="0" ro
 function render(){
   const week = state.mode === 'week';
   $('h-picks-t').textContent = (week ? '這週' : MODES[state.mode].name) + '燈號排序';
-  $('pick-info-body').innerHTML = pickInfo(week);
+  $('pick-info-body').innerHTML = pickInfo(week); gradeChips($('pick-info-body'));
   document.querySelectorAll('#seg .sd').forEach((e, i) => { const d = dayAt(i); e.textContent = fmt(d); e.classList.toggle('we', isWE(d)); });
   const md = d => `${d.getMonth()+1}/${d.getDate()}`;
   $('seg-week').textContent = `${md(dayAt(0))}–${md(dayAt(6))}`;   // 一週預報按鈕下方寫日期區間
@@ -235,6 +235,19 @@ function pickInfo(week){
   const today = state.mode === 'today';
   return '<h4>比較標準</h4><ul>' + base + `<li>逐 3 小時判定，每個時段一個燈號。</li>${today ? '<li>今天已過的時段不列入比較。</li>' : ''}</ul>`
     + '<h4>排序</h4>' + li([SCORE_TXT('個時段'), '先比登頂時段的總分，高者在前', '再比登頂時段中 A+ 的段數，多者在前', '再比當天所有時段的總分，高者在前', '以上都相同時，順序每天輪換一次，不代表哪座比較好']);
+}
+// 說明文字中的燈號（A+、A、B、C、—）換成小燈號方塊，顏色與列表一致（2026-10-20 使用者選「選項 1」）
+const GRADE_RE = /A\+|—|(?<![A-Za-z0-9])[ABC](?![A-Za-z])/g, GRADE_CLS = {'A+':'g p', 'A':'g', 'B':'y', 'C':'r', '—':'na'};
+function gradeChips(root){
+  if (!root) return;
+  const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT), nodes = [];
+  while (w.nextNode()) if (!w.currentNode.parentElement.closest('.lamp,button,.kbd')) nodes.push(w.currentNode);
+  for (const n of nodes){
+    GRADE_RE.lastIndex = 0; if (!GRADE_RE.test(n.data)) continue;
+    const t = document.createElement('template');
+    t.innerHTML = esc(n.data).replace(GRADE_RE, m => `<i class="lamp sm chip ${GRADE_CLS[m]}">${m}</i>`);
+    n.replaceWith(t.content);
+  }
 }
 function setPickInfo(v){ $('pick-info').hidden = !v; $('pick-info-btn').setAttribute('aria-expanded', v); }
 function setInfo(v){ $('info-ref').hidden = !v; $('info-btn').setAttribute('aria-expanded', v); }
@@ -350,6 +363,7 @@ const sameSet = (set, arr) => set.size === arr.length && arr.every(x => set.has(
     if (e.key === 'Enter' && !e.target.closest('[data-fav]')){ const t = e.target.closest('[data-k]'); if (t) openDetail(t.dataset.k); }
   });
 
+  gradeChips(document.querySelector('article.doc')); gradeChips($('info-ref'));
   refresh();                                                // 先顯示山岳清單，資料到了再補上燈號
   loadForecast();
   // 網頁開著時：每分鐘檢查是否跨時段；每 15 分鐘或回到網頁時，檢查是否有新資料
