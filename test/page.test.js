@@ -72,6 +72,10 @@ let fails = 0; const ok = (c, m) => { console.log((c ? '✓ ' : '✗ ') + m); if
     ok(pm.lv === 0 && pm.plus && /午後/.test(pm.why.join()), '一週：登頂時段在 12 點前，「晴午後短暫雷陣雨」視為晴（A+），原因註明');
     ok(J([h('晴午後短暫雷陣雨', true)], false).lv === 2, '一週：登頂時段有 12 點後，午後雷陣雨仍判 C');
     ok(J([h('晴', true), h('晴', false)], false).plus && !J([h('晴', true), h('晴時多雲', false)], false).plus, '一週：所有半天都是晴才算 A+');
+    const R = wx => w.judge({wx, pop: null, ws: 2}, false, null, true).lv;
+    ok(['多雲短暫陣雨', '陰短暫雨', '午後局部雨', '多雲局部短暫陣雨', '短暫雨或雪'].every(x => R(x) === 1), '第 4–7 天：「局部」「短暫」的雨判 B');
+    ok(['陰陣雨', '陰有雨', '雨天', '有雨或雪', '陰短暫雨或陣雨', '大雨'].every(x => R(x) === 2), '第 4–7 天：陣雨（不含短暫）、有雨等判 C');
+    ok(R('多雲時晴') === 0 && w.judge({wx: '陰陣雨', pop: 10, ws: 2}, false, null, false).lv === 0, '前 3 天：雨的描述不影響燈號，只看降雨機率');
     ok(w.eval('amOnly([6, 9])') && !w.eval('amOnly([9, 12])'), '一週：12 點前的判斷（09–12 算，12–15 不算）');
   }
   ok(plusTotal > 0, `天氣描述為「晴」的 A 時段顯示 A+（共 ${plusTotal} 格）`);

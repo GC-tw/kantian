@@ -67,7 +67,7 @@ function judgeDay(fc, lowHill, alert, noPop, am){
   const js = fc.halves.map(x => judge(am && x.day ? {...x, wx: dropPM(x.wx)} : x, lowHill, alert, noPop));
   const lv = Math.max(...js.map(j => j.lv)), why = [...new Set(js.flatMap(j => j.why))];
   if (am && fc.halves.some(x => x.day && dropPM(x.wx) !== x.wx)) why.push('登頂時段在 12 點前，「午後」部分不計');
-  return {lv, why, heavy: js.some(j => j.heavy), plus: lv === 0 && js.every(j => j.plus)};
+  return {lv, why, plus: lv === 0 && js.every(j => j.plus)};
 }
 const ALERT_LV = type => /颱風|豪雨|大雨/.test(type || '') ? 2 : 0;
 const alertHits = (p, start, end) => (FC?.alerts || []).filter(a => p.counties.includes(a.county) && (a.start == null || a.start < end) && (a.end == null || a.end > start));
@@ -75,26 +75,28 @@ function alertFor(p, start, end){                           // 列入燈號的�
   return alertHits(p, start, end).find(a => a.lv > 0) || null;
 }
 
+// 第 4–7 天（沒有降雨機率）雨的分級（2026-10-20 使用者決定）：「局部」「短暫」的雨為 B；
+// 其他的雨（陣雨、有雨、雨天、雨或雪等）為 C。描述中每個「雨」分別判斷，取最重的。
+const RAIN_RE = /(局部短暫陣|局部短暫|局部陣|局部|短暫陣|短暫|)雨/g;
+const rainLv = wx => Math.max(0, ...[...(wx || '').matchAll(RAIN_RE)].map(m => m[1] ? 1 : 2));
+
 // ---------- 判定規則（與「排序規則與說明」頁一致）----------
 function judge(fc, lowHill, alert, noPop){
-  const why = []; let lv = 0, heavy = false;
+  const why = []; let lv = 0;
   const up = (n, w) => { if (n > lv) lv = n; if (n > 0 && !why.includes(w)) why.push(w); };
   if (alert) up(alert.lv, alert.type);
-  if (!fc) return alert ? {lv, why, heavy} : {lv: -1, why: ['無資料'], heavy};
+  if (!fc) return alert ? {lv, why} : {lv: -1, why: ['無資料']};
   const wx = fc.wx || '';
   if (wx.includes('雷')) up(2, '有雷');
-  if (/大雨|豪雨/.test(wx)) up(2, '大雨');
   if (/下雪|積冰|暴風雪/.test(wx)) up(2, wx);             // 雪：下雪、積冰、暴風雪不建議；「雨或雪」等其他有「雪」的描述為注意
   else if (wx.includes('雪')) up(1, wx);
   if (wx.includes('霧')) up(1, '有霧');
   if (!noPop && fc.pop != null){ if (fc.pop>=50) up(2, '降雨機率 '+fc.pop+'%'); else if (fc.pop>=30) up(1, '降雨機率 '+fc.pop+'%'); }
-  else if (wx.includes('雨')){                            // 沒有降雨機率（第 4–7 天）：寫出原始天氣描述，「短暫」以外的雨另外標記，排序時往後
-    up(1, noPop ? wx + '（第 4–7 天無降雨機率）' : '可能下雨');
-    heavy = noPop && !/短暫/.test(wx);
-  }
+  else if (noPop && wx.includes('雨')) up(rainLv(wx), wx + '（第 4–7 天無降雨機率）');   // 第 4–7 天：依雨的用語分級，寫出原始描述
+  else if (wx.includes('雨')) up(1, '可能下雨');
   if (fc.ws != null){ if (fc.ws>=13.9) up(2, '風速 '+beaufort(fc.ws)+' 級'); else if (fc.ws>=8) up(1, '風速 '+beaufort(fc.ws)+' 級'); }   // 風速只顯示「級」（2026-10-20）
   if (lowHill && fc.at != null && fc.at>=36) up(1, '高溫 體感 '+fc.at+'°C');
-  return {lv, why, heavy, plus: lv === 0 && wx === '晴'};
+  return {lv, why, plus: lv === 0 && wx === '晴'};
 }
 
 // ---------- 山岳模型（只在載入時建立一次）----------
@@ -159,17 +161,17 @@ function evaluate(){                                       // 依時段與登頂
     });
     // 計分排序（2026-10-20 方案乙）：A+ 3、A 2、B 1、C 0；已過與無資料不計分
     // s1：登頂時段總分（一週為 7 天總分）；p1：其中 A+ 數；c1：其中 C 數（2026-10-20 加入，C 少的在前）；s2：當天所有時段總分（只用於逐 3 小時）
-    // k3：一週 B 之中「陣雨」（非短暫）的天數；nd：沒有任何資料（2026-10-20 加入，一律排最後）
-    let s1 = 0, p1 = 0, c1 = 0, s2 = 0, k3 = 0, has = false;
+    // nd：沒有任何資料（2026-10-20 加入，一律排最後）
+    let s1 = 0, p1 = 0, c1 = 0, s2 = 0, has = false;
     cells.forEach((c, i) => {
       if (c.past || c.lv < 0) return;
       has = true;
       const pt = SCORE(c);
-      if (week){ s1 += pt; if (c.plus) p1++; if (c.lv===2) c1++; if (c.lv===1 && c.per.some(y => y.j.heavy)) k3++; }
+      if (week){ s1 += pt; if (c.plus) p1++; if (c.lv===2) c1++; }
       else { s2 += pt; if (cols[i].peak){ s1 += pt; if (c.plus) p1++; if (c.lv===2) c1++; } }
     });
-    return {...x, cells, s1, p1, c1, s2, k3, nd: has ? 0 : 1, mix: hash(day + '|' + x.k)};
-  }).sort((a,b) => a.nd-b.nd || b.s1-a.s1 || b.p1-a.p1 || a.c1-b.c1 || b.s2-a.s2 || a.k3-b.k3 || a.mix-b.mix);
+    return {...x, cells, s1, p1, c1, s2, nd: has ? 0 : 1, mix: hash(day + '|' + x.k)};
+  }).sort((a,b) => a.nd-b.nd || b.s1-a.s1 || b.p1-a.p1 || a.c1-b.c1 || b.s2-a.s2 || a.mix-b.mix);
   byKey = new Map(all.map(r => [r.k, r]));
   applyFilters();
 }
@@ -244,7 +246,7 @@ function openDetail(k){
     ${r.m.al?.length?`<div class="note">別名：${esc(r.m.al.join('、'))}</div>`:''}
     ${r.m.note?`<div class="note">備註：${esc(r.m.note)}</div>`:''}
     ${pts.map(table).join('')}
-    <div class="note">${week ? '一週預報以你選的登頂時段（'+sortedSlots().map(slotLabel).join('、')+'）判定，取最差情況；第 4–7 天氣象署未提供降雨機率，以「—」表示，燈號最多只會到 B，請在出發前 3 天內再確認。' : '逐 3 小時預報；底色時段是你選的登頂時段，排序以此為準。'}</div>`;
+    <div class="note">${week ? '一週預報以你選的登頂時段（'+sortedSlots().map(slotLabel).join('、')+'）判定，取最差情況；第 4–7 天氣象署未提供降雨機率，以「—」表示，依天氣描述判定，請在出發前 3 天內再確認。' : '逐 3 小時預報；底色時段是你選的登頂時段，排序以此為準。'}</div>`;
   dr.hidden = false; $('scrim').hidden = false;
   $('d-close').focus();
 }
@@ -255,12 +257,12 @@ function pickInfo(week){
   const slots = sortedSlots().map(slotLabel).join('、');
   const ul = a => '<ul>' + a.map(x => '<li>' + x + '</li>').join('') + '</ul>', ol = a => '<ol>' + a.map(x => '<li>' + x + '</li>').join('') + '</ol>';
   const std = ['A+：適合，且天氣描述是「晴」；A：適合；B：注意；C：不建議。',
-    '依氣象署預報檢查降雨機率、天氣描述（霧、雪、雷、大雨、豪雨）、平均風速，以及颱風、豪雨、大雨特報；標高 1,000 公尺以下另看高溫。以最差的一項作為燈號。',
+    '依氣象署預報檢查降雨機率、天氣描述（霧、雪、雷）、平均風速，以及颱風、豪雨、大雨特報；標高 1,000 公尺以下另看高溫。以最差的一項作為燈號。',
     '跨多個鄉鎮的山，取最差的鄉鎮。'];
   const score = '計分：A+ 3 分、A 2 分、B 1 分、C 0 分。已過的時段和無資料不計分。';
   const tie = '以上所有條件都相同時：每天隨機排序一次同條件山岳。', nodata = '完全沒有資料的山排在最後。';
-  if (week) return '<h4>比較標準</h4>' + ul([...std, `每天依你選的登頂時段（${esc(slots)}）對應到白天或晚上，取最差的作為當天燈號。登頂時段都在 12 點前時，白天描述的「午後」部分不計。`, '第 4–7 天氣象署沒有降雨機率，只有天氣描述，僅供參考。'])
-    + '<h4>排序</h4>' + ul([score]) + '<p class="ip">依序比較：</p>' + ol(['7 天的總分，高的在前', 'A+ 的天數，多的在前', 'C 的天數，少的在前', '「陣雨」（不含「短暫陣雨」）的天數，少的在前']) + ul([nodata, tie]);
+  if (week) return '<h4>比較標準</h4>' + ul([...std, `每天依你選的登頂時段（${esc(slots)}）對應到白天或晚上，取最差的作為當天燈號。登頂時段都在 12 點前時，白天描述的「午後」部分不計。`, '第 4–7 天氣象署沒有降雨機率，依天氣描述判定：「局部」「短暫」的雨為 B，其他的雨（例如「陣雨」「有雨」）為 C。僅供參考。'])
+    + '<h4>排序</h4>' + ul([score]) + '<p class="ip">依序比較：</p>' + ol(['7 天的總分，高的在前', 'A+ 的天數，多的在前', 'C 的天數，少的在前']) + ul([nodata, tie]);
   return '<h4>比較標準</h4>' + ul([...std, '每 3 小時一格，每格一個燈號。', ...(state.mode === 'today' ? ['今天已過的時段不計分。'] : [])])
     + '<h4>排序</h4>' + ul([score]) + '<p class="ip">依序比較：</p>' + ol(['登頂時段的總分，高的在前', '登頂時段中 A+ 的數量，多的在前', '登頂時段中 C 的數量，少的在前', '當天所有時段的總分，高的在前']) + ul(['登頂時段都過了，就改看當天剩下的時段。', nodata, tie]);
 }
