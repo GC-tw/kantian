@@ -36,10 +36,22 @@
   "records": {
     "location": [
       {
-        "locationName": "金門縣",
-        "geocode": 9020,
+        "locationName": "苗栗縣",
+        "geocode": 10005,
         "hazardConditions": {
-          "hazards": []
+          "hazards": [
+            {
+              "info": {
+                "language": "zh-TW",
+                "phenomena": "陸上強風",
+                "significance": "特報"
+              },
+              "validTime": {
+                "startTime": "2026-10-21 11:00:00",
+                "endTime": "2026-10-21 23:00:00"
+              }
+            }
+          ]
         }
       },
       {
@@ -54,8 +66,8 @@
                 "significance": "特報"
               },
               "validTime": {
-                "startTime": "2026-10-15 16:23:00",
-                "endTime": "2026-10-15 22:00:00"
+                "startTime": "2026-10-21 11:00:00",
+                "endTime": "2026-10-21 23:00:00"
               }
             }
           ]
