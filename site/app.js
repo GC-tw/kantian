@@ -92,7 +92,7 @@ function judge(fc, lowHill, alert, noPop){
   if (/下雪|積冰|暴風雪/.test(wx)) up(2, wx);             // 雪：下雪、積冰、暴風雪不建議；「雨或雪」等其他有「雪」的描述為注意
   else if (wx.includes('雪')) up(1, wx);
   if (wx.includes('霧')) up(1, '有霧');
-  if (!noPop && fc.pop != null){ if (fc.pop>=50) up(2, '降雨機率 '+fc.pop+'%'); else if (fc.pop>=30) up(1, '降雨機率 '+fc.pop+'%'); }
+  if (!noPop && fc.pop != null){ if (fc.pop>=60) up(2, '降雨機率 '+fc.pop+'%'); else if (fc.pop>=30) up(1, '降雨機率 '+fc.pop+'%'); }
   else if (noPop && wx.includes('雨')) up(rainLv(wx), wx + '（第 4–7 天無降雨機率）');   // 第 4–7 天：依雨的用語分級，寫出原始描述
   else if (wx.includes('雨')) up(1, '可能下雨');
   if (fc.ws != null){ if (fc.ws>=13.9) up(2, '風速 '+beaufort(fc.ws)+' 級'); else if (fc.ws>=8) up(1, '風速 '+beaufort(fc.ws)+' 級'); }   // 風速只顯示「級」（2026-10-20）

@@ -75,6 +75,8 @@ let fails = 0; const ok = (c, m) => { console.log((c ? '✓ ' : '✗ ') + m); if
     const R = wx => w.judge({wx, pop: null, ws: 2}, false, null, true).lv;
     ok(['多雲短暫陣雨', '陰短暫雨', '午後局部雨', '多雲局部短暫陣雨', '短暫雨或雪'].every(x => R(x) === 1), '第 4–7 天：「局部」「短暫」的雨判 B');
     ok(['陰陣雨', '陰有雨', '雨天', '有雨或雪', '陰短暫雨或陣雨', '大雨'].every(x => R(x) === 2), '第 4–7 天：陣雨（不含短暫）、有雨等判 C');
+    const P = pop => w.judge({wx: '多雲', pop, ws: 2}, false, null, false).lv;
+    ok(P(29) === 0 && P(30) === 1 && P(59) === 1 && P(60) === 2, '降雨機率：未滿 30% 為 B、30–59% 為 C、60% 以上為 D');
     ok(R('多雲時晴') === 0 && w.judge({wx: '陰陣雨', pop: 10, ws: 2}, false, null, false).lv === 0, '前 3 天：雨的描述不影響燈號，只看降雨機率');
     ok(w.eval('amOnly([6, 9])') && !w.eval('amOnly([9, 12])'), '一週：12 點前的判斷（09–12 算，12–15 不算）');
   }
