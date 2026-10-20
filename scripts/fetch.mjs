@@ -235,7 +235,7 @@ async function main(){
   const missingTown = [...townsNeeded].filter(t => !result.points[t]);
   if (missingTown.length) warn('鄉鎮預報缺少：' + missingTown.join('、'));
 
-  // 3. 天氣警特報（只保留會影響燈號的種類）
+  // 3. 天氣警特報：保留颱風、豪雨、大雨（列入燈號）與陸上強風、低溫、濃霧（只在詳情顯示）；燈號等級由網頁的 ALERT_LV 決定
   try{
     const j = await getDataset(ALERT_ID); saveSample('alerts', j);
     const LV = [[/颱風|豪雨|大雨|陸上強風/, 2], [/低溫|濃霧/, 1]];
@@ -252,12 +252,6 @@ async function main(){
       }
     }
   }catch(e){ warn('警特報抓取失敗：' + e.message); }
-  // 特報內容與影響區域（W-C0033-002）：只存完整原始資料，用來確認是否有鄉鎮層級的影響範圍（2026-10-20 調查用，不影響燈號）
-  if (!FIXTURES) try{
-    const j2 = await getDataset('W-C0033-002');
-    fs.mkdirSync(SAMPLES_DIR, {recursive: true});
-    fs.writeFileSync(path.join(SAMPLES_DIR, 'alerts-detail.json'), JSON.stringify(j2, null, 1));
-  }catch(e){ console.log('（調查用）W-C0033-002 抓取失敗：' + e.message); }
 
   fs.mkdirSync(path.dirname(OUT), {recursive: true});
   fs.writeFileSync(OUT, JSON.stringify(result));

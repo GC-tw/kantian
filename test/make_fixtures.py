@@ -76,5 +76,6 @@ json.dump({'success': 'true', 'records': {'location': [
     {'locationName': '宜蘭縣', 'geocode': 10002, 'hazardConditions': {'hazards': [hz('陸上強風', '特報', 0, 30)]}},
     {'locationName': '南投縣', 'geocode': 10008, 'hazardConditions': {'hazards': [hz('低溫', '特報', 24, 40)]}},
     {'locationName': '臺北市', 'geocode': 63, 'hazardConditions': {'hazards': [hz('高溫', '資訊', 0, 12)]}},
-    {'locationName': '高雄市', 'geocode': 64, 'hazardConditions': {'hazards': []}}]}}, open(out+'W-C0033-001.json', 'w'), ensure_ascii=False)
+    {'locationName': '高雄市', 'geocode': 64, 'hazardConditions': {'hazards': []}},
+    {'locationName': '屏東縣', 'geocode': 10013, 'hazardConditions': {'hazards': [hz('豪雨', '特報', 0, 30)]}}]}}, open(out+'W-C0033-001.json', 'w'), ensure_ascii=False)
 print('fixtures ok', len(names), len(towns), sorted(os.listdir(out)))

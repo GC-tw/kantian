@@ -40,7 +40,8 @@ function useForecast(data){
   FC = data; fcIndex = new Map();
   for (const [key, p] of Object.entries(data.points || {}))
     fcIndex.set(key, {h3: new Map((p.h3 || []).map(r => [r.s, r])), week: new Map((p.week || []).map(r => [r.s, r]))});
-  FC.alerts = (data.alerts || []).slice().sort((a, b) => b.lv - a.lv);
+  // 特報：只有颱風、豪雨、大雨列入燈號（C）；陸上強風、低溫、濃霧只在詳情顯示（2026-10-20 使用者決定，山岳／鄉鎮預報的風速、氣溫、天氣描述已反映）
+  FC.alerts = (data.alerts || []).map(a => ({...a, lv: ALERT_LV(a.type)})).sort((a, b) => b.lv - a.lv);
 }
 function slotForecast(p, di, hr){                           // 逐 3 小時：沒有資料時回傳 null
   return fcIndex.get(p.key)?.h3.get(dayAt(di).getTime() + hr*H) || null;
@@ -66,8 +67,10 @@ function judgeDay(fc, lowHill, alert, noPop, am){
   if (am && fc.halves.some(x => x.day && dropPM(x.wx) !== x.wx)) why.push('登頂時段在 12 點前，「午後」部分不計');
   return {lv, why, heavy: js.some(j => j.heavy), plus: lv === 0 && js.every(j => j.plus)};
 }
-function alertFor(p, start, end){                           // 時段內生效、涵蓋這座山所在縣市的特報（取最嚴重）
-  return (FC?.alerts || []).find(a => p.counties.includes(a.county) && (a.start == null || a.start < end) && (a.end == null || a.end > start)) || null;
+const ALERT_LV = type => /颱風|豪雨|大雨/.test(type || '') ? 2 : 0;
+const alertHits = (p, start, end) => (FC?.alerts || []).filter(a => p.counties.includes(a.county) && (a.start == null || a.start < end) && (a.end == null || a.end > start));
+function alertFor(p, start, end){                           // 列入燈號的特報：時段內生效、涵蓋這座山所在縣市，取最嚴重
+  return alertHits(p, start, end).find(a => a.lv > 0) || null;
 }
 
 // ---------- 判定規則（與「排序規則與說明」頁一致）----------
@@ -214,7 +217,7 @@ const refilter = () => { state.shown = PAGE; fresh() ? applyFilters() : evaluate
 function openDetail(k){
   const r = byKey.get(k); if (!r) return;
   const week = state.mode === 'week', pts = r.pts;
-  const alerts = [...new Map(r.cells.flatMap(c => c.per.filter(x=>x.al).map(x=>[x.al.county+x.al.type, x.al]))).values()];
+  const alerts = [...new Map(r.pts.flatMap(p => alertHits(p, cols[0].ws, cols[cols.length-1].we)).map(a => [a.county+a.type, a])).values()];   // 詳情列出所有生效中的特報（含不列入燈號的）
   const v = (x, f) => x == null ? '—' : f(x);
   const table = (p, k) => `<div class="pt"><h3>${esc(p.label)}・${week ? '一週預報' : MODES[state.mode].name+'逐 3 小時預報'}</h3><div class="vt-box"><table class="vt"><thead><tr><th>${week?'日期':'時段'}</th><th>燈號</th><th>天氣現象</th><th>降雨機率</th><th>風速</th><th>氣溫</th><th>體感</th><th>原因</th></tr></thead><tbody>
       ${r.cells.map((c,j) => { const x = c.per[k], col = cols[j];
@@ -226,7 +229,7 @@ function openDetail(k){
     <div class="src"><span><b>採用預報</b>：${esc(pts.map(p=>p.label+(p.code?'（'+p.code+'）':'')).join('、'))}</span>
       <span>${pts.length>1?'跨多個鄉鎮，各自列出；燈號取最差的鄉鎮。':''}${r.low?'標高 1,000 公尺以下，另判斷高溫。':''}</span>
       <span class="issued">資料來源：交通部中央氣象署・本站更新 ${FC ? fmtTime(Date.parse(FC.fetchedAt)) : '—'}</span></div>
-    ${alerts.map(a=>`<div class="alert"><b>${esc(a.type)}・${WORD[a.lv]}</b>　${esc(a.county)}${a.end?`，有效至 ${fmtTime(a.end)}`:''}</div>`).join('')}
+    ${alerts.map(a=>`<div class="alert"><b>${esc(a.type)}・${a.lv > 0 ? WORD[a.lv] : '不列入燈號'}</b>　${esc(a.county)}${a.end?`，有效至 ${fmtTime(a.end)}`:''}</div>`).join('')}
     ${r.m.al?.length?`<div class="note">別名：${esc(r.m.al.join('、'))}</div>`:''}
     ${r.m.note?`<div class="note">備註：${esc(r.m.note)}</div>`:''}
     ${pts.map(table).join('')}
@@ -241,7 +244,7 @@ function pickInfo(week){
   const slots = sortedSlots().map(slotLabel).join('、');
   const ul = a => '<ul>' + a.map(x => '<li>' + x + '</li>').join('') + '</ul>', ol = a => '<ol>' + a.map(x => '<li>' + x + '</li>').join('') + '</ol>';
   const std = ['A+：適合，且天氣描述是「晴」；A：適合；B：注意；C：不建議。',
-    '依氣象署預報檢查降雨機率、天氣描述（霧、雪、雷、大雨、豪雨）、平均風速、天氣特報；標高 1,000 公尺以下另看高溫。以最差的一項作為燈號。',
+    '依氣象署預報檢查降雨機率、天氣描述（霧、雪、雷、大雨、豪雨）、平均風速，以及颱風、豪雨、大雨特報；標高 1,000 公尺以下另看高溫。以最差的一項作為燈號。',
     '跨多個鄉鎮的山，取最差的鄉鎮。'];
   const score = '計分：A+ 3 分、A 2 分、B 1 分、C 0 分。已過的時段和無資料不計分。';
   const tie = '以上所有條件都相同時：每天隨機排序一次同條件山岳。', nodata = '完全沒有資料的山排在最後。';

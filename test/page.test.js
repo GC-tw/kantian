@@ -93,7 +93,13 @@ let fails = 0; const ok = (c, m) => { console.log((c ? '✓ ' : '✗ ') + m); if
   click(w, d.querySelector('#seg [data-mode="today"]'));
   inp.value = '南湖北山'; inp.dispatchEvent(new w.Event('input', {bubbles: true}));
   click(w, d.querySelector('#matrix tbody tr td'));
-  ok(/陸上強風特報/.test(d.getElementById('drawer').innerHTML), '跨宜蘭縣的山顯示陸上強風特報');
+  ok(/陸上強風特報・不列入燈號/.test(d.getElementById('drawer').innerHTML) && !/陸上強風/.test([...d.querySelectorAll('#drawer td.why')].map(x => x.textContent).join()), '陸上強風特報顯示在詳情，但不列入燈號原因');
+  click(w, d.getElementById('d-close'));
+  // 豪雨特報：屏東縣的山今天未過的時段都是 C
+  inp.value = '笠頂山'; inp.dispatchEvent(new w.Event('input', {bubbles: true}));
+  ok([...d.querySelectorAll('#matrix tbody .lamp:not(.past)')].every(x => x.classList.contains('r')), '豪雨特報期間，涵蓋縣市的山判 C');
+  click(w, d.querySelector('#matrix tbody tr td'));
+  ok(/豪雨特報・C/.test(d.getElementById('drawer').innerHTML), '詳情顯示豪雨特報・C');
   click(w, d.getElementById('d-close'));
   // 別名：搜「鳶山」找得到福德坑山，詳情顯示別名
   inp.value = '鳶山'; inp.dispatchEvent(new w.Event('input', {bubbles: true}));
