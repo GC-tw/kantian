@@ -300,7 +300,7 @@ function showTyphoon(){
   box.hidden = !ts.length; if (!ts.length) return;
   const when = t => { const d = new Date(t); return t <= Date.now() ? '目前' : `${d.getMonth()+1}/${d.getDate()}（${WD[d.getDay()]}）${d.getHours() < 12 ? '上午' : d.getHours() < 18 ? '下午' : '晚上'}前後`; };
   box.innerHTML = ts.map(t => `<p><b>⚠ ${t.scale ? esc(t.scale) : '颱風'}${esc(t.name)}</b>：${t.warn ? `氣象署已發布「${esc(t.warn.headline)}」。` : ''}${t.near ? `氣象署預測${when(t.near.t)}最接近臺灣，中心距臺灣陸地約 ${t.near.km} 公里。` : ''}</p>`).join('')
-    + `<p>山區與鄉鎮的一週預報可能還沒反映颱風影響，燈號可能偏樂觀。出發前請看<a href="https://www.cwa.gov.tw/V8/C/P/Typhoon/TY_NEWS.html" target="_blank" rel="noopener">氣象署颱風消息</a>。</p>`;
+    + `<p>受限於資料不完整（氣象署 72 小時內才會發佈降雨機率、逐 3 小時預報），一週預報可能未完整反映颱風影響，燈號可能偏樂觀。出發前請看<a href="https://www.cwa.gov.tw/V8/C/P/Typhoon/TY_NEWS.html" target="_blank" rel="noopener">氣象署颱風消息</a>。</p>`;
 }
 function showStatus(){
   showTyphoon();
