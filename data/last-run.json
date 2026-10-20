@@ -1,10 +1,22 @@
 {
-  "time": "2026-10-20T08:42:17.439Z",
+  "time": "2026-10-20T08:47:33.670Z",
   "ok": true,
   "error": null,
   "cause": null,
   "warnings": [],
   "summary": {
+    "typhoons": [
+      {
+        "name": "薔琵",
+        "en": "CHAMPI",
+        "scale": "強烈颱風",
+        "near": {
+          "t": 1792735200000,
+          "km": 290
+        },
+        "warn": null
+      }
+    ],
     "wxWeekDay1to3": {
       "晴時多雲": 384,
       "陰短暫陣雨": 234,
