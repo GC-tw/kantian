@@ -342,9 +342,12 @@ const sameSet = (set, arr) => set.size === arr.length && arr.every(x => set.has(
   // 篩選面板裡的選擇先記下，按「完成」（或關閉面板）時才一次重新計算、排序，並回到列表最上面
   let pending = false;
   const onPick = () => { pending = true; $('filter-n').textContent = filterCount() || ''; };
-  chipGroup($('f-county'), 'data-co', state.counties, {allId:'c-all', onChange: onPick});
-  chipGroup($('f-cat'), 'data-c', state.cats, {allId:'cat-all', onChange: onPick});
-  chipGroup($('f-ht'), 'data-ht', state.hts, {allId:'ht-all', parse: Number, onChange: onPick});
+  const syncs = [chipGroup($('f-county'), 'data-co', state.counties, {allId:'c-all', onChange: onPick}),
+    chipGroup($('f-cat'), 'data-c', state.cats, {allId:'cat-all', onChange: onPick}),
+    chipGroup($('f-ht'), 'data-ht', state.hts, {allId:'ht-all', parse: Number, onChange: onPick})];
+  // 開始搜尋時，類別、標高、縣市篩選回到預設（全部）並記住；登頂時段不變（2026-10-20 使用者決定）
+  const resetForSearch = () => { if (!state.cats.size && !state.counties.size && !state.hts.size) return;
+    state.cats.clear(); state.counties.clear(); state.hts.clear(); syncs.forEach(f => f()); saveFilters(); };
   chipGroup($('f-slots'), 'data-h', state.slots, {parse: Number, keepOne: true, onChange: onPick});
   saveFilters();
 
@@ -353,11 +356,11 @@ const sameSet = (set, arr) => set.size === arr.length && arr.every(x => set.has(
   seg.forEach(b => b.onclick = () => { state.mode = b.dataset.mode; state.shown = PAGE; syncSeg(); store.set('mode', state.mode); refresh(); });
   syncSeg();
 
-  $('f-name').oninput = e => { state.name = e.target.value; $('s-btn').classList.toggle('on', !!state.name.trim()); if ($('view-find').hidden) $('tab-find').click(); refilter(); };
-  const setSearch = open => { $('search').classList.toggle('open', open); $('search').closest('.row1').classList.toggle('searching', open); $('s-btn').setAttribute('aria-expanded', open); if (open) $('f-name').focus(); };
+  $('f-kw').oninput = e => { state.name = e.target.value; if (state.name.trim()) resetForSearch(); $('s-btn').classList.toggle('on', !!state.name.trim()); if ($('view-find').hidden) $('tab-find').click(); refilter(); };
+  const setSearch = open => { $('search').classList.toggle('open', open); $('search').closest('.row1').classList.toggle('searching', open); $('s-btn').setAttribute('aria-expanded', open); if (open) $('f-kw').focus(); };
   $('s-btn').onclick = () => setSearch(!$('search').classList.contains('open'));
-  $('s-x').onclick = () => { const f = $('f-name'); if (f.value){ f.value = ''; f.dispatchEvent(new Event('input')); } setSearch(false); $('s-btn').focus(); };
-  $('f-name').addEventListener('blur', () => setTimeout(() => { if (!$('search').contains(document.activeElement)) setSearch(false); }, 150));   // 離開搜尋框就收起（已輸入的字保留，放大鏡會變深色）
+  $('s-x').onclick = () => { const f = $('f-kw'); if (f.value){ f.value = ''; f.dispatchEvent(new Event('input')); } setSearch(false); $('s-btn').focus(); };
+  $('f-kw').addEventListener('blur', () => setTimeout(() => { if (!$('search').contains(document.activeElement)) setSearch(false); }, 150));   // 離開搜尋框就收起（已輸入的字保留，放大鏡會變深色）
   const setFilter = open => {
     $('q').classList.toggle('open', open); $('f-scrim').hidden = !open; $('filter-btn').setAttribute('aria-expanded', open);
     if (!open && pending){ pending = false; saveFilters(); state.shown = PAGE; refresh(); window.scrollTo(0, 0); }   // 按「完成」才套用並記住

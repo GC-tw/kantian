@@ -92,17 +92,22 @@ let fails = 0; const ok = (c, m) => { console.log((c ? '✓ ' : '✗ ') + m); if
   ok(shown, '一週：詳情寫出「陰陣雨（第 4–7 天無降雨機率）」這類原因');
   // 缺資料的山（鹿山）應顯示無資料
   click(w, d.querySelector('#seg [data-mode="tmr"]'));
-  const inp = d.getElementById('f-name'); inp.value = '鹿山'; inp.dispatchEvent(new w.Event('input', {bubbles: true}));
+  const inp = d.getElementById('f-kw'); inp.value = '鹿山'; inp.dispatchEvent(new w.Event('input', {bubbles: true}));
   ok(lamps().length && lamps().every(x => x === 'na'), '缺少資料的預報點顯示「無資料」');
   inp.value = ''; inp.dispatchEvent(new w.Event('input', {bubbles: true}));
-  { // 搜尋時忽略篩選：只選小百岳，搜尋百岳「玉山」仍找得到；清掉搜尋後篩選恢復
-    w.eval("state.cats.add('小百岳')");
+  { // 開始搜尋時，類別、標高、縣市篩選回到預設並記住；登頂時段不變
+    click(w, d.querySelector('#f-cat [data-c="小百岳"]')); click(w, d.querySelector('#f-slots [data-h="12"]'));
+    w.eval('saveFilters()');
     inp.value = '玉山東峰'; inp.dispatchEvent(new w.Event('input', {bubbles: true}));
     const found = [...d.querySelectorAll('#matrix tbody tr')].some(tr => /玉山東峰/.test(tr.textContent));
+    const saved = JSON.parse(w.localStorage.getItem('filters') || '{}');
+    ok(found && w.eval('state.cats.size') === 0 && !saved.cats?.length && d.getElementById('cat-all').getAttribute('aria-pressed') === 'true' && w.eval('state.slots.has(12)'),
+      '開始搜尋時，類別篩選回到「全部」並記住，登頂時段保留，搜得到玉山東峰');
     inp.value = ''; inp.dispatchEvent(new w.Event('input', {bubbles: true}));
-    const back = w.eval('rows.length');
-    w.eval("state.cats.clear()"); inp.dispatchEvent(new w.Event('input', {bubbles: true}));
-    ok(found && back === 100, `搜尋時忽略篩選（只選小百岳仍搜得到玉山東峰；清掉搜尋後回到 ${back} 座小百岳）`);
+    click(w, d.querySelector('#f-slots [data-h="12"]')); w.eval('saveFilters()');
+    ok(w.eval('rows.length') === 235, '清掉搜尋後列出全部 235 座');
+    const el = d.getElementById('f-kw');
+    ok(!/name/i.test(el.id + (el.name || '')) && el.getAttribute('autocomplete') === 'off', '搜尋框的 id、name 不含 name，關閉自動填寫（避免 iPhone 跳出聯絡人）');
   }
   // 特報：宜蘭縣今天陸上強風（不採用）
   click(w, d.querySelector('#seg [data-mode="today"]'));
