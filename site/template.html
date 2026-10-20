@@ -163,7 +163,7 @@ table.matrix{border-collapse:separate;border-spacing:0;width:100%;font-variant-n
 .matrix .st{display:none}
 .lamp{font-style:normal;display:inline-grid;place-items:center;width:30px;height:30px;border-radius:6px;font-size:13px;font-weight:700;border:1.5px solid transparent}
 .lamp.g{background:var(--go-soft);color:var(--go);border-color:var(--go)}
-.lamp.g.p{background:var(--go);color:var(--surface);letter-spacing:-.04em}   /* A+：實心綠 */
+.lamp.g.p{background:var(--go);color:var(--surface);letter-spacing:-.04em}   /* A：實心綠 */
 .lamp.sm.p{font-size:10px}
 .lamp.y{background:var(--warn-soft);color:var(--warn);border-color:var(--warn)}
 .lamp.r{background:var(--stop-soft);color:var(--stop);border-color:var(--stop)}
@@ -316,14 +316,14 @@ footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);paddin
 
     <div style="display:flex;flex-direction:column;gap:10px">
       <div class="legend">
-          <span><i class="lamp sm g p">A+</i>晴</span><span><i class="lamp sm g">A</i>適合</span><span><i class="lamp sm y">B</i>注意</span><span><i class="lamp sm r">C</i>不建議</span><span><i class="lamp sm na">—</i>已過或無資料</span><span id="lg-ref" class="lg-ref"><i class="lamp sm g ref">A</i>虛線＝第 4–7 天，僅供參考<button type="button" class="info" id="info-btn" aria-expanded="false" aria-controls="info-ref" aria-label="為什麼第 4–7 天只供參考"><svg viewBox="0 0 20 20" aria-hidden="true"><circle class="ring" cx="10" cy="10" r="9.1"/><circle cx="10" cy="6.1" r="1.2"/><rect x="9.2" y="8.5" width="1.6" height="6.6" rx=".8"/></svg></button></span>
+          <span><i class="lamp sm g p">A</i>讚</span><span><i class="lamp sm g">B</i>可</span><span><i class="lamp sm y">C</i>注意</span><span><i class="lamp sm r">D</i>不建議</span><span><i class="lamp sm na">—</i>已過或無資料</span><span id="lg-ref" class="lg-ref"><i class="lamp sm g ref">B</i>虛線＝第 4–7 天，僅供參考<button type="button" class="info" id="info-btn" aria-expanded="false" aria-controls="info-ref" aria-label="為什麼第 4–7 天只供參考"><svg viewBox="0 0 20 20" aria-hidden="true"><circle class="ring" cx="10" cy="10" r="9.1"/><circle cx="10" cy="6.1" r="1.2"/><rect x="9.2" y="8.5" width="1.6" height="6.6" rx=".8"/></svg></button></span>
         </div>
       <div class="info-pop" id="info-ref" hidden>
         <div class="info-head"><b>為什麼第 4–7 天只供參考？</b><button type="button" class="info-x" id="info-x" aria-label="關閉說明">×</button></div>
         <ul>
           <li>氣象署的一週預報，只有前 3 天提供「降雨機率」。</li>
           <li>第 4–7 天只有天氣描述（例如「多雲短暫陣雨」），會不會下雨只能看描述判斷，比較粗略。</li>
-          <li>描述有「局部」「短暫」的雨為 B，其他的雨（例如「陣雨」「有雨」）為 C；請點開詳情看天氣描述。</li>
+          <li>描述有「局部」「短暫」的雨為 C，其他的雨（例如「陣雨」「有雨」）為 D；請點開詳情看天氣描述。</li>
           <li>預報的日子越遠，準確度本來就越低。</li>
           <li>建議用來初步安排行程，出發前 3 天內再回來確認。</li>
         </ul>
@@ -344,7 +344,7 @@ footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);paddin
 
   <main id="view-fav" hidden style="display:flex;flex-direction:column;gap:10px">
     <div class="sec-head"><h2 id="h-favs">我的收藏</h2></div>
-    <div class="legend"><span><i class="lamp sm g p">A+</i>晴</span><span><i class="lamp sm g">A</i>適合</span><span><i class="lamp sm y">B</i>注意</span><span><i class="lamp sm r">C</i>不建議</span><span><i class="lamp sm na">—</i>已過或無資料</span><span class="lg-ref"><i class="lamp sm g ref">A</i>虛線＝第 4–7 天，僅供參考</span></div>
+    <div class="legend"><span><i class="lamp sm g p">A</i>讚</span><span><i class="lamp sm g">B</i>可</span><span><i class="lamp sm y">C</i>注意</span><span><i class="lamp sm r">D</i>不建議</span><span><i class="lamp sm na">—</i>已過或無資料</span><span class="lg-ref"><i class="lamp sm g ref">B</i>虛線＝第 4–7 天，僅供參考</span></div>
     <div class="matrix-box" id="fav-box"><table class="matrix" id="fav-matrix"><thead></thead><tbody></tbody></table><div class="cards" id="fav-cards"></div></div>
     <div class="fav-empty" id="fav-empty">還沒有收藏。到「找山」點山名旁的 ♡，就能把山加到這裡，快速查看它們的天氣。</div>
   </main>
@@ -355,10 +355,10 @@ footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);paddin
       <p><b class="warn">本站不自行預測天氣，只把氣象署預報數值，依下面規則換成燈號並排序。</b>點任何一座山，都能看到每一格的原始數值。</p>
       <h3>燈號代表什麼</h3>
       <ul>
-        <li><b>A+</b>：適合，且天氣描述是「晴」</li>
-        <li><b>A</b>：適合</li>
-        <li><b>B</b>：注意</li>
-        <li><b>C</b>：不建議</li>
+        <li><b>A</b>：讚。各項都適合，且天氣描述是「晴」</li>
+        <li><b>B</b>：可。各項都適合</li>
+        <li><b>C</b>：注意</li>
+        <li><b>D</b>：不建議</li>
         <li><b>—</b>：時段已過，或沒有資料</li>
         <li><b>虛線</b>：第 4–7 天的預報，僅供參考</li>
       </ul>
@@ -370,23 +370,23 @@ footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);paddin
       <h3>燈號怎麼算</h3>
       <p>每個時段檢查下列項目，以最差的一項作為燈號。</p>
       <ul>
-        <li><b>降雨機率</b><ul><li>未滿 30%：A</li><li>30–49%：B</li><li>50% 以上：C</li></ul></li>
-        <li><b>天氣描述</b><ul><li>有「霧」（例如「晴有霧」）：B</li><li>有「雪」（例如「雨或雪」）：B</li><li>有「下雪」「積冰」「暴風雪」：C</li><li>有「雷」：C</li></ul></li>
-        <li><b>風速</b>（平均風速）<ul><li>4 級以下：A</li><li>5–6 級：B</li><li>7 級以上：C</li><li>陣風通常是平均風速的 1.5–3 倍，稜線上請特別小心。</li></ul></li>
-        <li><b>高溫</b>（只看標高 1,000 公尺以下的山）<ul><li>體感溫度 36°C 以上：B</li></ul></li>
-        <li><b>天氣特報</b>（特報涵蓋的縣市內的山）<ul><li>颱風、豪雨、大雨：C（預報只有降雨機率、沒有雨量，雨勢大小要靠特報）</li><li>陸上強風、低溫、高溫、濃霧特報不採用：氣象署的特報範圍只到縣市，無法對應到每座山；請看各山的風速、氣溫、天氣描述預報。</li></ul></li>
+        <li><b>降雨機率</b><ul><li>未滿 30%：B</li><li>30–49%：C</li><li>50% 以上：D</li></ul></li>
+        <li><b>天氣描述</b><ul><li>有「霧」（例如「晴有霧」）：C</li><li>有「雪」（例如「雨或雪」）：C</li><li>有「下雪」「積冰」「暴風雪」：D</li><li>有「雷」：D</li></ul></li>
+        <li><b>風速</b>（平均風速）<ul><li>4 級以下：B</li><li>5–6 級：C</li><li>7 級以上：D</li><li>陣風通常是平均風速的 1.5–3 倍，稜線上請特別小心。</li></ul></li>
+        <li><b>高溫</b>（只看標高 1,000 公尺以下的山）<ul><li>體感溫度 36°C 以上：C</li></ul></li>
+        <li><b>天氣特報</b>（特報涵蓋的縣市內的山）<ul><li>颱風、豪雨、大雨：D（預報只有降雨機率、沒有雨量，雨勢大小要靠特報）</li><li>陸上強風、低溫、高溫、濃霧特報不採用：氣象署的特報範圍只到縣市，無法對應到每座山；請看各山的風速、氣溫、天氣描述預報。</li></ul></li>
         <li><b>低溫不列入燈號</b><ul><li>可以靠保暖裝備應對，請參考預報準備對應衣物。</li></ul></li>
       </ul>
       <h3>特殊情況</h3>
       <ul>
-        <li><b>跨多個鄉鎮的山：</b>各鄉鎮分別判定，取最差的；每個鄉鎮都是 A+ 才算 A+。</li>
-        <li><b>一週預報：</b><ul><li>氣象署的一週資料分成白天（06–18）和晚上（18–06）。本站依你選的登頂時段對應到白天或晚上，取最差的作為當天燈號。</li><li>登頂時段都在 12 點前時，白天描述中「午後」的部分不計（例如「晴午後短暫雷陣雨」視為「晴」）；降雨機率仍照整個白天的數值。</li><li>對應到的都是「晴」，才算 A+。</li><li>第 4–7 天氣象署沒有降雨機率，只有天氣描述，依雨的用語判定：<ul><li>「局部」「短暫」的雨（例如「多雲短暫陣雨」「午後局部雨」）：B</li><li>其他的雨（例如「陰陣雨」「陰有雨」）：C</li></ul>詳情會列出原始描述。請在出發前 3 天內再確認。</li></ul></li>
+        <li><b>跨多個鄉鎮的山：</b>各鄉鎮分別判定，取最差的；每個鄉鎮都是 A 才算 A。</li>
+        <li><b>一週預報：</b><ul><li>氣象署的一週資料分成白天（06–18）和晚上（18–06）。本站依你選的登頂時段對應到白天或晚上，取最差的作為當天燈號。</li><li>登頂時段都在 12 點前時，白天描述中「午後」的部分不計（例如「晴午後短暫雷陣雨」視為「晴」）；降雨機率仍照整個白天的數值。</li><li>對應到的都是「晴」，才算 A。</li><li>第 4–7 天氣象署沒有降雨機率，只有天氣描述，依雨的用語判定：<ul><li>「局部」「短暫」的雨（例如「多雲短暫陣雨」「午後局部雨」）：C</li><li>其他的雨（例如「陰陣雨」「陰有雨」）：D</li></ul>詳情會列出原始描述。請在出發前 3 天內再確認。</li></ul></li>
       </ul>
       <h3>排序方式</h3>
       <ul>
-        <li><b>計分：</b>A+ 3 分、A 2 分、B 1 分、C 0 分。已過的時段和無資料不計分。分數只用來排序，網頁上不顯示。<ul><li>例：「A+、A」共 5 分，排在「A、A」共 4 分前面。</li></ul></li>
-        <li><b>今天／明天／後天／大後天</b>（每 3 小時一格），依序比較：<ol><li>登頂時段的總分，高的在前</li><li>登頂時段中 A+ 的數量，多的在前</li><li>登頂時段中 C 的數量，少的在前</li><li>當天所有時段的總分，高的在前</li></ol><ul><li>登頂時段都過了，就改看當天剩下的時段。</li></ul></li>
-        <li><b>一週預報</b>（每天一格），依序比較：<ol><li>7 天的總分，高的在前</li><li>A+ 的天數，多的在前</li><li>C 的天數，少的在前</li></ol></li>
+        <li><b>計分：</b>A 3 分、B 2 分、C 1 分、D 0 分。已過的時段和無資料不計分。分數只用來排序，網頁上不顯示。<ul><li>例：「A、B」共 5 分，排在「B、B」共 4 分前面。</li></ul></li>
+        <li><b>今天／明天／後天／大後天</b>（每 3 小時一格），依序比較：<ol><li>登頂時段的總分，高的在前</li><li>登頂時段中 A 的數量，多的在前</li><li>登頂時段中 D 的數量，少的在前</li><li>當天所有時段的總分，高的在前</li></ol><ul><li>登頂時段都過了，就改看當天剩下的時段。</li></ul></li>
+        <li><b>一週預報</b>（每天一格），依序比較：<ol><li>7 天的總分，高的在前</li><li>A 的天數，多的在前</li><li>D 的天數，少的在前</li></ol></li>
         <li><b>完全沒有資料的山：</b>排在最後。</li>
         <li><b>以上所有條件都相同時：</b>每天隨機排序一次同條件山岳。</li>
       </ul>

@@ -36,7 +36,7 @@ let fails = 0; const ok = (c, m) => { console.log((c ? '✓ ' : '✗ ') + m); if
     const body = d.body.innerHTML.replace(/<script>[\s\S]*<\/script>/, '');
     const L = lamps(), cnt = k => L.filter(x => x === k).length;
     ok(d.querySelectorAll('#matrix tbody tr').length === 235, `${m}：235 座都列出`);
-    { // 計分排序（A+ 3、A 2、B 1、C 0；已過與無資料不計）：依畫面上的燈號重算，順序須為 總分 → A+ 數 → 全日總分 由高到低
+    { // 計分排序（A 3、B 2、C 1、D 0；已過與無資料不計）：依畫面上的燈號重算，順序須為 總分 → A 數 → D 少 → 全日總分
       const peakCol = [...d.querySelectorAll('#matrix thead th')].slice(1).map(th => m === 'week' || th.classList.contains('peak'));
       const keys = [...d.querySelectorAll('#matrix tbody tr')].map(tr => { let s1 = 0, p1 = 0, c1 = 0, s2 = 0, has = 0;
         [...tr.querySelectorAll('.lamp')].forEach((l, i) => { if (l.classList.contains('past') || l.classList.contains('na')) return;
@@ -55,7 +55,7 @@ let fails = 0; const ok = (c, m) => { console.log((c ? '✓ ' : '✗ ') + m); if
     ok(!/undefined|NaN|\[object/.test(body), `${m}：畫面沒有空值或錯誤數字`);
     const plus = d.querySelectorAll('#matrix tbody .lamp.g.p');
     plusTotal += plus.length;
-    ok([...plus].every(x => x.textContent === 'A+') && [...d.querySelectorAll('#matrix tbody .lamp.g:not(.p)')].every(x => x.textContent === 'A'), `${m}：A+ ${plus.length} 格、A 格都寫字母`);
+    ok([...plus].every(x => x.textContent === 'A') && [...d.querySelectorAll('#matrix tbody .lamp.g:not(.p)')].every(x => x.textContent === 'B') && [...d.querySelectorAll('#matrix tbody .lamp.y')].every(x => x.textContent === 'C') && [...d.querySelectorAll('#matrix tbody .lamp.r')].every(x => x.textContent === 'D'), `${m}：A ${plus.length} 格、B、C、D 格都寫對應字母`);
     ok(!/\s\d{3}・|E\d\d・/.test(d.getElementById('matrix-cards').textContent), `${m}：卡片不顯示編號`);
     ok(cnt('g') + cnt('y') + cnt('r') > 0, `${m}：有實際燈號（適合 ${cnt('g')}、注意 ${cnt('y')}、不建議 ${cnt('r')}、無資料 ${cnt('na')}）`);
     // 打開每座山的詳情
@@ -69,16 +69,16 @@ let fails = 0; const ok = (c, m) => { console.log((c ? '✓ ' : '✗ ') + m); if
     ok(J([h('晴', true), h('多雲有霧', false)], false).lv === 1, '一週：晚上有霧時，即使白天晴也判 B');
     ok(J([h('晴', true), h('雨或雪', false)], false).lv === 1 && J([h('下雪', false), h('晴', true)], false).lv === 2, '一週：另一個半天的雪也會判定');
     const pm = J([h('晴午後短暫雷陣雨', true)], true);
-    ok(pm.lv === 0 && pm.plus && /午後/.test(pm.why.join()), '一週：登頂時段在 12 點前，「晴午後短暫雷陣雨」視為晴（A+），原因註明');
+    ok(pm.lv === 0 && pm.plus && /午後/.test(pm.why.join()), '一週：登頂時段在 12 點前，「晴午後短暫雷陣雨」視為晴（A），原因註明');
     ok(J([h('晴午後短暫雷陣雨', true)], false).lv === 2, '一週：登頂時段有 12 點後，午後雷陣雨仍判 C');
-    ok(J([h('晴', true), h('晴', false)], false).plus && !J([h('晴', true), h('晴時多雲', false)], false).plus, '一週：所有半天都是晴才算 A+');
+    ok(J([h('晴', true), h('晴', false)], false).plus && !J([h('晴', true), h('晴時多雲', false)], false).plus, '一週：所有半天都是晴才算 A');
     const R = wx => w.judge({wx, pop: null, ws: 2}, false, null, true).lv;
     ok(['多雲短暫陣雨', '陰短暫雨', '午後局部雨', '多雲局部短暫陣雨', '短暫雨或雪'].every(x => R(x) === 1), '第 4–7 天：「局部」「短暫」的雨判 B');
     ok(['陰陣雨', '陰有雨', '雨天', '有雨或雪', '陰短暫雨或陣雨', '大雨'].every(x => R(x) === 2), '第 4–7 天：陣雨（不含短暫）、有雨等判 C');
     ok(R('多雲時晴') === 0 && w.judge({wx: '陰陣雨', pop: 10, ws: 2}, false, null, false).lv === 0, '前 3 天：雨的描述不影響燈號，只看降雨機率');
     ok(w.eval('amOnly([6, 9])') && !w.eval('amOnly([9, 12])'), '一週：12 點前的判斷（09–12 算，12–15 不算）');
   }
-  ok(plusTotal > 0, `天氣描述為「晴」的 A 時段顯示 A+（共 ${plusTotal} 格）`);
+  ok(plusTotal > 0, `天氣描述為「晴」的時段顯示 A（共 ${plusTotal} 格）`);
   // 一週：第 4–7 天沒有降雨機率時，詳情列出原始天氣描述
   click(w, d.querySelector('#seg [data-mode="week"]'));
   ok(d.querySelectorAll('#matrix tbody .lamp.ref').length > 0, '一週：第 4–7 天有虛線燈號');
@@ -111,7 +111,13 @@ let fails = 0; const ok = (c, m) => { console.log((c ? '✓ ' : '✗ ') + m); if
   inp.value = '笠頂山'; inp.dispatchEvent(new w.Event('input', {bubbles: true}));
   ok([...d.querySelectorAll('#matrix tbody .lamp:not(.past)')].every(x => x.classList.contains('r')), '豪雨特報期間，涵蓋縣市的山判 C');
   click(w, d.querySelector('#matrix tbody tr td'));
-  ok(/豪雨特報・C/.test(d.getElementById('drawer').innerHTML), '詳情顯示豪雨特報・C');
+  ok(/豪雨特報・D/.test(d.getElementById('drawer').innerHTML), '詳情顯示豪雨特報・D');
+  { // 燈號名稱（2026-10-20 定案）：A 讚、B 可、C 注意、D 不建議；說明頁的字母換成小燈號方塊，°C 不上色
+    const lg = d.querySelector('.legend').textContent;
+    ok(/A讚/.test(lg) && /B可/.test(lg) && /C注意/.test(lg) && /D不建議/.test(lg) && !/A\+/.test(d.body.textContent), '圖例為 A 讚、B 可、C 注意、D 不建議，畫面上沒有 A+');
+    const chips = [...d.querySelectorAll('article.doc .lamp.chip')];
+    ok(chips.some(x => x.textContent === 'D' && x.classList.contains('r')) && chips.some(x => x.textContent === 'A' && x.classList.contains('p')) && /36°C/.test(d.querySelector('article.doc').textContent), '說明頁的 A–D 換成小燈號方塊，36°C 不受影響');
+  }
   click(w, d.getElementById('d-close'));
   // 別名：搜「鳶山」找得到福德坑山，詳情顯示別名
   inp.value = '鳶山'; inp.dispatchEvent(new w.Event('input', {bubbles: true}));

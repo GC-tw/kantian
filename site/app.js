@@ -8,9 +8,10 @@ const SLOTS = [0,3,6,9,12,15,18,21];                       // 每段 3 小時的
 const MODES = {today:{di:0,name:'今天'}, tmr:{di:1,name:'明天'}, d2:{di:2,name:'後天'}, d3:{di:3,name:'大後天'}, week:{name:'一週'}};
 const COUNTY_ORDER = ['基隆市','臺北市','新北市','桃園市','新竹市','新竹縣','苗栗縣','臺中市','彰化縣','南投縣','雲林縣','嘉義市','嘉義縣','臺南市','高雄市','屏東縣','宜蘭縣','花蓮縣','臺東縣','澎湖縣','金門縣','連江縣'];
 const BF = [0,0.3,1.6,3.4,5.5,8.0,10.8,13.9,17.2,20.8,24.5];  // 蒲福風級下限（公尺／秒）
-const SYM = ['A','B','C','—'], CLS = ['g','y','r','na'], WORD = ['A','B','C','已過或無資料'];
+// 燈號名稱（2026-10-20 使用者定案）：A 讚（晴）、B 可、C 注意、D 不建議。內部等級 lv 仍是 0／1／2，plus 表示 A
+const SYM = ['B','C','D','—'], CLS = ['g','y','r','na'], WORD = ['可','注意','不建議','已過或無資料'];
 const LV = lv => lv < 0 ? 3 : lv;                                // 燈號等級 -1 代表沒有資料
-// A+：燈號 A 且天氣描述剛好是「晴」（2026-10-20 使用者決定）；畫面上寫 A+，class 多加 p
+// A（讚）：等級 0 且天氣描述剛好是「晴」（plus）；畫面上寫 A，class 多加 p
 const PAGE = 10;                                           // 山岳列表一次顯示幾座
 const H = 3600e3, STALE = 9*H;                              // 超過 9 小時沒更新就提醒
 
@@ -143,7 +144,7 @@ function buildCols(){
 }
 const hash = t => { let h = 2166136261; for (const ch of t){ h ^= ch.codePointAt(0); h = Math.imul(h, 16777619); } return h >>> 0; };
 const fmtDayKey = () => { const d = new Date(Date.now() + 8*3600e3); return d.toISOString().slice(0, 10); };   // 台灣日期
-const SCORE = c => c.plus ? 3 : 2 - c.lv;                 // A+ 3、A 2、B 1、C 0
+const SCORE = c => c.plus ? 3 : 2 - c.lv;                 // A 3、B 2、C 1、D 0
 function evaluate(){                                       // 依時段與登頂時段計算所有山的燈號並排序
   evalStamp = timeStamp(); dataStamp = FC?.fetchedAt || '';
   cols = buildCols();
@@ -157,10 +158,10 @@ function evaluate(){                                       // 依時段與登頂
         return {p, fc, al, j: week ? judgeDay(fc, x.low, al, c.di>=3, am) : judge(fc, x.low, al, false)};
       });
       const lv = Math.max(...per.map(y=>y.j.lv));
-      return {lv, plus: lv === 0 && per.every(y => y.j.plus), per, ref:!!c.ref, past:!!c.past};   // 跨鄉鎮：每個鄉鎮都是 A+ 才算 A+
+      return {lv, plus: lv === 0 && per.every(y => y.j.plus), per, ref:!!c.ref, past:!!c.past};   // 跨鄉鎮：每個鄉鎮都是 A 才算 A
     });
-    // 計分排序（2026-10-20 方案乙）：A+ 3、A 2、B 1、C 0；已過與無資料不計分
-    // s1：登頂時段總分（一週為 7 天總分）；p1：其中 A+ 數；c1：其中 C 數（2026-10-20 加入，C 少的在前）；s2：當天所有時段總分（只用於逐 3 小時）
+    // 計分排序（2026-10-20 方案乙）：A 3、B 2、C 1、D 0；已過與無資料不計分
+    // s1：登頂時段總分（一週為 7 天總分）；p1：其中 A 數；c1：其中 D 數（2026-10-20 加入，D 少的在前）；s2：當天所有時段總分（只用於逐 3 小時）
     // nd：沒有任何資料（2026-10-20 加入，一律排最後）
     let s1 = 0, p1 = 0, c1 = 0, s2 = 0, has = false;
     cells.forEach((c, i) => {
@@ -187,8 +188,8 @@ function applyFilters(){                                    // 篩選不需重�
 // ---------- 畫面 ----------
 const star = k => { const on = favs.has(k), t = on ? '取消收藏' : '加入收藏';
   return `<button type="button" class="star" data-fav="${k}" aria-pressed="${on}" aria-label="${t}" title="${t}">${on?'♥':'♡'}</button>`; };
-const lamp = (c, sm) => { const t = c.plus ? 'A+' : SYM[LV(c.lv)];
-  return `<i class="lamp ${CLS[LV(c.lv)]}${c.plus?' p':''}${c.ref?' ref':''}${c.past?' past':''}${sm?' sm':''}" title="${c.plus ? 'A+（晴）' : WORD[LV(c.lv)]}${c.ref?'（參考）':''}${c.past?'（已過）':''}">${t}</i>`; };
+const lamp = (c, sm) => { const t = c.plus ? 'A' : SYM[LV(c.lv)];
+  return `<i class="lamp ${CLS[LV(c.lv)]}${c.plus?' p':''}${c.ref?' ref':''}${c.past?' past':''}${sm?' sm':''}" title="${c.plus ? 'A 讚（晴）' : SYM[LV(c.lv)] + ' ' + WORD[LV(c.lv)]}${c.ref?'（參考）':''}${c.past?'（已過）':''}">${t}</i>`; };
 const sub = m => `${m.h ? m.h.toLocaleString()+' m' : '標高待補'}・${m.c}・${esc(m.co)}`;   // 標高、類別、縣市（不顯示編號）
 const peaksLeft = () => cols.filter(c => c.peak && !c.past).length;
 // 列表與卡片都不顯示比較結果（段數、A 天數；2026-10-20 拿掉），排序仍照規則
@@ -242,7 +243,7 @@ function openDetail(k){
     <div class="src"><span><b>採用預報</b>：${esc(pts.map(p=>p.label+(p.code?'（'+p.code+'）':'')).join('、'))}</span>
       <span>${pts.length>1?'跨多個鄉鎮，各自列出；燈號取最差的鄉鎮。':''}${r.low?'標高 1,000 公尺以下，另判斷高溫。':''}</span>
       <span class="issued">資料來源：交通部中央氣象署・本站更新 ${FC ? fmtTime(Date.parse(FC.fetchedAt)) : '—'}</span></div>
-    ${alerts.map(a=>`<div class="alert"><b>${esc(a.type)}・${a.lv > 0 ? WORD[a.lv] : '不列入燈號'}</b>　${esc(a.county)}${a.end?`，有效至 ${fmtTime(a.end)}`:''}</div>`).join('')}
+    ${alerts.map(a=>`<div class="alert"><b>${esc(a.type)}・${a.lv > 0 ? SYM[a.lv] : '不列入燈號'}</b>　${esc(a.county)}${a.end?`，有效至 ${fmtTime(a.end)}`:''}</div>`).join('')}
     ${r.m.al?.length?`<div class="note">別名：${esc(r.m.al.join('、'))}</div>`:''}
     ${r.m.note?`<div class="note">備註：${esc(r.m.note)}</div>`:''}
     ${pts.map(table).join('')}
@@ -256,19 +257,19 @@ function closeDetail(){ $('drawer').hidden = true; $('scrim').hidden = true; }
 function pickInfo(week){
   const slots = sortedSlots().map(slotLabel).join('、');
   const ul = a => '<ul>' + a.map(x => '<li>' + x + '</li>').join('') + '</ul>', ol = a => '<ol>' + a.map(x => '<li>' + x + '</li>').join('') + '</ol>';
-  const std = ['A+：適合，且天氣描述是「晴」；A：適合；B：注意；C：不建議。',
+  const std = ['A：讚，各項都適合，且天氣描述是「晴」；B：可，各項都適合；C：注意；D：不建議。',
     '依氣象署預報檢查降雨機率、天氣描述（霧、雪、雷）、平均風速，以及颱風、豪雨、大雨特報；標高 1,000 公尺以下另看高溫。以最差的一項作為燈號。',
     '跨多個鄉鎮的山，取最差的鄉鎮。'];
-  const score = '計分：A+ 3 分、A 2 分、B 1 分、C 0 分。已過的時段和無資料不計分。';
+  const score = '計分：A 3 分、B 2 分、C 1 分、D 0 分。已過的時段和無資料不計分。';
   const tie = '以上所有條件都相同時：每天隨機排序一次同條件山岳。', nodata = '完全沒有資料的山排在最後。';
-  if (week) return '<h4>比較標準</h4>' + ul([...std, `每天依你選的登頂時段（${esc(slots)}）對應到白天或晚上，取最差的作為當天燈號。登頂時段都在 12 點前時，白天描述的「午後」部分不計。`, '第 4–7 天氣象署沒有降雨機率，依天氣描述判定：「局部」「短暫」的雨為 B，其他的雨（例如「陣雨」「有雨」）為 C。僅供參考。'])
-    + '<h4>排序</h4>' + ul([score]) + '<p class="ip">依序比較：</p>' + ol(['7 天的總分，高的在前', 'A+ 的天數，多的在前', 'C 的天數，少的在前']) + ul([nodata, tie]);
+  if (week) return '<h4>比較標準</h4>' + ul([...std, `每天依你選的登頂時段（${esc(slots)}）對應到白天或晚上，取最差的作為當天燈號。登頂時段都在 12 點前時，白天描述的「午後」部分不計。`, '第 4–7 天氣象署沒有降雨機率，依天氣描述判定：「局部」「短暫」的雨為 C，其他的雨（例如「陣雨」「有雨」）為 D。僅供參考。'])
+    + '<h4>排序</h4>' + ul([score]) + '<p class="ip">依序比較：</p>' + ol(['7 天的總分，高的在前', 'A 的天數，多的在前', 'D 的天數，少的在前']) + ul([nodata, tie]);
   return '<h4>比較標準</h4>' + ul([...std, '每 3 小時一格，每格一個燈號。', ...(state.mode === 'today' ? ['今天已過的時段不計分。'] : [])])
-    + '<h4>排序</h4>' + ul([score]) + '<p class="ip">依序比較：</p>' + ol(['登頂時段的總分，高的在前', '登頂時段中 A+ 的數量，多的在前', '登頂時段中 C 的數量，少的在前', '當天所有時段的總分，高的在前']) + ul(['登頂時段都過了，就改看當天剩下的時段。', nodata, tie]);
+    + '<h4>排序</h4>' + ul([score]) + '<p class="ip">依序比較：</p>' + ol(['登頂時段的總分，高的在前', '登頂時段中 A 的數量，多的在前', '登頂時段中 D 的數量，少的在前', '當天所有時段的總分，高的在前']) + ul(['登頂時段都過了，就改看當天剩下的時段。', nodata, tie]);
 }
-// 說明文字中的燈號（A+、A、B、C、—）換成小燈號方塊，顏色與列表一致（2026-10-20 使用者選「選項 1」）
-const GRADE_RE = /A\+|—|(?<![A-Za-z0-9°])[ABC](?![A-Za-z])/g,   // 「°C」的 C 不是燈號（2026-10-20）
- GRADE_CLS = {'A+':'g p', 'A':'g', 'B':'y', 'C':'r', '—':'na'};
+// 說明文字中的燈號（A、B、C、D、—）換成小燈號方塊，顏色與列表一致（2026-10-20 使用者選「選項 1」）
+const GRADE_RE = /—|(?<![A-Za-z0-9°])[ABCD](?![A-Za-z0-9+])/g,   // 「°C」的 C 不是燈號（2026-10-20）
+ GRADE_CLS = {'A':'g p', 'B':'g', 'C':'y', 'D':'r', '—':'na'};
 function gradeChips(root){
   if (!root) return;
   const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT), nodes = [];
