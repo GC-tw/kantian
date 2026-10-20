@@ -92,7 +92,7 @@ function judge(fc, lowHill, alert, noPop){
     up(1, noPop ? wx + '（第 4–7 天無降雨機率）' : '可能下雨');
     heavy = noPop && !/短暫/.test(wx);
   }
-  if (fc.ws != null){ if (fc.ws>=13.9) up(2, '風速 '+fc.ws+' m/s'); else if (fc.ws>=8) up(1, '風速 '+fc.ws+' m/s'); }
+  if (fc.ws != null){ if (fc.ws>=13.9) up(2, '風速 '+beaufort(fc.ws)+' 級'); else if (fc.ws>=8) up(1, '風速 '+beaufort(fc.ws)+' 級'); }   // 風速只顯示「級」（2026-10-20）
   if (lowHill && fc.at != null && fc.at>=36) up(1, '高溫 體感 '+fc.at+'°C');
   return {lv, why, heavy, plus: lv === 0 && wx === '晴'};
 }
@@ -232,7 +232,7 @@ function openDetail(k){
   const v = (x, f) => x == null ? '—' : f(x);
   const table = (p, k) => `<div class="pt"><h3>${esc(p.label)}・${week ? '一週預報' : MODES[state.mode].name+'逐 3 小時預報'}</h3><div class="vt-box"><table class="vt"><thead><tr><th>${week?'日期':'時段'}</th><th>燈號</th><th>天氣現象</th><th>降雨機率</th><th>風速</th><th>氣溫</th><th>體感</th><th>原因</th></tr></thead><tbody>
       ${r.cells.map((c,j) => { const x = c.per[k], col = cols[j];
-        return `<tr class="${c.ref||c.past?'ref':''}"><td>${week?fmtH(col.date):col.label}</td><td>${lamp({lv:x.j.lv,plus:x.j.plus,ref:c.ref,past:c.past},true)}</td><td>${v(x.fc?.wx, esc)}</td><td class="num">${v(x.fc?.pop, n=>n+'%')}</td><td class="num">${v(x.fc?.ws, n=>`${n} m/s（${x.fc.bf} 級）`)}</td><td class="num">${v(x.fc?.t, n=>n+'°C')}</td><td class="num">${v(x.fc?.at, n=>n+'°C')}</td><td class="why">${esc(x.j.why.join('、')||'—')}</td></tr>`; }).join('')}
+        return `<tr class="${c.ref||c.past?'ref':''}"><td>${week?fmtH(col.date):col.label}</td><td>${lamp({lv:x.j.lv,plus:x.j.plus,ref:c.ref,past:c.past},true)}</td><td>${v(x.fc?.wx, esc)}</td><td class="num">${v(x.fc?.pop, n=>n+'%')}</td><td class="num">${v(x.fc?.bf ?? (x.fc?.ws != null ? beaufort(x.fc.ws) : null), n=>n+' 級')}</td><td class="num">${v(x.fc?.t, n=>n+'°C')}</td><td class="num">${v(x.fc?.at, n=>n+'°C')}</td><td class="why">${esc(x.j.why.join('、')||'—')}</td></tr>`; }).join('')}
       </tbody></table></div></div>`;
   const dr = $('drawer');
   dr.innerHTML = `
