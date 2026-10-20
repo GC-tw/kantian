@@ -360,6 +360,7 @@ const sameSet = (set, arr) => set.size === arr.length && arr.every(x => set.has(
   const setSearch = open => { $('search').classList.toggle('open', open); $('search').closest('.row1').classList.toggle('searching', open); $('s-btn').setAttribute('aria-expanded', open); if (open) $('f-kw').focus(); };
   $('s-btn').onclick = () => setSearch(!$('search').classList.contains('open'));
   $('s-x').onclick = () => { const f = $('f-kw'); if (f.value){ f.value = ''; f.dispatchEvent(new Event('input')); } setSearch(false); $('s-btn').focus(); };
+  $('f-kw').addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); e.target.blur(); } });   // 按「搜尋」／Enter：收起手機鍵盤（搜尋框有字所以維持展開）
   $('f-kw').addEventListener('blur', () => setTimeout(() => { if (!$('search').contains(document.activeElement) && !state.name.trim()) setSearch(false); }, 150));   // 離開搜尋框時：沒有打字才收起；有打字就維持展開（2026-10-20 使用者決定）
   const setFilter = open => {
     $('q').classList.toggle('open', open); $('f-scrim').hidden = !open; $('filter-btn').setAttribute('aria-expanded', open);
