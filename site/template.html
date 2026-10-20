@@ -48,7 +48,7 @@ h1 .logo{width:1.05em;height:1.05em;flex:none}
 .s-btn.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
 .search input,.s-x{display:none}
 .search input::-webkit-search-cancel-button{-webkit-appearance:none;display:none}
-.row1.searching h1{display:none}   /* 搜尋展開時：標題讓出位置，搜尋框和「篩選」並排，不遮住篩選數字 */
+.row1.searching h1{display:none}   /* 搜尋展開時：標題讓出位置，搜尋框填滿標題列 */
 .row1.searching .tools{flex:1;min-width:0}
 .search.open{flex:1;min-width:0}
 .search.open input{display:block;flex:1;border-radius:999px;background:var(--surface);padding:6px 12px}
@@ -145,10 +145,11 @@ h2 .info{width:17px;height:17px;top:1.5px}
 .pick .rank{flex:none;font-family:var(--f-mono);font-size:12px;line-height:24px;color:var(--muted)}
 .sec-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:6px 16px}
 .sec-head p{margin:0;color:var(--muted);font-size:13px}
-/* 重新整理按鈕：在「○○燈號排序」同一行靠右（2026-10-20） */
+/* 「○○燈號排序」同一行靠右：篩選＋重新整理（圖示）（2026-10-20 由標題列移來） */
+.sec-tools{display:flex;align-items:center;gap:8px;flex:none}
 #sec-picks{flex-wrap:nowrap;align-items:center}
-.reload{display:inline-flex;align-items:center;gap:4px;flex:none;font:inherit;font-size:13px;font-weight:500;color:var(--muted);background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:5px 11px 5px 9px;cursor:pointer;white-space:nowrap}
-.reload svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.reload{display:inline-grid;place-items:center;flex:none;width:34px;height:34px;padding:0;color:var(--muted);background:var(--surface);border:1px solid var(--line);border-radius:50%;cursor:pointer}
+.reload svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
 .reload:hover{color:var(--ink)}
 .legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;color:var(--muted);align-items:center}
 .legend span{display:inline-flex;align-items:center;gap:5px}
@@ -298,7 +299,6 @@ footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);paddin
     <h1><a class="brand" id="brand" href="./" title="回到最上方"><svg class="logo" viewBox="0 0 512 512" aria-hidden="true"><rect width="512" height="512" rx="112" fill="#2f363d"/><circle cx="352" cy="168" r="56" fill="#f2b544"/><path d="M40 412 196 176l70 104 44-58 162 190z" fill="#8f99a3"/><path d="M40 412 196 176l116 236z" fill="#f4f5f6"/></svg>看天爬山</a><small>看天氣，找出適合造訪的山</small></h1>
       <div class="tools">
       <div class="search" id="search"><button type="button" class="s-btn" id="s-btn" aria-label="搜尋山名或別名" aria-expanded="false" aria-controls="f-kw"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></svg></button><input id="f-kw" name="kw" type="search" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" aria-label="搜尋山名或別名" placeholder="搜尋山名或別名"><button type="button" class="s-x" id="s-x" aria-label="清除並關閉搜尋">×</button></div>
-        <button type="button" class="filter-btn" id="filter-btn" aria-expanded="false" aria-controls="q" aria-label="篩選" title="篩選"><span class="fb-t">篩選</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M7 12h10M10 18h4"/></svg><span id="filter-n" class="badge"></span></button>
       </div>
     </div>
   </header>
@@ -312,22 +312,6 @@ footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);paddin
     <button role="tab" id="tab-rules" aria-selected="false" data-view="rules"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v16H5z"/><path d="M9 9h6M9 13h6M9 17h3"/></svg><span>排序規則<span class="full">與說明</span></span></button>
   </nav>
 
-  <form class="panel-search" id="q" autocomplete="off" aria-label="篩選">
-    <div class="sheet-head"><b>篩選</b><button type="button" class="btn" id="filter-done">完成</button></div>
-    <div class="field wide"><span class="lab">登頂時段（可多選，預設 09–12，排序依此計算）</span><div class="chips" id="f-slots"></div></div>
-    <div class="field wide"><span class="lab">山岳類別（可多選，未選＝全部）</span><div class="chips" id="f-cat">
-      <button type="button" class="chip reset" id="cat-all" aria-pressed="true">全部</button>
-      <button type="button" class="chip" aria-pressed="false" data-c="百岳">百岳</button>
-      <button type="button" class="chip" aria-pressed="false" data-c="小百岳">小百岳</button>
-      <button type="button" class="chip" aria-pressed="false" data-c="其他山岳">其他山岳</button></div></div>
-    <div class="field wide"><span class="lab">標高（可多選，未選＝全部）</span><div class="chips" id="f-ht">
-      <button type="button" class="chip reset" id="ht-all" aria-pressed="true">全部</button>
-      <button type="button" class="chip" aria-pressed="false" data-ht="0">1,000 m 以下</button>
-      <button type="button" class="chip" aria-pressed="false" data-ht="1">1,000–2,000 m</button>
-      <button type="button" class="chip" aria-pressed="false" data-ht="2">2,000–3,000 m</button>
-      <button type="button" class="chip" aria-pressed="false" data-ht="3">3,000 m 以上</button></div></div>
-    <div class="field wide"><span class="lab">地點（縣市，可多選，未選＝全部）</span><div class="chips" id="f-county"></div></div>
-  </form>
 
   <div class="seg find-only" role="tablist" aria-label="預報時段" id="seg">
     <button type="button" role="tab" data-mode="today" aria-selected="true">今天<small class="sd">逐 3 小時預報</small></button>
@@ -356,7 +340,24 @@ footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);paddin
     </div>
 
     <section style="display:flex;flex-direction:column;gap:10px" aria-labelledby="h-matrix">
-      <div class="sec-head" id="sec-picks"><h2 id="h-matrix"><span id="h-picks-t">燈號排序</span><button type="button" class="info" id="pick-info-btn" aria-expanded="false" aria-controls="pick-info" aria-label="怎麼比較與排序"><svg viewBox="0 0 20 20" aria-hidden="true"><circle class="ring" cx="10" cy="10" r="9.1"/><circle cx="10" cy="6.1" r="1.2"/><rect x="9.2" y="8.5" width="1.6" height="6.6" rx=".8"/></svg></button></h2><button type="button" class="reload" id="reload-btn" aria-label="重新整理網頁" title="重新整理網頁"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v5h-5"/></svg>重新整理</button></div>
+      <div class="sec-head" id="sec-picks"><h2 id="h-matrix"><span id="h-picks-t">燈號排序</span><button type="button" class="info" id="pick-info-btn" aria-expanded="false" aria-controls="pick-info" aria-label="怎麼比較與排序"><svg viewBox="0 0 20 20" aria-hidden="true"><circle class="ring" cx="10" cy="10" r="9.1"/><circle cx="10" cy="6.1" r="1.2"/><rect x="9.2" y="8.5" width="1.6" height="6.6" rx=".8"/></svg></button></h2><div class="sec-tools"><button type="button" class="filter-btn" id="filter-btn" aria-expanded="false" aria-controls="q" aria-label="篩選" title="篩選"><span class="fb-t">篩選</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M7 12h10M10 18h4"/></svg><span id="filter-n" class="badge"></span></button><button type="button" class="reload" id="reload-btn" aria-label="重新整理網頁" title="重新整理網頁"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v5h-5"/></svg></button></div></div>
+      <!-- 篩選面板放在「○○燈號排序」下方：電腦版在篩選按鈕下方展開；手機版由底部滑出（2026-10-20） -->
+      <form class="panel-search" id="q" autocomplete="off" aria-label="篩選">
+        <div class="sheet-head"><b>篩選</b><button type="button" class="btn" id="filter-done">完成</button></div>
+        <div class="field wide"><span class="lab">登頂時段（可多選，預設 09–12，排序依此計算）</span><div class="chips" id="f-slots"></div></div>
+        <div class="field wide"><span class="lab">山岳類別（可多選，未選＝全部）</span><div class="chips" id="f-cat">
+          <button type="button" class="chip reset" id="cat-all" aria-pressed="true">全部</button>
+          <button type="button" class="chip" aria-pressed="false" data-c="百岳">百岳</button>
+          <button type="button" class="chip" aria-pressed="false" data-c="小百岳">小百岳</button>
+          <button type="button" class="chip" aria-pressed="false" data-c="其他山岳">其他山岳</button></div></div>
+        <div class="field wide"><span class="lab">標高（可多選，未選＝全部）</span><div class="chips" id="f-ht">
+          <button type="button" class="chip reset" id="ht-all" aria-pressed="true">全部</button>
+          <button type="button" class="chip" aria-pressed="false" data-ht="0">1,000 m 以下</button>
+          <button type="button" class="chip" aria-pressed="false" data-ht="1">1,000–2,000 m</button>
+          <button type="button" class="chip" aria-pressed="false" data-ht="2">2,000–3,000 m</button>
+          <button type="button" class="chip" aria-pressed="false" data-ht="3">3,000 m 以上</button></div></div>
+        <div class="field wide"><span class="lab">地點（縣市，可多選，未選＝全部）</span><div class="chips" id="f-county"></div></div>
+      </form>
       <div class="info-pop" id="pick-info" hidden>
         <div class="info-head"><b id="pick-info-t">怎麼比較與排序？</b><button type="button" class="info-x" id="pick-info-x" aria-label="關閉說明">×</button></div>
         <div id="pick-info-body"></div>

@@ -415,8 +415,7 @@ const sameSet = (set, arr) => set.size === arr.length && arr.every(x => set.has(
   document.addEventListener('keydown', e => { if (e.key === 'Escape'){ setFilter(false); setSearch(false); } });
   $('q').onsubmit = e => e.preventDefault();
   $('brand').onclick = e => { e.preventDefault(); window.scrollTo({top: 0, behavior: 'smooth'}); };   // 點標題：回到最上方（不重新整理）
-  $('reload-btn').onclick = () => location.reload();   // 「○○燈號排序」旁的重新整理按鈕：重新整理網頁（篩選與登頂時段會保留）
-  if (!store.raw('seenFilter')){ store.set('seenFilter', '1'); setFilter(true); }   // 第一次造訪時自動打開篩選，之後不再自動打開
+  $('reload-btn').onclick = () => location.reload();   // 「○○燈號排序」旁、篩選右側的重新整理圖示：重新整理網頁（篩選與登頂時段會保留）
   $('more').onclick = () => { state.shown += PAGE; if (!fresh()) evaluate(); render(); };
   $('info-btn').onclick = () => setInfo($('info-ref').hidden);
   $('info-x').onclick = () => { setInfo(false); $('info-btn').focus(); };
