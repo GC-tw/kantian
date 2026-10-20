@@ -178,10 +178,10 @@ function evaluate(){                                       // 依時段與登頂
 }
 function applyFilters(){                                    // 篩選不需重算燈號
   const q = state.name.trim();
-  rows = all.filter(r => (!state.cats.size || state.cats.has(r.m.c))
+  // 有搜尋文字時只看山名／別名，忽略類別、標高、縣市篩選（2026-10-20 使用者決定；登頂時段仍用來判定燈號）
+  rows = q ? all.filter(r => r.search.includes(q)) : all.filter(r => (!state.cats.size || state.cats.has(r.m.c))
     && (!state.counties.size || r.counties.some(c => state.counties.has(c)))
-    && (!state.hts.size || state.hts.has(r.ht))
-    && (!q || r.search.includes(q)));
+    && (!state.hts.size || state.hts.has(r.ht)));
   favRows = all.filter(r => favs.has(r.k));
 }
 

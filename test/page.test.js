@@ -95,6 +95,15 @@ let fails = 0; const ok = (c, m) => { console.log((c ? '✓ ' : '✗ ') + m); if
   const inp = d.getElementById('f-name'); inp.value = '鹿山'; inp.dispatchEvent(new w.Event('input', {bubbles: true}));
   ok(lamps().length && lamps().every(x => x === 'na'), '缺少資料的預報點顯示「無資料」');
   inp.value = ''; inp.dispatchEvent(new w.Event('input', {bubbles: true}));
+  { // 搜尋時忽略篩選：只選小百岳，搜尋百岳「玉山」仍找得到；清掉搜尋後篩選恢復
+    w.eval("state.cats.add('小百岳')");
+    inp.value = '玉山東峰'; inp.dispatchEvent(new w.Event('input', {bubbles: true}));
+    const found = [...d.querySelectorAll('#matrix tbody tr')].some(tr => /玉山東峰/.test(tr.textContent));
+    inp.value = ''; inp.dispatchEvent(new w.Event('input', {bubbles: true}));
+    const back = w.eval('rows.length');
+    w.eval("state.cats.clear()"); inp.dispatchEvent(new w.Event('input', {bubbles: true}));
+    ok(found && back === 100, `搜尋時忽略篩選（只選小百岳仍搜得到玉山東峰；清掉搜尋後回到 ${back} 座小百岳）`);
+  }
   // 特報：宜蘭縣今天陸上強風（不採用）
   click(w, d.querySelector('#seg [data-mode="today"]'));
   inp.value = '南湖北山'; inp.dispatchEvent(new w.Event('input', {bubbles: true}));
