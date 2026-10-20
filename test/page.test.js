@@ -103,6 +103,11 @@ let fails = 0; const ok = (c, m) => { console.log((c ? '✓ ' : '✗ ') + m); if
     const saved = JSON.parse(w.localStorage.getItem('filters') || '{}');
     ok(found && w.eval('state.cats.size') === 0 && !saved.cats?.length && d.getElementById('cat-all').getAttribute('aria-pressed') === 'true' && w.eval('state.slots.has(12)'),
       '開始搜尋時，類別篩選回到「全部」並記住，登頂時段保留，搜得到玉山東峰');
+    // 搜尋中再改篩選：照常套用，不符合就顯示「沒有符合條件的山」；繼續打字也不會再重設
+    click(w, d.querySelector('#f-cat [data-c="小百岳"]')); w.eval('refilter()');
+    inp.value = '玉山東'; inp.dispatchEvent(new w.Event('input', {bubbles: true}));
+    ok(w.eval('rows.length') === 0 && w.eval('state.cats.has("小百岳")') && /沒有符合條件的山/.test(d.getElementById('matrix-cards').textContent), '搜尋中改篩選照常套用：只選小百岳時搜尋玉山東峰顯示「沒有符合條件的山」');
+    click(w, d.getElementById('cat-all')); w.eval('saveFilters()');
     inp.value = ''; inp.dispatchEvent(new w.Event('input', {bubbles: true}));
     click(w, d.querySelector('#f-slots [data-h="12"]')); w.eval('saveFilters()');
     ok(w.eval('rows.length') === 235, '清掉搜尋後列出全部 235 座');

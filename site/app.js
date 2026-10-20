@@ -178,10 +178,11 @@ function evaluate(){                                       // 依時段與登頂
 }
 function applyFilters(){                                    // 篩選不需重算燈號
   const q = state.name.trim();
-  // 有搜尋文字時只看山名／別名，忽略類別、標高、縣市篩選（2026-10-20 使用者決定；登頂時段仍用來判定燈號）
-  rows = q ? all.filter(r => r.search.includes(q)) : all.filter(r => (!state.cats.size || state.cats.has(r.m.c))
+  // 搜尋文字和篩選同時套用：開始搜尋時篩選已回到預設，之後再改篩選仍會生效，不符合就顯示「沒有符合條件的山」（2026-10-20）
+  rows = all.filter(r => (!state.cats.size || state.cats.has(r.m.c))
     && (!state.counties.size || r.counties.some(c => state.counties.has(c)))
-    && (!state.hts.size || state.hts.has(r.ht)));
+    && (!state.hts.size || state.hts.has(r.ht))
+    && (!q || r.search.includes(q)));
   favRows = all.filter(r => favs.has(r.k));
 }
 
@@ -355,7 +356,7 @@ const sameSet = (set, arr) => set.size === arr.length && arr.every(x => set.has(
   const syncs = [chipGroup($('f-county'), 'data-co', state.counties, {allId:'c-all', onChange: onPick}),
     chipGroup($('f-cat'), 'data-c', state.cats, {allId:'cat-all', onChange: onPick}),
     chipGroup($('f-ht'), 'data-ht', state.hts, {allId:'ht-all', parse: Number, onChange: onPick})];
-  // 開始搜尋時，類別、標高、縣市篩選回到預設（全部）並記住；登頂時段不變（2026-10-20 使用者決定）
+  // 開始搜尋（搜尋框從空白變成有字）時，類別、標高、縣市篩選回到預設（全部）並記住；登頂時段不變（2026-10-20 使用者決定）
   const resetForSearch = () => { if (!state.cats.size && !state.counties.size && !state.hts.size) return;
     state.cats.clear(); state.counties.clear(); state.hts.clear(); syncs.forEach(f => f()); saveFilters(); };
   chipGroup($('f-slots'), 'data-h', state.slots, {parse: Number, keepOne: true, onChange: onPick});
@@ -366,7 +367,8 @@ const sameSet = (set, arr) => set.size === arr.length && arr.every(x => set.has(
   seg.forEach(b => b.onclick = () => { state.mode = b.dataset.mode; state.shown = PAGE; syncSeg(); store.set('mode', state.mode); refresh(); });
   syncSeg();
 
-  $('f-kw').oninput = e => { state.name = e.target.value; if (state.name.trim()) resetForSearch(); $('s-btn').classList.toggle('on', !!state.name.trim()); if ($('view-find').hidden) $('tab-find').click(); refilter(); };
+  $('f-kw').oninput = e => { const was = state.name.trim(); state.name = e.target.value; if (!was && state.name.trim()) resetForSearch();   // 從空白開始輸入時才重設篩選，搜尋中改篩選照常套用
+ $('s-btn').classList.toggle('on', !!state.name.trim()); if ($('view-find').hidden) $('tab-find').click(); refilter(); };
   const setSearch = open => { $('search').classList.toggle('open', open); $('search').closest('.row1').classList.toggle('searching', open); $('s-btn').setAttribute('aria-expanded', open); if (open) $('f-kw').focus(); };
   $('s-btn').onclick = () => setSearch(!$('search').classList.contains('open'));
   $('s-x').onclick = () => { const f = $('f-kw'); if (f.value){ f.value = ''; f.dispatchEvent(new Event('input')); } setSearch(false); $('s-btn').focus(); };
