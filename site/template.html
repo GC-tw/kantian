@@ -65,6 +65,11 @@ h1{font-family:var(--f-body);font-weight:700;font-size:clamp(26px,3.4vw,34px);li
 h1 small{display:block;font-family:var(--f-body);font-weight:500;font-size:13px;color:var(--muted);letter-spacing:.04em;margin-top:2px}
 h2{font-family:var(--f-body);font-weight:700;font-size:20px;margin:0;text-wrap:balance}
 .notice{background:var(--warn-soft);border:1px solid var(--warn);color:var(--ink);border-radius:6px;padding:10px 14px;font-size:14px}
+/* 颱風提示（2026-10-20）：颱風預測路徑接近臺灣或已發布颱風警報時顯示；燈號不變 */
+.ty-alert{background:var(--stop-soft);border:1px solid var(--stop);border-left-width:5px;color:var(--ink);border-radius:6px;padding:10px 14px;font-size:14px;line-height:1.6}
+.ty-alert b{color:var(--stop)}
+.ty-alert a{color:inherit;font-weight:700;text-underline-offset:3px}
+.ty-alert p{margin:0}.ty-alert p+p{margin-top:4px}
 .lamp.na{background:var(--bg);color:var(--muted);border-color:var(--line)}
 .tabs{display:flex;gap:4px;border-bottom:1px solid var(--line)}
 .tabs button{font:inherit;background:none;border:0;border-bottom:3px solid transparent;color:var(--muted);padding:8px 12px;cursor:pointer;font-weight:500}
@@ -272,6 +277,7 @@ footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);paddin
     </div>
   </header>
 
+  <div class="ty-alert" id="typhoon" role="alert" hidden></div>
   <div class="notice" id="status" role="status" hidden></div>
 
   <nav class="tabs" role="tablist">

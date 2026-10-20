@@ -291,7 +291,16 @@ async function loadForecast(){
   }catch(e){ loadError = '暫時無法取得天氣資料，請稍後重新整理。'; }
   showStatus();
 }
+// 颱風提示：只轉述氣象署的颱風路徑與警報，燈號不變（2026-10-20 使用者決定）
+function showTyphoon(){
+  const box = $('typhoon'), ts = FC?.typhoons || [];
+  box.hidden = !ts.length; if (!ts.length) return;
+  const when = t => { const d = new Date(t); return t <= Date.now() ? '目前' : `${d.getMonth()+1}/${d.getDate()}（${WD[d.getDay()]}）${d.getHours() < 12 ? '上午' : d.getHours() < 18 ? '下午' : '晚上'}前後`; };
+  box.innerHTML = ts.map(t => `<p><b>⚠ ${t.scale ? esc(t.scale) : '颱風'}${esc(t.name)}</b>：${t.warn ? `氣象署已發布「${esc(t.warn.headline)}」。` : ''}${t.near ? `氣象署預測${when(t.near.t)}最接近臺灣，中心距臺灣陸地約 ${t.near.km} 公里。` : ''}</p>`).join('')
+    + `<p>山區與鄉鎮的一週預報可能還沒反映颱風影響，燈號可能偏樂觀。出發前請看<a href="https://www.cwa.gov.tw/V8/C/P/Typhoon/TY_NEWS.html" target="_blank" rel="noopener">氣象署颱風消息</a>。</p>`;
+}
 function showStatus(){
+  showTyphoon();
   const s = $('status'), at = FC ? Date.parse(FC.fetchedAt) : 0;
   $('issued').textContent = FC ? '資料更新：' + fmtTime(at) : (loadError ? '' : '資料載入中…');
   const msg = loadError && !FC ? loadError

@@ -78,4 +78,10 @@ json.dump({'success': 'true', 'records': {'location': [
     {'locationName': '臺北市', 'geocode': 63, 'hazardConditions': {'hazards': [hz('高溫', '資訊', 0, 12)]}},
     {'locationName': '高雄市', 'geocode': 64, 'hazardConditions': {'hazards': []}},
     {'locationName': '屏東縣', 'geocode': 10013, 'hazardConditions': {'hazards': [hz('豪雨', '特報', 0, 30)]}}]}}, open(out+'W-C0033-001.json', 'w'), ensure_ascii=False)
+# 颱風路徑（新格式）：一個會在 2 天後接近臺灣東方（約 300 公里），一個遠在南海外（不顯示）
+fx = lambda h, la, lo, ws: {'InitialTime': iso(mid), 'ForecastHour': str(h), 'CoordinateLatitude': str(la), 'CoordinateLongitude': str(lo), 'MaxWindSpeed': str(ws)}
+json.dump({'success': 'true', 'records': {'TropicalCyclones': {'TropicalCyclone': [
+    {'CwaTyphoonName': '測試', 'TyphoonName': 'TEST', 'AnalysisData': {'Fix': [{'DateTime': iso(mid), 'CoordinateLatitude': '18.0', 'CoordinateLongitude': '130.0', 'MaxWindSpeed': '55'}]}, 'ForecastData': {'Fix': [fx(24, 21, 127, 52), fx(48, 24, 124.6, 45), fx(72, 28, 125, 30)]}},
+    {'CwaTyphoonName': '遠方', 'TyphoonName': 'FAR', 'AnalysisData': {'Fix': [{'DateTime': iso(mid), 'CoordinateLatitude': '12.0', 'CoordinateLongitude': '150.0', 'MaxWindSpeed': '20'}]}, 'ForecastData': {'Fix': [fx(48, 15, 145, 25)]}}]}}}, open(out+'W-C0034-005.json', 'w'), ensure_ascii=False)
+json.dump({'success': 'true', 'records': {'info': []}}, open(out+'W-C0034-001.json', 'w'), ensure_ascii=False)
 print('fixtures ok', len(names), len(towns), sorted(os.listdir(out)))

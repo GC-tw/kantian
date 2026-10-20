@@ -26,6 +26,8 @@ let fails = 0; const ok = (c, m) => { console.log((c ? '✓ ' : '✗ ') + m); if
   let {w, d, errors} = await open();
   const lamps = () => [...d.querySelectorAll('#matrix tbody .lamp')].map(x => x.className.split(' ')[1]);
   ok(d.getElementById('status').hidden, '資料正常時不顯示提示');
+  { const ty = d.getElementById('typhoon');
+    ok(!ty.hidden && /強烈颱風測試/.test(ty.textContent) && /最接近臺灣/.test(ty.textContent) && !/遠方/.test(ty.textContent), '颱風接近臺灣時顯示提示（遠方的颱風不顯示）'); }
   ok(/資料更新/.test(d.getElementById('issued').textContent), '顯示資料更新時間');
   let plusTotal = 0;
   for (const m of ['today', 'tmr', 'd2', 'week']){
@@ -115,6 +117,9 @@ let fails = 0; const ok = (c, m) => { console.log((c ? '✓ ' : '✗ ') + m); if
   ok(/別名：鳶山/.test(d.getElementById('drawer').innerHTML), '詳情顯示別名');
   click(w, d.getElementById('d-close'));
   ok(errors.length === 0, '沒有程式錯誤' + (errors.length ? '：' + errors[0] : ''));
+
+  ({d} = await open({data: {...forecast, typhoons: []}}));
+  ok(d.getElementById('typhoon').hidden, '沒有颱風時不顯示颱風提示');
 
   // 2. 資料過舊
   ({d} = await open({data: {...forecast, fetchedAt: new Date(Date.now() - 10*3600e3).toISOString()}}));

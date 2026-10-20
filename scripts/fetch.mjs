@@ -184,9 +184,49 @@ function saveSample(name, j){                            // 只存第一個地�
   fs.writeFileSync(path.join(SAMPLES_DIR, name + '.json'), JSON.stringify(c, null, 2));
 }
 
+// ---------- 颱風 ----------
+const TW_COAST = [[25.30,121.54],[25.01,122.00],[24.60,121.87],[23.97,121.62],[23.10,121.38],[22.40,120.95],[21.90,120.85],[22.37,120.59],[23.00,120.15],[23.60,120.20],[24.27,120.52],[24.83,120.92],[23.50,121.00]];   // 臺灣本島沿岸與中央的幾個點，用來估算颱風中心到陸地的距離
+const kmTo = (la, lo) => Math.min(...TW_COAST.map(([a, b]) => { const r = Math.PI/180, d1 = (a-la)*r, d2 = (b-lo)*r; return 2*6371*Math.asin(Math.sqrt(Math.sin(d1/2)**2 + Math.cos(la*r)*Math.cos(a*r)*Math.sin(d2/2)**2)); }));
+const TY_KM = 500;
+const tyScale = ws => ws >= 51 ? '強烈颱風' : ws >= 32.7 ? '中度颱風' : ws >= 17.2 ? '輕度颱風' : '熱帶性低氣壓';   // 氣象署颱風強度分級（近中心最大風速，公尺／秒）
+async function typhoons(){
+  const out = [];
+  const track = await getDataset('W-C0034-005', {}, {tries: 2, timeout: 30000});
+  const keep = (n, j) => { if (!FIXTURES){ fs.mkdirSync(SAMPLES_DIR, {recursive: true}); fs.writeFileSync(path.join(SAMPLES_DIR, n + '.json'), JSON.stringify(j, null, 2)); } };
+  keep('typhoon-track', track);
+  const tcs = [].concat(pick(pick(track.records || track, 'TropicalCyclones') || {}, 'TropicalCyclone') || []);
+  let warns = [];
+  try{
+    const w = await getDataset('W-C0034-001', {}, {tries: 2, timeout: 30000}); keep('typhoon-warning', w);
+    const infos = []; (function walk(o){ if (!o || typeof o !== 'object') return; if (Array.isArray(o)) return o.forEach(walk); if ('headline' in o && 'expires' in o) infos.push(o); else Object.values(o).forEach(walk); })(w.records || w);
+    const now = Date.now();
+    warns = infos.filter(i => Date.parse(i.expires) > now && !/解除/.test(i.headline || '') && !JSON.stringify(i['typhoon-info'] || '').includes('"END"'))
+      .map(i => ({headline: i.headline, expires: twTime(i.expires), name: (JSON.stringify(i).match(/"cwa_typhoon_name":"([^"]+)"/) || [])[1] || ''}));
+  }catch(e){ warn('颱風警報抓取失敗：' + e.message); }
+  for (const tc of tcs){
+    const name = pick(tc, 'CwaTyphoonName') || '', en = pick(tc, 'TyphoonName') || '';
+    const fixes = [].concat(pick(pick(tc, 'AnalysisData') || {}, 'Fix') || []);
+    const last = fixes[fixes.length - 1];
+    const pts = [];
+    if (last) pts.push({t: twTime(pick(last, 'DateTime')), la: num(pick(last, 'CoordinateLatitude')), lo: num(pick(last, 'CoordinateLongitude')), ws: num(pick(last, 'MaxWindSpeed'))});
+    for (const f of [].concat(pick(pick(tc, 'ForecastData') || {}, 'Fix') || [])){
+      const t0 = twTime(pick(f, 'InitialTime')), h = num(pick(f, 'ForecastHour'));
+      if (t0 != null && h != null) pts.push({t: t0 + h*H, la: num(pick(f, 'CoordinateLatitude')), lo: num(pick(f, 'CoordinateLongitude')), ws: num(pick(f, 'MaxWindSpeed'))});
+    }
+    const ok = pts.filter(p => p.la != null && p.lo != null).map(p => ({...p, km: Math.round(kmTo(p.la, p.lo))}));
+    if (!ok.length) continue;
+    const near = ok.reduce((a, b) => b.km < a.km ? b : a);
+    const w = warns.find(x => x.name && x.name === name) || null;
+    if (near.km > TY_KM && !w) continue;
+    out.push({name, en, scale: tyScale(ok[0].ws ?? 0), near: {t: near.t, km: Math.round(near.km / 10) * 10}, warn: w});
+  }
+  for (const w of warns) if (!out.some(t => t.warn === w)) out.push({name: w.name, en: '', scale: '', near: null, warn: w});   // 有警報但路徑資料對不上：仍顯示
+  return out;
+}
+
 // ---------- 主流程 ----------
 async function main(){
-  const result = {version: 1, fetchedAt: new Date().toISOString(), datasets: {}, issued: null, points: {}, alerts: [], warnings};
+  const result = {version: 1, fetchedAt: new Date().toISOString(), datasets: {}, issued: null, points: {}, alerts: [], typhoons: [], warnings};
   const nameToPid = new Map(MOUNTAINS.filter(m => m.pid).map(m => [m.cn, m.pid]));
   const pids = new Set(nameToPid.values());
   const townsNeeded = new Set(MOUNTAINS.flatMap(m => m.tw || []));
@@ -253,18 +293,16 @@ async function main(){
     }
   }catch(e){ warn('警特報抓取失敗：' + e.message); }
 
-  // 4. 颱風資料（試抓，先存樣本核對格式；2026-10-20）
-  if (!FIXTURES) for (const id of ['W-C0034-005', 'W-C0034-001']){
-    try{ const j = await getDataset(id, {}, {tries: 2, timeout: 30000}); fs.mkdirSync(SAMPLES_DIR, {recursive: true}); fs.writeFileSync(path.join(SAMPLES_DIR, 'typhoon-' + id + '.json'), JSON.stringify(j, null, 2)); }
-    catch(e){ console.log('颱風資料試抓失敗 ' + id + '：' + e.message); fs.writeFileSync(path.join(SAMPLES_DIR, 'typhoon-' + id + '.json'), JSON.stringify({error: e.message.replace(/Authorization=[^&\s]+/g, 'Authorization=***')})); }
-  }
+  // 4. 颱風：氣象署颱風路徑（W-C0034-005）與颱風警報（W-C0034-001）。
+  // 一週預報常常還沒反映颱風，所以只要颱風預測路徑會到臺灣陸地 500 公里內、或氣象署已發布颱風警報，網頁最上方就顯示提示（燈號不變；2026-10-20 使用者決定）
+  try{ result.typhoons = await typhoons(); }catch(e){ warn('颱風資料抓取失敗：' + e.message); }
 
   fs.mkdirSync(path.dirname(OUT), {recursive: true});
   fs.writeFileSync(OUT, JSON.stringify(result));
   const n = Object.values(result.points);
   console.log(`完成：${n.length} 個預報點（3 小時資料 ${n.filter(p=>p.h3?.length).length}、一週資料 ${n.filter(p=>p.week?.length).length}），特報 ${result.alerts.length} 則，警告 ${warnings.length} 則`);
   const d4 = twMidnight(Date.now()) + 3*24*H, wxCount = (pick) => Object.fromEntries(Object.entries(n.flatMap(p => (p.week || []).filter(pick).map(x => x.wx)).reduce((m, w) => (m[w] = (m[w] || 0) + 1, m), {})).sort((a, b) => b[1] - a[1]));
-  summary = {wxWeekDay1to3: wxCount(x => x.s < d4), wxWeekDay4to7: wxCount(x => x.s >= d4), points: n.length, h3: n.filter(p => p.h3?.length).length, week: n.filter(p => p.week?.length).length, alerts: result.alerts, datasets: result.datasets, issued: result.issued,
+  summary = {typhoons: result.typhoons, wxWeekDay1to3: wxCount(x => x.s < d4), wxWeekDay4to7: wxCount(x => x.s >= d4), points: n.length, h3: n.filter(p => p.h3?.length).length, week: n.filter(p => p.week?.length).length, alerts: result.alerts, datasets: result.datasets, issued: result.issued,
     example: Object.fromEntries(Object.entries(result.points).slice(0, 2).map(([k, p]) => [k, {name: p.name, h3: p.h3?.slice(0, 3), week: p.week?.slice(0, 2)}]))};
   if (!n.some(p => p.h3?.length)) throw new Error('沒有任何可用的預報資料，停止更新網站');
   try{ logWx(n, result.alerts); }catch(e){ warn('天氣用語紀錄失敗：' + e.message); }
