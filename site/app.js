@@ -138,8 +138,8 @@ function buildCols(){
   const di = MODES[state.mode].di, date = dayAt(di), now = new Date();
   return SLOTS.map(h => {
     const end = dayAt(di); end.setHours(h+3);
-    const peak = state.slots.has(h);
-    return {di, hr:h, date, ws:date.getTime()+h*H, we:date.getTime()+(h+3)*H, past: di===0 && end<=now, peak, label:slotLabel(h), short:pad(h), head:`${pad(h)}<span class="hr-to">–${pad(h+3)}</span>`, sub: peak?'<span class="pk-sub">登頂時段</span>':''};
+    const peak = state.slots.has(h), win = [h-3, h, h+3].some(x => state.slots.has(x));   // win：計分範圍＝登頂時段＋前後各一段（2026-10-20）
+    return {di, hr:h, date, ws:date.getTime()+h*H, we:date.getTime()+(h+3)*H, past: di===0 && end<=now, peak, win, label:slotLabel(h), short:pad(h), head:`${pad(h)}<span class="hr-to">–${pad(h+3)}</span>`, sub: peak?'<span class="pk-sub">登頂時段</span>':''};
   });
 }
 const hash = t => { let h = 2166136261; for (const ch of t){ h ^= ch.codePointAt(0); h = Math.imul(h, 16777619); } return h >>> 0; };
@@ -161,7 +161,7 @@ function evaluate(){                                       // 依時段與登頂
       return {lv, plus: lv === 0 && per.every(y => y.j.plus), per, ref:!!c.ref, past:!!c.past};   // 跨鄉鎮：每個鄉鎮都是 A 才算 A
     });
     // 計分排序（2026-10-20 方案乙）：A 3、B 2、C 1、D 0；已過與無資料不計分
-    // s1：登頂時段總分（一週為 7 天總分）；p1：其中 A 數；c1：其中 D 數（2026-10-20 加入，D 少的在前）；s2：當天所有時段總分（只用於逐 3 小時）
+    // s1：計分範圍（登頂時段＋前後各一段）總分（一週為 7 天總分）；p1：其中 A 數；c1：其中 D 數（2026-10-20 加入，D 少的在前）；s2：當天所有時段總分（只用於逐 3 小時）
     // nd：沒有任何資料（2026-10-20 加入，一律排最後）
     let s1 = 0, p1 = 0, c1 = 0, s2 = 0, has = false;
     cells.forEach((c, i) => {
@@ -169,7 +169,7 @@ function evaluate(){                                       // 依時段與登頂
       has = true;
       const pt = SCORE(c);
       if (week){ s1 += pt; if (c.plus) p1++; if (c.lv===2) c1++; }
-      else { s2 += pt; if (cols[i].peak){ s1 += pt; if (c.plus) p1++; if (c.lv===2) c1++; } }
+      else { s2 += pt; if (cols[i].win){ s1 += pt; if (c.plus) p1++; if (c.lv===2) c1++; } }
     });
     return {...x, cells, s1, p1, c1, s2, nd: has ? 0 : 1, mix: hash(day + '|' + x.k)};
   }).sort((a,b) => a.nd-b.nd || b.s1-a.s1 || b.p1-a.p1 || a.c1-b.c1 || b.s2-a.s2 || a.mix-b.mix);
@@ -261,7 +261,7 @@ function openDetail(k){
     ${r.m.al?.length?`<div class="note">別名：${esc(r.m.al.join('、'))}</div>`:''}
     ${r.m.note?`<div class="note">備註：${esc(r.m.note)}</div>`:''}
     ${pts.map(table).join('')}
-    <div class="note">${week ? '一週預報以你選的登頂時段（'+sortedSlots().map(slotLabel).join('、')+'）判定，取最差情況；第 4–7 天氣象署未提供降雨機率，以「—」表示，依天氣描述判定，請在出發前 3 天內再確認。' : '逐 3 小時預報；底色時段是你選的登頂時段，排序以此為準。'}</div>`;
+    <div class="note">${week ? '一週預報以你選的登頂時段（'+sortedSlots().map(slotLabel).join('、')+'）判定，取最差情況；第 4–7 天氣象署未提供降雨機率，以「—」表示，依天氣描述判定，請在出發前 3 天內再確認。' : '逐 3 小時預報；底色時段是你選的登頂時段，排序依登頂時段及前後各 3 小時計算。'}</div>`;
   dr.hidden = false; $('scrim').hidden = false;
   $('d-close').focus();
 }
@@ -279,7 +279,7 @@ function pickInfo(week){
   if (week) return '<h4>比較標準</h4>' + ul([...std, `每天依你選的登頂時段（${esc(slots)}）對應到白天或晚上，取最差的作為當天燈號。登頂時段都在 12 點前時，白天描述的「午後」部分不計。`, '第 4–7 天氣象署沒有降雨機率，依天氣描述判定：「局部」「短暫」的雨為 C，其他的雨（例如「陣雨」「有雨」）為 D。僅供參考。'])
     + '<h4>排序</h4>' + ul([score]) + '<p class="ip">依序比較：</p>' + ol(['7 天的總分，高的在前', 'A 的天數，多的在前', 'D 的天數，少的在前']) + ul([nodata, tie]);
   return '<h4>比較標準</h4>' + ul([...std, '每 3 小時一格，每格一個燈號。', ...(state.mode === 'today' ? ['今天已過的時段不計分。'] : [])])
-    + '<h4>排序</h4>' + ul([score]) + '<p class="ip">依序比較：</p>' + ol(['登頂時段的總分，高的在前', '登頂時段中 A 的數量，多的在前', '登頂時段中 D 的數量，少的在前', '當天所有時段的總分，高的在前']) + ul(['登頂時段都過了，就改看當天剩下的時段。', nodata, tie]);
+    + '<h4>排序</h4>' + ul([score]) + '<p class="ip">依序比較：</p>' + ol(['計分範圍（登頂時段及前後各 3 小時，作為上山與下山時間）的總分，高的在前', '計分範圍中 A 的數量，多的在前', '計分範圍中 D 的數量，少的在前', '當天所有時段的總分，高的在前']) + ul(['計分範圍都過了，就改看當天剩下的時段。', nodata, tie]);
 }
 // 說明文字中的燈號（A、B、C、D、—）換成小燈號方塊，顏色與列表一致（2026-10-20 使用者選「選項 1」）
 const GRADE_RE = /—|(?<![A-Za-z0-9°])[ABCD](?![A-Za-z0-9+])/g,   // 「°C」的 C 不是燈號（2026-10-20）

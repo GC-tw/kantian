@@ -344,7 +344,7 @@ footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);paddin
       <!-- 篩選面板放在「○○燈號排序」下方：電腦版在篩選按鈕下方展開；手機版由底部滑出（2026-10-20） -->
       <form class="panel-search" id="q" autocomplete="off" aria-label="篩選">
         <div class="sheet-head"><b>篩選</b><button type="button" class="btn" id="filter-done">完成</button></div>
-        <div class="field wide"><span class="lab">登頂時段（可多選，預設 09–12，排序依此計算）</span><div class="chips" id="f-slots"></div></div>
+        <div class="field wide"><span class="lab">登頂時段（可多選，預設 09–12，排序依此時段及前後各 3 小時計算）</span><div class="chips" id="f-slots"></div></div>
         <div class="field wide"><span class="lab">山岳類別（可多選，未選＝全部）</span><div class="chips" id="f-cat">
           <button type="button" class="chip reset" id="cat-all" aria-pressed="true">全部</button>
           <button type="button" class="chip" aria-pressed="false" data-c="百岳">百岳</button>
@@ -391,7 +391,7 @@ footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);paddin
       <h3>登頂時段</h3>
       <ul>
         <li>從 8 個 3 小時時段中自由多選，預設 09–12。</li>
-        <li>排序主要看你選的登頂時段。</li>
+        <li>排序看登頂時段及前後各 3 小時（上山與下山的時間），稱為「計分範圍」。例如登頂時段 09–12，計分範圍是 06–15。</li>
       </ul>
       <h3>燈號怎麼算</h3>
       <p>每個時段檢查下列項目，以最差的一項作為燈號。</p>
@@ -411,7 +411,7 @@ footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);paddin
       <h3>排序方式</h3>
       <ul>
         <li><b>計分：</b>A 3 分、B 2 分、C 1 分、D 0 分。已過的時段和無資料不計分。分數只用來排序，網頁上不顯示。<ul><li>例：「A、B」共 5 分，排在「B、B」共 4 分前面。</li></ul></li>
-        <li><b>今天／明天／後天／大後天</b>（每 3 小時一格），依序比較：<ol><li>登頂時段的總分，高的在前</li><li>登頂時段中 A 的數量，多的在前</li><li>登頂時段中 D 的數量，少的在前</li><li>當天所有時段的總分，高的在前</li></ol><ul><li>登頂時段都過了，就改看當天剩下的時段。</li></ul></li>
+        <li><b>今天／明天／後天／大後天</b>（每 3 小時一格），依序比較：<ol><li>計分範圍（登頂時段及前後各 3 小時）的總分，高的在前</li><li>計分範圍中 A 的數量，多的在前</li><li>計分範圍中 D 的數量，少的在前</li><li>當天所有時段的總分，高的在前</li></ol><ul><li>計分範圍都過了，就改看當天剩下的時段。</li></ul></li>
         <li><b>一週預報</b>（每天一格），依序比較：<ol><li>7 天的總分，高的在前</li><li>A 的天數，多的在前</li><li>D 的天數，少的在前</li></ol></li>
         <li><b>完全沒有資料的山：</b>排在最後。</li>
         <li><b>以上所有條件都相同時：</b>每天隨機排序一次同條件山岳。</li>

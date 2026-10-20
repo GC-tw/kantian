@@ -37,7 +37,8 @@ let fails = 0; const ok = (c, m) => { console.log((c ? '✓ ' : '✗ ') + m); if
     const L = lamps(), cnt = k => L.filter(x => x === k).length;
     ok(d.querySelectorAll('#matrix tbody tr').length === 235, `${m}：235 座都列出`);
     { // 計分排序（A 3、B 2、C 1、D 0；已過與無資料不計）：依畫面上的燈號重算，順序須為 總分 → A 數 → D 少 → 全日總分
-      const peakCol = [...d.querySelectorAll('#matrix thead th')].slice(1).map(th => m === 'week' || th.classList.contains('peak'));
+      const pk = [...d.querySelectorAll('#matrix thead th')].slice(1).map(th => th.classList.contains('peak'));
+      const peakCol = pk.map((x, i) => m === 'week' || x || pk[i-1] || pk[i+1]);   // 計分範圍：登頂時段＋前後各一段
       const keys = [...d.querySelectorAll('#matrix tbody tr')].map(tr => { let s1 = 0, p1 = 0, c1 = 0, s2 = 0, has = 0;
         [...tr.querySelectorAll('.lamp')].forEach((l, i) => { if (l.classList.contains('past') || l.classList.contains('na')) return;
           const pt = l.classList.contains('p') ? 3 : l.classList.contains('g') ? 2 : l.classList.contains('y') ? 1 : 0;
@@ -48,7 +49,7 @@ let fails = 0; const ok = (c, m) => { console.log((c ? '✓ ' : '✗ ') + m); if
     }
     click(w, d.getElementById('pick-info-btn'));
     const info = d.getElementById('pick-info');
-    ok(!info.hidden && /比較標準/.test(info.textContent) && /排序/.test(info.textContent) && (m === 'week' ? /7 天的總分/ : /登頂時段的總分/).test(info.textContent) && /燈號排序$/.test(d.getElementById('h-picks-t').textContent), `${m}：燈號排序旁的 i 顯示對應的比較標準與排序`);
+    ok(!info.hidden && /比較標準/.test(info.textContent) && /排序/.test(info.textContent) && (m === 'week' ? /7 天的總分/ : /計分範圍.*的總分/).test(info.textContent) && /燈號排序$/.test(d.getElementById('h-picks-t').textContent), `${m}：燈號排序旁的 i 顯示對應的比較標準與排序`);
     click(w, d.getElementById('pick-info-x'));
     ok(!/第\s*\d+\s*名|最推薦/.test(d.getElementById('h-matrix').textContent), `${m}：標題不顯示名次與「最推薦」`);
     ok(!d.getElementById('picks') && !d.getElementById('reroll'), `${m}：推薦區與「換一批」已移除`);
