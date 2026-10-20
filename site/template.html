@@ -172,7 +172,8 @@ table.matrix{border-collapse:separate;border-spacing:0;width:100%;font-variant-n
 .seg{display:grid;grid-template-columns:repeat(5,1fr);gap:0;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--surface);max-width:720px}
 .seg button{font:inherit;font-weight:700;font-size:16px;background:none;border:0;border-left:1px solid var(--line);color:var(--muted);padding:10px 8px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:0}
 .seg button:first-child{border-left:0}
-.seg button small{font-weight:500;font-size:12px}
+.seg button small{font-weight:500;font-size:12px;line-height:1.3}
+.seg button small .sw{display:block}
 .seg button[aria-selected="true"]{background:var(--accent);color:var(--accent-ink)}
 .matrix th.peak{background:var(--accent);color:var(--accent-ink)}
 .matrix thead th.peak .dt,.matrix thead th.peak .pk-sub{color:var(--accent-ink)}
@@ -308,7 +309,7 @@ footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);paddin
     <button type="button" role="tab" data-mode="tmr" aria-selected="false">明天<small class="sd">逐 3 小時預報</small></button>
     <button type="button" role="tab" data-mode="d2" aria-selected="false">後天<small class="sd">逐 3 小時預報</small></button>
     <button type="button" role="tab" data-mode="d3" aria-selected="false">大後天<small class="sd">逐 3 小時預報</small></button>
-    <button type="button" role="tab" data-mode="week" aria-selected="false">一週預報<small id="seg-week">7 天</small></button>
+    <button type="button" role="tab" data-mode="week" aria-selected="false">一週<small id="seg-week">7 天</small></button>
   </div>
 
   <main id="view-find" style="display:flex;flex-direction:column;gap:18px">

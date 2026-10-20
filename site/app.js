@@ -203,9 +203,9 @@ function render(){
   const week = state.mode === 'week';
   $('h-picks-t').textContent = (week ? '這週' : MODES[state.mode].name) + '燈號排序';
   $('pick-info-body').innerHTML = pickInfo(week); gradeChips($('pick-info-body'));
-  document.querySelectorAll('#seg .sd').forEach((e, i) => { const d = dayAt(i); e.textContent = fmt(d); e.classList.toggle('we', isWE(d)); });
+  document.querySelectorAll('#seg .sd').forEach((e, i) => { const d = dayAt(i); e.innerHTML = `${d.getMonth()+1}/${d.getDate()}<span class="sw">週${WD[d.getDay()]}</span>`; e.classList.toggle('we', isWE(d)); });
   const md = d => `${d.getMonth()+1}/${d.getDate()}`;
-  $('seg-week').textContent = `${md(dayAt(0))}–${md(dayAt(6))}`;   // 一週預報按鈕下方寫日期區間
+  $('seg-week').textContent = `${md(dayAt(0))}–${md(dayAt(6))}`;   // 一週按鈕下方寫日期區間
   ['matrix','fav-matrix'].forEach(id => $(id).style.setProperty('--n', cols.length));
   document.querySelectorAll('.lg-ref').forEach(e => e.hidden = !week);
   if (!week) setInfo(false);
