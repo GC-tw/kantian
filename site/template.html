@@ -61,9 +61,9 @@ h1 .logo{width:1.05em;height:1.05em;flex:none}
 #q:not(.open){display:none}
 .sheet-head{display:flex;justify-content:space-between;align-items:center;grid-column:1/-1}
 @media (min-width:641px){#f-scrim{display:none!important}}
-h1{font-family:var(--f-display);font-weight:800;font-size:clamp(26px,3.4vw,34px);line-height:1.15;margin:0;letter-spacing:.02em;text-wrap:balance}
+h1{font-family:var(--f-body);font-weight:700;font-size:clamp(26px,3.4vw,34px);line-height:1.15;margin:0;letter-spacing:.02em;text-wrap:balance}
 h1 small{display:block;font-family:var(--f-body);font-weight:500;font-size:13px;color:var(--muted);letter-spacing:.04em;margin-top:2px}
-h2{font-family:var(--f-display);font-weight:600;font-size:20px;margin:0;text-wrap:balance}
+h2{font-family:var(--f-body);font-weight:700;font-size:20px;margin:0;text-wrap:balance}
 .notice{background:var(--warn-soft);border:1px solid var(--warn);color:var(--ink);border-radius:6px;padding:10px 14px;font-size:14px}
 .lamp.na{background:var(--bg);color:var(--muted);border-color:var(--line)}
 .tabs{display:flex;gap:4px;border-bottom:1px solid var(--line)}
@@ -173,7 +173,7 @@ table.matrix{border-collapse:separate;border-spacing:0;width:100%;font-variant-n
 aside.drawer{position:fixed;top:0;right:0;bottom:0;width:min(520px,100%);background:var(--surface);border-left:1px solid var(--line);z-index:21;overflow-y:auto;
   padding-top:calc(18px + env(safe-area-inset-top,0px));padding-bottom:calc(24px + env(safe-area-inset-bottom,0px));padding-left:20px;padding-right:max(20px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:16px}
 .d-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
-.d-head h2{font-size:26px;font-weight:800}
+.d-head h2{font-family:var(--f-display);font-size:26px;font-weight:800}   /* 山岳名稱維持明體，其他都用黑體 */
 .d-head .sub{color:var(--muted);font-size:13px}
 .close{font:inherit;font-size:20px;line-height:1;background:none;border:1px solid var(--line);color:var(--ink);border-radius:5px;width:36px;height:36px;cursor:pointer;flex:none}
 .src{background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:10px 12px;font-size:13px;display:flex;flex-direction:column;gap:3px}
@@ -192,7 +192,7 @@ table.vt{border-collapse:collapse;width:100%;font-size:13px;font-variant-numeric
 .issued{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
 /* rules page */
 .doc{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:20px;max-width:780px;display:flex;flex-direction:column;gap:14px}
-.doc h3{font-family:var(--f-display);font-size:17px;margin:4px 0 0}
+.doc h3{font-family:var(--f-body);font-weight:700;font-size:17px;margin:4px 0 0}
 .doc ul{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:4px}
 .doc p{margin:0}
 .kbd{font-family:var(--f-mono);font-size:13px;background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:0 5px}
