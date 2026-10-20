@@ -70,6 +70,13 @@ h2{font-family:var(--f-body);font-weight:700;font-size:20px;margin:0;text-wrap:b
 .ty-alert b{color:var(--stop)}
 .ty-alert a{color:inherit;font-weight:700;text-underline-offset:3px}
 .ty-alert p{margin:0}.ty-alert p+p{margin-top:4px}
+.ty-body{max-height:calc(3.2em + 4px);overflow:hidden}   /* 只顯示前兩行，點擊展開 */
+.ty-alert.more{position:relative;padding-right:36px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.ty-alert.more:not(.open) .ty-body{-webkit-mask-image:linear-gradient(#000 calc(100% - 1em),transparent);mask-image:linear-gradient(#000 calc(100% - 1em),transparent)}
+.ty-alert.open .ty-body{max-height:none}
+.ty-more{display:none;position:absolute;right:10px;top:12px;width:20px;height:20px;fill:none;stroke:var(--stop);stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;transition:transform .15s}
+.ty-alert.more .ty-more{display:block}
+.ty-alert.open .ty-more{transform:rotate(180deg)}
 .lamp.na{background:var(--bg);color:var(--muted);border-color:var(--line)}
 .tabs{display:flex;gap:4px;border-bottom:1px solid var(--line)}
 .tabs button{font:inherit;background:none;border:0;border-bottom:3px solid transparent;color:var(--muted);padding:8px 12px;cursor:pointer;font-weight:500}

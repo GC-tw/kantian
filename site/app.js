@@ -300,8 +300,18 @@ function showTyphoon(){
   const box = $('typhoon'), ts = FC?.typhoons || [];
   box.hidden = !ts.length; if (!ts.length) return;
   const when = t => { const d = new Date(t); return t <= Date.now() ? '目前' : `${d.getMonth()+1}/${d.getDate()}（${WD[d.getDay()]}）${d.getHours() < 12 ? '上午' : d.getHours() < 18 ? '下午' : '晚上'}前後`; };
-  box.innerHTML = ts.map(t => `<p><b>⚠ ${t.scale ? esc(t.scale) : '颱風'}${esc(t.name)}</b>：${t.warn ? `氣象署已發布「${esc(t.warn.headline)}」。` : ''}${t.near ? `氣象署預測${when(t.near.t)}最接近臺灣，中心距臺灣陸地約 ${t.near.km} 公里。` : ''}</p>`).join('')
-    + `<p>一週預報的第 4–7 天，氣象署僅提供天氣描述、無降雨機率，燈號可能偏樂觀。出發前請看<a href="https://www.cwa.gov.tw/V8/C/P/Typhoon/TY_NEWS.html" target="_blank" rel="noopener">氣象署颱風消息</a>。</p>`;
+  box.innerHTML = '<div class="ty-body">' + ts.map(t => `<p><b>⚠ ${t.scale ? esc(t.scale) : '颱風'}${esc(t.name)}</b>：${t.warn ? `氣象署已發布「${esc(t.warn.headline)}」。` : ''}${t.near ? `氣象署預測${when(t.near.t)}最接近臺灣，中心距臺灣陸地約 ${t.near.km} 公里。` : ''}</p>`).join('')
+    + `<p>一週預報的第 4–7 天，氣象署僅提供天氣描述、無降雨機率，燈號可能偏樂觀。出發前請看<a href="https://www.cwa.gov.tw/V8/C/P/Typhoon/TY_NEWS.html" target="_blank" rel="noopener">氣象署颱風消息</a>。</p></div>`
+    + '<svg class="ty-more" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>';
+  fitTyphoon();
+}
+// 颱風提示只顯示前兩行，點擊展開／收起（2026-10-20 使用者決定）；內容本來就在兩行內時不需要展開
+function fitTyphoon(){
+  const box = $('typhoon'), body = box.querySelector('.ty-body'); if (!body || box.hidden) return;
+  const more = box.classList.contains('open') || body.scrollHeight > body.clientHeight + 1;
+  box.classList.toggle('more', more);
+  if (more){ box.tabIndex = 0; box.setAttribute('aria-expanded', box.classList.contains('open')); }
+  else { box.removeAttribute('tabindex'); box.removeAttribute('aria-expanded'); }
 }
 function showStatus(){
   showTyphoon();
@@ -368,6 +378,10 @@ const sameSet = (set, arr) => set.size === arr.length && arr.every(x => set.has(
   };
   $('filter-btn').onclick = () => { if (!$('view-find').hidden || !$('view-fav').hidden) setFilter(!$('q').classList.contains('open')); else { $('tab-find').click(); setFilter(true); } };
   $('filter-done').onclick = $('f-scrim').onclick = () => setFilter(false);
+  const tyToggle = () => { const box = $('typhoon'); if (!box.classList.contains('more')) return; box.classList.toggle('open'); box.setAttribute('aria-expanded', box.classList.contains('open')); };
+  $('typhoon').addEventListener('click', e => { if (!e.target.closest('a')) tyToggle(); });
+  $('typhoon').addEventListener('keydown', e => { if ((e.key === 'Enter' || e.key === ' ') && !e.target.closest('a')){ e.preventDefault(); tyToggle(); } });
+  addEventListener('resize', fitTyphoon);
   document.addEventListener('keydown', e => { if (e.key === 'Escape'){ setFilter(false); setSearch(false); } });
   $('q').onsubmit = e => e.preventDefault();
   $('brand').onclick = e => { e.preventDefault(); window.scrollTo({top: 0, behavior: 'smooth'}); };   // 點標題：回到最上方（不重新整理）
