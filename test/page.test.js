@@ -95,6 +95,12 @@ let fails = 0; const ok = (c, m) => { console.log((c ? '✓ ' : '✗ ') + m); if
   click(w, d.querySelector('#matrix tbody tr td'));
   ok(!/陸上強風/.test(d.getElementById('drawer').innerHTML), '陸上強風特報不顯示，也不列入燈號');
   click(w, d.getElementById('d-close'));
+  click(w, d.querySelector('#seg [data-mode="tmr"]'));
+  inp.value = '玉山北峰'; inp.dispatchEvent(new w.Event('input', {bubbles: true}));
+  click(w, d.querySelector('#matrix tbody tr td'));
+  ok(!/低溫/.test(d.getElementById('drawer').innerHTML), '低溫特報不顯示，也不列入燈號');
+  click(w, d.querySelector('#seg [data-mode="today"]'));
+  click(w, d.getElementById('d-close'));
   // 豪雨特報：屏東縣的山今天未過的時段都是 C
   inp.value = '笠頂山'; inp.dispatchEvent(new w.Event('input', {bubbles: true}));
   ok([...d.querySelectorAll('#matrix tbody .lamp:not(.past)')].every(x => x.classList.contains('r')), '豪雨特報期間，涵蓋縣市的山判 C');
