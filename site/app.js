@@ -5,11 +5,13 @@
 const M = __DATA__;
 const WD = ['日','一','二','三','四','五','六'];
 const SLOTS = [0,3,6,9,12,15,18,21];                       // 每段 3 小時的開始時刻
+const RARE = [0,18,21];                                    // 較少用的登頂時段，放在進階篩選
 const MODES = {today:{di:0,name:'今天'}, tmr:{di:1,name:'明天'}, d2:{di:2,name:'後天'}, week:{name:'一週'}};
 const COUNTY_ORDER = ['基隆市','臺北市','新北市','桃園市','新竹市','新竹縣','苗栗縣','臺中市','彰化縣','南投縣','雲林縣','嘉義市','嘉義縣','臺南市','高雄市','屏東縣','宜蘭縣','花蓮縣','臺東縣','澎湖縣','金門縣','連江縣'];
 const BF = [0,0.3,1.6,3.4,5.5,8.0,10.8,13.9,17.2,20.8,24.5];  // 蒲福風級下限（公尺／秒）
-const SYM = ['○','△','✕','—'], CLS = ['g','y','r','na'], WORD = ['適合','注意','不建議','時間已過或無資料'];
+const SYM = ['A','B','C','—'], CLS = ['g','y','r','na'], WORD = ['A','B','C','時間已過或無資料'];
 const LV = lv => lv < 0 ? 3 : lv;                                // 燈號等級 -1 代表沒有資料
+// A+：燈號 A 且天氣描述剛好是「晴」（2026-10-20 使用者決定）；畫面上寫 A+，class 多加 p
 const REGIONS = [['全台', []],                              // 標題列的地區快速切換；選了地區＝勾選該地區所有縣市
   ['北部', ['基隆市','臺北市','新北市','桃園市','新竹市','新竹縣','宜蘭縣']],
   ['中部', ['苗栗縣','臺中市','彰化縣','南投縣','雲林縣']],
@@ -58,7 +60,7 @@ function dayForecast(p, di, slots){                         // 一週：把登�
   const worst = s.find(x=>wx(x).includes('雷')) || s.find(x=>/大雨|豪雨/.test(wx(x))) || s.find(x=>wx(x).includes('雨')) || s[0];
   const max = k => { const v = s.map(x=>x[k]).filter(v=>v!=null); return v.length ? Math.max(...v) : null; };
   const ws = max('ws');
-  return {pop: di<3 ? max('pop') : null, ws, bf: ws!=null ? beaufort(ws) : max('bf'), t: max('t'), at: max('at'), wx: worst.wx};
+  return {pop: di<3 ? max('pop') : null, ws, bf: ws!=null ? beaufort(ws) : max('bf'), t: max('t'), at: max('at'), wx: worst.wx, sunny: s.every(x => wx(x) === '晴')};
 }
 function alertFor(p, start, end){                           // 時段內生效、涵蓋這座山所在縣市的特報（取最嚴重）
   return (FC?.alerts || []).find(a => p.counties.includes(a.county) && (a.start == null || a.start < end) && (a.end == null || a.end > start)) || null;
@@ -83,7 +85,7 @@ function judge(fc, lowHill, alert, noPop){
   }
   if (fc.ws != null){ if (fc.ws>=13.9) up(2, '風速 '+fc.ws+' m/s'); else if (fc.ws>=8) up(1, '風速 '+fc.ws+' m/s'); }
   if (lowHill && fc.at != null && fc.at>=36) up(1, '高溫 體感 '+fc.at+'°C');
-  return {lv, why, heavy};
+  return {lv, why, heavy, plus: lv === 0 && (fc.sunny ?? wx === '晴')};
 }
 
 // ---------- 山岳模型（只在載入時建立一次）----------
@@ -134,15 +136,16 @@ function evaluate(){                                       // 依時段與登頂
         const al = alertFor(p, c.ws, c.we);
         return {p, fc, al, j: judge(fc, x.low, al, week && c.di>=3)};
       });
-      return {lv: Math.max(...per.map(y=>y.j.lv)), per, ref:!!c.ref, past:!!c.past};
+      const lv = Math.max(...per.map(y=>y.j.lv));
+      return {lv, plus: lv === 0 && per.every(y => y.j.plus), per, ref:!!c.ref, past:!!c.past};   // 跨鄉鎮：每個鄉鎮都是 A+ 才算 A+
     });
-    let k1 = 0, k2 = 0, k3 = 0;                            // k3：「注意」的天數中，天氣描述是陣雨（非短暫）的天數
+    let k1 = 0, kp = 0, k2 = 0, k3 = 0;                    // kp：k1 之中 A+ 的數目；k3：B 的天數中，天氣描述是陣雨（非短暫）的天數
     cells.forEach((c, i) => {
-      if (week){ if (c.lv===0) k1++; else if (c.lv===1){ k2++; if (c.per.some(y => y.j.heavy)) k3++; } }
-      else if (!c.past && c.lv===0){ k2++; if (cols[i].peak) k1++; }
+      if (week){ if (c.lv===0){ k1++; if (c.plus) kp++; } else if (c.lv===1){ k2++; if (c.per.some(y => y.j.heavy)) k3++; } }
+      else if (!c.past && c.lv===0){ k2++; if (cols[i].peak){ k1++; if (c.plus) kp++; } }
     });
-    return {...x, cells, k1, k2, k3, mix: hash(day + '|' + x.k)};
-  }).sort((a,b) => b.k1-a.k1 || b.k2-a.k2 || a.k3-b.k3 || a.mix-b.mix);
+    return {...x, cells, k1, kp, k2, k3, mix: hash(day + '|' + x.k)};
+  }).sort((a,b) => b.k1-a.k1 || b.kp-a.kp || b.k2-a.k2 || a.k3-b.k3 || a.mix-b.mix);
   byKey = new Map(all.map(r => [r.k, r]));
   applyFilters();
 }
@@ -157,17 +160,18 @@ function applyFilters(){                                    // 篩選不需重�
 // ---------- 畫面 ----------
 const star = k => { const on = favs.has(k), t = on ? '取消收藏' : '加入收藏';
   return `<button type="button" class="star" data-fav="${k}" aria-pressed="${on}" aria-label="${t}" title="${t}">${on?'♥':'♡'}</button>`; };
-const lamp = (c, sm) => `<i class="lamp ${CLS[LV(c.lv)]}${c.ref?' ref':''}${c.past?' past':''}${sm?' sm':''}" title="${WORD[LV(c.lv)]}${c.ref?'（參考）':''}${c.past?'（已過）':''}">${SYM[LV(c.lv)]}</i>`;
-const sub = m => `${m.c} ${m.no}・${m.h ? m.h.toLocaleString()+' m' : '標高待補'}・${esc(m.co)}`;
+const lamp = (c, sm) => { const t = c.plus ? 'A+' : SYM[LV(c.lv)];
+  return `<i class="lamp ${CLS[LV(c.lv)]}${c.plus?' p':''}${c.ref?' ref':''}${c.past?' past':''}${sm?' sm':''}" title="${c.plus ? 'A+（晴）' : WORD[LV(c.lv)]}${c.ref?'（參考）':''}${c.past?'（已過）':''}">${t}</i>`; };
+const sub = m => `${m.h ? m.h.toLocaleString()+' m' : '標高待補'}・${m.c}・${esc(m.co)}`;   // 標高、類別、縣市（不顯示編號）
 const peaksLeft = () => cols.filter(c => c.peak && !c.past).length;
 // 比較結果只在一週模式顯示（適合天數）；逐 3 小時模式不顯示段數（使用者認為難懂），排序仍照規則
 const isWeek = () => state.mode === 'week';
-const headRow = () => `<tr><th class="mt">山岳</th>${cols.map(c=>`<th class="${c.ref?'ref ':''}${c.peak?'peak ':''}${c.wkd?'we':''}"><span class="dt"><span class="lg">${c.head||c.label}</span><span class="st">${c.short}</span></span>${c.sub}</th>`).join('')}${isWeek()?'<th class="cnt-h">適合天數</th>':''}</tr>`;
-const bodyRow = r => `<tr data-k="${r.k}" tabindex="0"><th class="mt" scope="row"><div class="mt-in"><span class="nm">${esc(r.m.n)}</span><span class="sub">${sub(r.m)}</span>${star(r.k)}</div></th>${r.cells.map(c=>`<td>${lamp(c)}</td>`).join('')}${isWeek()?`<td class="cnt"><span class="cn-s">${r.k1} / 7</span><span class="cn-l">適合 ${r.k1} 天</span></td>`:''}</tr>`;
+const headRow = () => `<tr><th class="mt">山岳</th>${cols.map(c=>`<th class="${c.ref?'ref ':''}${c.peak?'peak ':''}${c.wkd?'we':''}"><span class="dt"><span class="lg">${c.head||c.label}</span><span class="st">${c.short}</span></span>${c.sub}</th>`).join('')}${isWeek()?'<th class="cnt-h">A 天數</th>':''}</tr>`;
+const bodyRow = r => `<tr data-k="${r.k}" tabindex="0"><th class="mt" scope="row"><div class="mt-in"><span class="nm">${esc(r.m.n)}</span><span class="sub">${sub(r.m)}</span>${star(r.k)}</div></th>${r.cells.map(c=>`<td>${lamp(c)}</td>`).join('')}${isWeek()?`<td class="cnt"><span class="cn-s">${r.k1} / 7</span><span class="cn-l">A ${r.k1} 天</span></td>`:''}</tr>`;
 // 推薦卡（精簡兩列）：山名＋資訊＋收藏／燈號＋比較結果
 // 小燈上方標出時段（逐 3 小時寫開始時刻，一週寫日期＋星期），和下方列表一樣；登頂時段加底色、週末紅色
 const pickHead = () => cols.map(c => `<span class="ph${c.peak?' peak':''}${c.wkd?' we':''}${c.ref?' ref':''}" aria-hidden="true">${c.short}</span>`).join('');
-const pickCard = (r, head) => `<div class="pick" data-k="${r.k}" tabindex="0" role="button"><div class="p1"><span class="nm">${esc(r.m.n)}</span><span class="meta">${sub(r.m)}</span>${star(r.k)}</div><div class="p2"><span class="lights" style="--n:${cols.length}">${head}${r.cells.map(c=>lamp(c,true)).join('')}</span>${isWeek()?`<span class="rank">適合 ${r.k1} 天</span>`:''}</div></div>`;
+const pickCard = (r, head) => `<div class="pick" data-k="${r.k}" tabindex="0" role="button"><div class="p1"><span class="nm">${esc(r.m.n)}</span><span class="meta">${sub(r.m)}</span>${star(r.k)}</div><div class="p2"><span class="lights" style="--n:${cols.length}">${head}${r.cells.map(c=>lamp(c,true)).join('')}</span>${isWeek()?`<span class="rank">A ${r.k1} 天</span>`:''}</div></div>`;
 
 function render(){
   const week = state.mode === 'week', d0 = cols[0].date;
@@ -176,6 +180,8 @@ function render(){
   $('pick-info-body').innerHTML = pickInfo(week);
   $('range-text').innerHTML = `${title}・${regionNow()?.[0] || state.counties.size + ' 個縣市'}`;
   document.querySelectorAll('#seg .sd').forEach((e, i) => { const d = dayAt(i); e.textContent = fmt(d); e.classList.toggle('we', isWE(d)); });
+  const md = d => `${d.getMonth()+1}/${d.getDate()}`;
+  $('seg-week').textContent = `${md(dayAt(0))}–${md(dayAt(6))}`;   // 一週預報按鈕下方寫日期區間
   ['matrix','fav-matrix'].forEach(id => $(id).style.setProperty('--n', cols.length));
   document.querySelectorAll('.lg-ref').forEach(e => e.hidden = !week);
   if (!week) setInfo(false);
@@ -185,12 +191,12 @@ function render(){
   rb.hidden = !pk.list.length; rb.disabled = !pk.more;
   rb.title = pk.more ? '' : '目前沒有同分的山可以換';
   $('picks').innerHTML = pk.list.map(r => pickCard(r, ph)).join('')
-    || `<div class="empty">${rows.length ? '這段期間沒有燈號為「適合」的山，可以參考下方列表。' : '沒有符合條件的山，請放寬類別或縣市。'}</div>`;
+    || `<div class="empty">${rows.length ? '這段期間沒有燈號為 A 的山，可以參考下方列表。' : '沒有符合條件的山，請放寬類別或縣市。'}</div>`;
   const head = headRow();
   $('fav-tab-n').textContent = favRows.length || '';
   const rg = regionNow();
   document.querySelectorAll('#f-region [data-rg]').forEach(b => b.setAttribute('aria-pressed', !!rg && REGIONS[+b.dataset.rg] === rg));
-  $('filter-n').textContent = (state.cats.size + (rg ? 0 : state.counties.size)) || '';   // 手機「進階篩選」按鈕：地區以外另外選了幾項
+  $('filter-n').textContent = (state.cats.size + (rg ? 0 : state.counties.size) + RARE.filter(h => state.slots.has(h)).length) || '';   // 手機「篩選」按鈕：地區以外另外選了幾項（含較少用的登頂時段）
   $('fav-count').innerHTML = favRows.length ? `${title}・${favRows.length} 座，依燈號排序` : '';
   $('fav-box').hidden = !favRows.length; $('fav-empty').hidden = !!favRows.length;
   $('fav-matrix').tHead.innerHTML = head;
@@ -202,12 +208,12 @@ function render(){
   $('more-box').hidden = rows.length <= state.shown;
   $('more').textContent = `顯示更多（還有 ${rows.length-state.shown} 座）`;
 }
-// 推薦：只列有「適合」時段（或天數）的山，最多 3 座。名額邊界上分數相同的山超過剩餘名額時，「換一批」圖示依當天順序輪流換成其他同分的山
+// 推薦：只列有 A（含 A+）時段（或天數）的山，最多 3 座。名額邊界上分數相同的山超過剩餘名額時，「換一批」圖示依當天順序輪流換成其他同分的山
 function choosePicks(week){
   const good = r => (week || peaksLeft() ? r.k1 : r.k2) > 0;
   const cand = rows.filter(good);
   if (cand.length <= 3) return {list: cand, more: false};
-  const key = r => r.k1 + '|' + r.k2 + '|' + r.k3, b = key(cand[2]);
+  const key = r => r.k1 + '|' + r.kp + '|' + r.k2 + '|' + r.k3, b = key(cand[2]);
   const fixed = cand.slice(0, 3).filter(r => key(r) !== b), pool = cand.filter(r => key(r) === b), need = 3 - fixed.length;
   if (pool.length <= need) return {list: cand.slice(0, 3), more: false};
   const off = (state.turn * need) % pool.length;
@@ -222,9 +228,9 @@ function openDetail(k){
   const week = state.mode === 'week', pts = r.pts;
   const alerts = [...new Map(r.cells.flatMap(c => c.per.filter(x=>x.al).map(x=>[x.al.county+x.al.type, x.al]))).values()];
   const v = (x, f) => x == null ? '—' : f(x);
-  const table = (p, k) => `<div class="pt"><h3>${esc(p.label)}・${week ? '一週逐日' : MODES[state.mode].name+'逐 3 小時預報'}</h3><div class="vt-box"><table class="vt"><thead><tr><th>${week?'日期':'時段'}</th><th>燈號</th><th>天氣現象</th><th>降雨機率</th><th>風速</th><th>氣溫</th><th>體感</th><th>原因</th></tr></thead><tbody>
+  const table = (p, k) => `<div class="pt"><h3>${esc(p.label)}・${week ? '一週預報' : MODES[state.mode].name+'逐 3 小時預報'}</h3><div class="vt-box"><table class="vt"><thead><tr><th>${week?'日期':'時段'}</th><th>燈號</th><th>天氣現象</th><th>降雨機率</th><th>風速</th><th>氣溫</th><th>體感</th><th>原因</th></tr></thead><tbody>
       ${r.cells.map((c,j) => { const x = c.per[k], col = cols[j];
-        return `<tr class="${c.ref||c.past?'ref':''}"><td>${week?fmtH(col.date):col.label}</td><td>${lamp({lv:x.j.lv,ref:c.ref,past:c.past},true)}</td><td>${v(x.fc?.wx, esc)}</td><td class="num">${v(x.fc?.pop, n=>n+'%')}</td><td class="num">${v(x.fc?.ws, n=>`${n} m/s（${x.fc.bf} 級）`)}</td><td class="num">${v(x.fc?.t, n=>n+'°C')}</td><td class="num">${v(x.fc?.at, n=>n+'°C')}</td><td class="why">${esc(x.j.why.join('、')||'—')}</td></tr>`; }).join('')}
+        return `<tr class="${c.ref||c.past?'ref':''}"><td>${week?fmtH(col.date):col.label}</td><td>${lamp({lv:x.j.lv,plus:x.j.plus,ref:c.ref,past:c.past},true)}</td><td>${v(x.fc?.wx, esc)}</td><td class="num">${v(x.fc?.pop, n=>n+'%')}</td><td class="num">${v(x.fc?.ws, n=>`${n} m/s（${x.fc.bf} 級）`)}</td><td class="num">${v(x.fc?.t, n=>n+'°C')}</td><td class="num">${v(x.fc?.at, n=>n+'°C')}</td><td class="why">${esc(x.j.why.join('、')||'—')}</td></tr>`; }).join('')}
       </tbody></table></div></div>`;
   const dr = $('drawer');
   dr.innerHTML = `
@@ -236,24 +242,25 @@ function openDetail(k){
     ${r.m.al?.length?`<div class="note">別名：${esc(r.m.al.join('、'))}</div>`:''}
     ${r.m.note?`<div class="note">備註：${esc(r.m.note)}</div>`:''}
     ${pts.map(table).join('')}
-    <div class="note">${week ? '一週預報以你選的登頂時段（'+sortedSlots().map(slotLabel).join('、')+'）判定，取最差情況；第 4–7 天氣象署未提供降雨機率，以「—」表示，燈號最多只會到「注意」，請在出發前 3 天內再確認。' : '逐 3 小時預報；底色時段是你選的登頂時段，排序以此為準。'}</div>`;
+    <div class="note">${week ? '一週預報以你選的登頂時段（'+sortedSlots().map(slotLabel).join('、')+'）判定，取最差情況；第 4–7 天氣象署未提供降雨機率，以「—」表示，燈號最多只會到 B，請在出發前 3 天內再確認。' : '逐 3 小時預報；底色時段是你選的登頂時段，排序以此為準。'}</div>`;
   dr.hidden = false; $('scrim').hidden = false;
   $('d-close').focus();
 }
 function closeDetail(){ $('drawer').hidden = true; $('scrim').hidden = true; }
 // 推薦旁的 i：依目前模式說明比較標準與排序
 const REROLL = '推薦右邊的「換一批」：排序相同的山超過名額時，按一下可以換成其他同分的山；沒有同分的山時按鈕是灰色的。';
+const GRADE = '<li>A+：A 之中天氣描述為「晴」；A：適合；B：注意；C：不建議。</li>';
 function pickInfo(week){
   const slots = sortedSlots().map(slotLabel).join('、');
-  const base = '<li>燈號依氣象署預報判定：降雨機率、天氣描述（雷、大雨、豪雨）、平均風速、天氣特報；標高 1,000 公尺以下另看高溫。各項取最差的結果。</li><li>跨多個鄉鎮的山，取最差的鄉鎮。</li>';
+  const base = GRADE + '<li>燈號依氣象署預報判定：降雨機率、天氣描述（雷、大雨、豪雨）、平均風速、天氣特報；標高 1,000 公尺以下另看高溫。各項取最差的結果。</li><li>跨多個鄉鎮的山，取最差的鄉鎮。</li>';
   const li = a => '<ul>' + a.map(x => '<li>' + x + '</li>').join('') + '</ul>';
-  if (week) return '<h4>比較標準</h4><ul>' + base + `<li>每天以你選的登頂時段（${esc(slots)}）中最差的情況作為當天燈號。</li><li>第 4–7 天氣象署沒有降雨機率，燈號最多只會到「注意」，僅供參考。</li></ul>`
-    + '<h4>推薦條件</h4>' + li(['7 天中至少 1 天「適合」的山才會列入，最多 3 座，不標名次。', REROLL])
-    + '<h4>排序</h4>' + li(['「適合」的天數多者在前', '再比「注意」的天數', '再比「注意」裡天氣描述為「陣雨」（非「短暫陣雨」）的天數，少者在前', '以上都相同時，順序每天輪換一次，不代表哪座比較好']);
+  if (week) return '<h4>比較標準</h4><ul>' + base + `<li>每天以你選的登頂時段（${esc(slots)}）中最差的情況作為當天燈號。</li><li>第 4–7 天氣象署沒有降雨機率，燈號最多只會到 B，僅供參考。</li></ul>`
+    + '<h4>推薦條件</h4>' + li(['7 天中至少 1 天為 A（含 A+）的山才會列入，最多 3 座，不標名次。', REROLL])
+    + '<h4>排序</h4>' + li(['A（含 A+）的天數多者在前', '再比其中 A+ 的天數', '再比 B 的天數', '再比 B 裡天氣描述為「陣雨」（非「短暫陣雨」）的天數，少者在前', '以上都相同時，順序每天輪換一次，不代表哪座比較好']);
   const today = state.mode === 'today';
   return '<h4>比較標準</h4><ul>' + base + `<li>逐 3 小時判定，每個時段一個燈號。</li>${today ? '<li>今天已過的時段不列入比較。</li>' : ''}</ul>`
-    + '<h4>推薦條件</h4>' + li([`你選的登頂時段（${esc(slots)}）至少有 1 段「適合」的山才會列入，最多 3 座，不標名次。` + (today ? '登頂時段都已過時，改看今天剩餘的時段。' : ''), REROLL])
-    + '<h4>排序</h4>' + li(['登頂時段中「適合」的段數多者在前', '再比當天所有時段「適合」的段數', '以上都相同時，順序每天輪換一次，不代表哪座比較好']);
+    + '<h4>推薦條件</h4>' + li([`你選的登頂時段（${esc(slots)}）至少有 1 段 A（含 A+）的山才會列入，最多 3 座，不標名次。` + (today ? '登頂時段都已過時，改看今天剩餘的時段。' : ''), REROLL])
+    + '<h4>排序</h4>' + li(['登頂時段中 A（含 A+）的段數多者在前', '再比其中 A+ 的段數', '再比當天所有時段 A 的段數', '以上都相同時，順序每天輪換一次，不代表哪座比較好']);
 }
 function setPickInfo(v){ $('pick-info').hidden = !v; $('pick-info-btn').setAttribute('aria-expanded', v); }
 function setInfo(v){ $('info-ref').hidden = !v; $('info-btn').setAttribute('aria-expanded', v); }
@@ -303,7 +310,9 @@ const regionNow = () => REGIONS.find(([, cs]) => sameSet(state.counties, cs));  
 (function init(){
   const counties = [...new Set(M.flatMap(m => m.co.split('、')))].filter(Boolean).sort((a,b) => COUNTY_ORDER.indexOf(a) - COUNTY_ORDER.indexOf(b));
   $('f-county').innerHTML = `<button type="button" class="chip reset" id="c-all" aria-pressed="true">全部</button>` + counties.map(c=>`<button type="button" class="chip" data-co="${esc(c)}" aria-pressed="false">${esc(c)}</button>`).join('');
-  $('f-slots').innerHTML = SLOTS.map(h=>`<button type="button" class="chip mono" data-h="${h}">${slotLabel(h)}</button>`).join('');
+  const slotChips = a => a.map(h=>`<button type="button" class="chip mono" data-h="${h}">${slotLabel(h)}</button>`).join('');
+  $('f-slots').innerHTML = slotChips(SLOTS.filter(h => !RARE.includes(h)));
+  $('f-slots2').innerHTML = slotChips(RARE);
 
   const syncCounty = chipGroup($('f-county'), 'data-co', state.counties, {allId:'c-all', onChange: refilter});
   $('f-region').innerHTML = REGIONS.map(([n], i) => `<button type="button" class="chip" data-rg="${i}" aria-pressed="false">${n}</button>`).join('');
@@ -315,7 +324,9 @@ const regionNow = () => REGIONS.find(([, cs]) => sameSet(state.counties, cs));  
     refilter();
   };
   chipGroup($('f-cat'), 'data-c', state.cats, {allId:'cat-all', onChange: refilter});
-  chipGroup($('f-slots'), 'data-h', state.slots, {parse: Number, keepOne: true, onChange(){ store.set('slots', [...state.slots]); refresh(); }});
+  const onSlots = {parse: Number, keepOne: true, onChange(){ store.set('slots', [...state.slots]); refresh(); }};
+  chipGroup($('f-slots'), 'data-h', state.slots, onSlots);
+  chipGroup($('f-slots2'), 'data-h', state.slots, onSlots);   // 較少用的時段（進階篩選裡），和上面共用同一組登頂時段
   store.set('slots', [...state.slots]);
 
   const seg = document.querySelectorAll('#seg button');
@@ -370,6 +381,17 @@ const regionNow = () => REGIONS.find(([, cs]) => sameSet(state.counties, cs));  
     if (e.key === 'Escape') return closeDetail();
     if (e.key === 'Enter' && !e.target.closest('[data-fav]')){ const t = e.target.closest('[data-k]'); if (t) openDetail(t.dataset.k); }
   });
+
+  // 手機：往下滑時標題那一排收起，只留搜尋、地區、篩選；往上滑或回到頂端再出現
+  let lastY = window.scrollY, lockUntil = 0;
+  window.addEventListener('scroll', () => {
+    const y = window.scrollY, hd = document.querySelector('header.top'), now = Date.now();
+    if (now < lockUntil){ lastY = y; return; }           // 剛收起／展開，等動畫結束再判斷，避免來回閃動
+    const want = y < 60 ? false : y > lastY + 6 ? true : y < lastY - 6 ? false : null;
+    if (want === null) return;
+    lastY = y;
+    if (want !== hd.classList.contains('compact')){ hd.classList.toggle('compact', want); lockUntil = now + 350; }
+  }, {passive: true});
 
   refresh();                                                // 先顯示山岳清單，資料到了再補上燈號
   loadForecast();

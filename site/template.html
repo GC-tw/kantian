@@ -33,12 +33,11 @@ body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:1
   background-image:repeating-radial-gradient(circle at 85% -10%, transparent 0 38px, var(--contour) 38px 39px);
   background-attachment:fixed}
 .wrap{max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px;display:flex;flex-direction:column;gap:18px}
-header.top{display:grid;grid-template-columns:1fr auto;grid-template-areas:"t is" "ctrl ctrl";align-items:end;gap:8px 24px}
+header.top{display:grid;grid-template-columns:1fr;grid-template-areas:"t" "ctrl";align-items:end;gap:8px 24px}
 header.top h1{grid-area:t}
 h1 .brand{display:inline-flex;align-items:center;gap:.28em}
 h1 .logo{width:1.05em;height:1.05em;flex:none}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) h1 .logo rect{stroke:#4a535b;stroke-width:12}}
-header.top .issued{grid-area:is;text-align:right}
 /* 標題列第二排：搜尋（放大鏡，點了才展開）→ 地區 → 進階篩選 */
 .ctrl{grid-area:ctrl;display:flex;align-items:center;gap:6px;position:relative;min-width:0}
 .search{flex:none;display:flex;align-items:center;gap:6px}
@@ -54,11 +53,12 @@ header.top .issued{grid-area:is;text-align:right}
 .filter-btn .badge{position:absolute;top:-6px;right:-6px;min-width:18px;height:18px;padding:0 4px;border-radius:9px;background:var(--accent);color:var(--accent-ink);font:700 11px/18px var(--f-body);text-align:center}
 .filter-btn .badge:empty{display:none}
 .sheet-head{display:none}
+.on-m{display:none}
 .chips.regions{flex:0 1 auto;min-width:0;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;padding:2px 0}
 .regions::-webkit-scrollbar{display:none}
 .regions .chip{flex:none;white-space:nowrap}
-h1{font-family:var(--f-display);font-weight:800;font-size:clamp(34px,5vw,48px);line-height:1.15;margin:0;letter-spacing:.02em;text-wrap:balance}
-h1 small{display:block;font-family:var(--f-body);font-weight:500;font-size:14px;color:var(--muted);letter-spacing:.04em;margin-top:6px}
+h1{font-family:var(--f-display);font-weight:800;font-size:clamp(26px,3.4vw,34px);line-height:1.15;margin:0;letter-spacing:.02em;text-wrap:balance}
+h1 small{display:block;font-family:var(--f-body);font-weight:500;font-size:13px;color:var(--muted);letter-spacing:.04em;margin-top:2px}
 h2{font-family:var(--f-display);font-weight:600;font-size:20px;margin:0;text-wrap:balance}
 .notice{background:var(--warn-soft);border:1px solid var(--warn);color:var(--ink);border-radius:6px;padding:10px 14px;font-size:14px}
 .lamp.na{background:var(--bg);color:var(--muted);border-color:var(--line)}
@@ -143,6 +143,8 @@ table.matrix{border-collapse:separate;border-spacing:0;width:100%;font-variant-n
 .matrix .st,.matrix .cn-l{display:none}
 .lamp{font-style:normal;display:inline-grid;place-items:center;width:30px;height:30px;border-radius:6px;font-size:13px;font-weight:700;border:1.5px solid transparent}
 .lamp.g{background:var(--go-soft);color:var(--go);border-color:var(--go)}
+.lamp.g.p{background:var(--go);color:var(--surface);letter-spacing:-.04em}   /* A+：實心綠 */
+.lamp.sm.p{font-size:10px}
 .lamp.y{background:var(--warn-soft);color:var(--warn);border-color:var(--warn)}
 .lamp.r{background:var(--stop-soft);color:var(--stop);border-color:var(--stop)}
 .lamp.ref{border-style:dashed;opacity:.85}
@@ -216,18 +218,26 @@ footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);paddin
   header.top .filter-btn .badge{background:var(--bar-ink);color:var(--bar)}
   header.top .search.open{background:var(--bar)}
   header.top .search.open .s-x{color:var(--bar-muted)}
-  header.top h1{font-size:30px}
-  header.top h1 small{font-size:11px;margin-top:2px}
-  header.top .issued{font-size:11px;padding-top:4px}
+  header.top h1{font-size:22px;max-height:60px;overflow:hidden;transition:max-height .2s ease,opacity .2s ease}
+  header.top h1 small{font-size:11px;margin-top:1px}
+  header.top{transition:padding .2s ease,row-gap .2s ease}
+  /* 往下滑：標題那一排收起，只留搜尋、地區、篩選 */
+  header.top.compact{row-gap:0;padding-top:calc(8px + env(safe-area-inset-top,0px));padding-bottom:8px}
+  header.top.compact h1{max-height:0;opacity:0}
   .search.open input{font-size:16px}
   /* 手機寬度放不下文字：進階篩選只留圖示，地區按鈕縮小，整排不需左右滑動 */
-  .filter-btn{display:inline-grid;place-items:center;margin-left:auto;width:34px;height:34px;padding:0}
-  .filter-btn .fb-t{display:none}
+  .filter-btn{display:inline-flex;align-items:center;gap:2px;margin-left:auto;height:34px;padding:0 7px 0 9px;font-size:13px;white-space:nowrap}
+  .filter-btn svg{width:15px;height:15px}
+  .on-m{display:inline}.on-d{display:none}
   .ctrl{gap:4px}
   .chips.regions{gap:3px}
-  .regions .chip{padding:4px 6px;font-size:13px}
+  .regions .chip{padding:4px clamp(4px,1.3vw,6px);font-size:clamp(12px,3.35vw,13px)}
+  body{overflow-anchor:none}   /* 標題列收起時不要讓瀏覽器自動調整捲動位置（會造成來回閃動） */
+  /* 手機：常用的 5 個登頂時段排成一列 */
+  #f-slots{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}
+  #f-slots .chip{padding:5px 0;font-size:12.5px;text-align:center}
   .seg button{padding:8px 2px}
-  .seg button small{white-space:nowrap;font-size:clamp(10px,3vw,12px);letter-spacing:-.03em}
+  .seg button small{white-space:nowrap;font-size:clamp(9.5px,2.9vw,12px);letter-spacing:-.04em}
   /* 手機：篩選收進底部面板，點「篩選」才打開 */
   #q:not(.open){display:none}
   #q.open{position:fixed;left:0;right:0;bottom:0;z-index:23;max-height:80vh;overflow-y:auto;border-radius:16px 16px 0 0;border-bottom:0;
@@ -235,18 +245,17 @@ footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);paddin
   #q .sheet-head{display:flex;justify-content:space-between;align-items:center;grid-column:1/-1;font-size:17px}
   #f-scrim{z-index:22}
 }
-@media (max-width:374px){.regions .chip{padding:4px 5px}.chips.regions{gap:2px}}
+@media (max-width:374px){.chips.regions{gap:2px}}
 </style>
 
 <div class="wrap">
   <header class="top">
     <!-- 圖示為暫定示意（方向 A），之後再重新設計 -->
     <h1><span class="brand"><svg class="logo" viewBox="0 0 512 512" aria-hidden="true"><rect width="512" height="512" rx="112" fill="#2f363d"/><circle cx="352" cy="168" r="56" fill="#f2b544"/><path d="M40 412 196 176l70 104 44-58 162 190z" fill="#8f99a3"/><path d="M40 412 196 176l116 236z" fill="#f4f5f6"/></svg>看天爬山</span><small>看天氣，找出適合造訪的山</small></h1>
-    <div class="issued" id="issued"></div>
-    <div class="ctrl">
+        <div class="ctrl">
       <div class="search" id="search"><button type="button" class="s-btn" id="s-btn" aria-label="搜尋山名或別名" aria-expanded="false" aria-controls="f-name"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></svg></button><input id="f-name" type="search" autocomplete="off" aria-label="搜尋山名或別名" placeholder="搜尋山名或別名"><button type="button" class="s-x" id="s-x" aria-label="清除並關閉搜尋">×</button></div>
       <div class="chips regions" id="f-region" role="group" aria-label="地區"></div>
-      <button type="button" class="filter-btn" id="filter-btn" aria-expanded="false" aria-controls="q" aria-label="進階篩選" title="進階篩選"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M7 12h10M10 18h4"/></svg><span class="fb-t">進階篩選</span><span id="filter-n" class="badge"></span></button>
+      <button type="button" class="filter-btn" id="filter-btn" aria-expanded="false" aria-controls="q" aria-label="篩選" title="進階篩選"><span class="fb-t">篩選</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M7 12h10M10 18h4"/></svg><span id="filter-n" class="badge"></span></button>
     </div>
   </header>
 
@@ -263,10 +272,10 @@ footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);paddin
       <button type="button" role="tab" data-mode="today" aria-selected="true">今天<small class="sd">逐 3 小時預報</small></button>
       <button type="button" role="tab" data-mode="tmr" aria-selected="false">明天<small class="sd">逐 3 小時預報</small></button>
       <button type="button" role="tab" data-mode="d2" aria-selected="false">後天<small class="sd">逐 3 小時預報</small></button>
-      <button type="button" role="tab" data-mode="week" aria-selected="false">一週預報<small>逐日</small></button>
+      <button type="button" role="tab" data-mode="week" aria-selected="false">一週預報<small id="seg-week">7 天</small></button>
     </div>
     <div class="panel-search">
-      <div class="field wide"><span class="lab">登頂時段（可多選，預設 06–12，排序依此計算）</span><div class="chips" id="f-slots"></div></div>
+      <div class="field wide"><span class="lab">登頂時段（可多選；其他時段在<span class="on-m">「篩選」</span><span class="on-d">下方</span>）</span><div class="chips" id="f-slots"></div></div>
     </div>
   </div>
 
@@ -279,18 +288,19 @@ footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);paddin
         <button type="button" class="chip" aria-pressed="false" data-c="小百岳">小百岳</button>
         <button type="button" class="chip" aria-pressed="false" data-c="其他山岳">其他山岳</button></div></div>
       <div class="field wide"><span class="lab">縣市（可多選，未選＝全部）</span><div class="chips" id="f-county"></div></div>
+      <div class="field wide"><span class="lab">較少用的登頂時段（和上方登頂時段一起計算）</span><div class="chips" id="f-slots2"></div></div>
     </form>
 
     <div style="display:flex;flex-direction:column;gap:10px">
       <div class="legend">
-          <span><i class="lamp sm g">○</i>適合</span><span><i class="lamp sm y">△</i>注意</span><span><i class="lamp sm r">✕</i>不建議</span><span><i class="lamp sm na">—</i>時間已過或無資料</span><span id="lg-ref" class="lg-ref"><i class="lamp sm g ref">○</i>虛線＝第 4–7 天，僅供參考<button type="button" class="info" id="info-btn" aria-expanded="false" aria-controls="info-ref" aria-label="為什麼第 4–7 天只供參考">i</button></span>
+          <span><i class="lamp sm g p">A+</i>晴</span><span><i class="lamp sm g">A</i>適合</span><span><i class="lamp sm y">B</i>注意</span><span><i class="lamp sm r">C</i>不建議</span><span><i class="lamp sm na">—</i>時間已過或無資料</span><span id="lg-ref" class="lg-ref"><i class="lamp sm g ref">A</i>虛線＝第 4–7 天，僅供參考<button type="button" class="info" id="info-btn" aria-expanded="false" aria-controls="info-ref" aria-label="為什麼第 4–7 天只供參考">i</button></span>
         </div>
       <div class="info-pop" id="info-ref" hidden>
         <div class="info-head"><b>為什麼第 4–7 天只供參考？</b><button type="button" class="info-x" id="info-x" aria-label="關閉說明">×</button></div>
         <ul>
           <li>氣象署的一週預報，只有前 3 天提供「降雨機率」。</li>
           <li>第 4–7 天少了降雨機率，燈號只能依天氣描述（例如「多雲短暫陣雨」）、風力和氣溫來判斷，比較粗略。</li>
-          <li>因此第 4–7 天的燈號最多只會到「注意」；「注意」也可能是雨勢較大的陣雨，請點開詳情看天氣描述。</li>
+          <li>因此第 4–7 天的燈號最多只會到 B；B 也可能是雨勢較大的陣雨，請點開詳情看天氣描述。</li>
           <li>預報的日子越遠，準確度本來就越低。</li>
           <li>建議用來初步安排行程，出發前 3 天內再回來確認。</li>
         </ul>
@@ -316,7 +326,7 @@ footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);paddin
 
   <main id="view-fav" hidden style="display:flex;flex-direction:column;gap:10px">
     <div class="sec-head"><h2 id="h-favs">我的收藏</h2><p id="fav-count"></p></div>
-    <div class="legend"><span><i class="lamp sm g">○</i>適合</span><span><i class="lamp sm y">△</i>注意</span><span><i class="lamp sm r">✕</i>不建議</span><span><i class="lamp sm na">—</i>時間已過或無資料</span><span class="lg-ref"><i class="lamp sm g ref">○</i>虛線＝第 4–7 天，僅供參考</span></div>
+    <div class="legend"><span><i class="lamp sm g p">A+</i>晴</span><span><i class="lamp sm g">A</i>適合</span><span><i class="lamp sm y">B</i>注意</span><span><i class="lamp sm r">C</i>不建議</span><span><i class="lamp sm na">—</i>時間已過或無資料</span><span class="lg-ref"><i class="lamp sm g ref">A</i>虛線＝第 4–7 天，僅供參考</span></div>
     <div class="matrix-box" id="fav-box"><table class="matrix" id="fav-matrix"><thead></thead><tbody></tbody></table><div class="cards" id="fav-cards"></div></div>
     <div class="fav-empty" id="fav-empty">還沒有收藏。到「找山」點山名旁的 ♡，就能把山加到這裡，快速查看它們的天氣。</div>
   </main>
@@ -334,20 +344,21 @@ footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);paddin
       </ul>
       <h3>燈號怎麼算</h3>
       <ul>
+        <li>燈號分四級：A+、A（適合）、B（注意）、C（不建議）。A+ 是 A 之中天氣描述為「晴」的時段；一週預報要你選的登頂時段都是「晴」才算 A+；跨多個鄉鎮的山，每個鄉鎮都是 A+ 才算。</li>
         <li>登頂時段由你從 8 個 3 小時時段中自由多選，預設為 06–12。今天、明天、後天：逐 3 小時判定每個時段。一週預報：取你選的登頂時段中最差的情況作為當天燈號。一週資料為逐 12 小時（白天 06–18、晚上 18–06），會依你選的時段對應到白天或晚上。</li>
-        <li>降雨：降雨機率未滿 30% 適合；30% 以上注意；60% 以上不建議。天氣描述出現「大雨」「豪雨」，不論機率都是不建議。</li>
-        <li>第 4–7 天沒有降雨機率，改看天氣描述：有「雨」為注意，有「大雨」「豪雨」為不建議。因此這幾天的燈號通常最多只到「注意」，詳情會列出原始天氣描述。這幾天以虛線顯示，僅供參考，請在出發前 3 天內再確認。</li>
-        <li>風速（平均風速）：未滿每秒 8 公尺（4 級以下）適合；每秒 8.0–13.8 公尺（5–6 級）注意；每秒 13.9 公尺以上（7 級以上）不建議。陣風通常比平均風速強 1.5–3 倍，稜線上請特別小心。</li>
-        <li>雷：天氣描述出現「雷」，不建議。</li>
-        <li>霧：天氣描述出現「霧」（例如「晴有霧」），注意。</li>
-        <li>雪：天氣描述出現「下雪」「積冰」「暴風雪」，不建議；其他有「雪」的描述（例如「雨或雪」），注意。</li>
-        <li>高溫：標高 1,000 公尺以下的山，體感溫度 36°C 以上為注意。</li>
-        <li>天氣特報：颱風警報、豪雨／大雨特報、陸上強風特報，不建議；低溫特報、濃霧特報，注意。</li>
+        <li>降雨：降雨機率未滿 30% 為 A；30% 以上 B；60% 以上 C。天氣描述出現「大雨」「豪雨」，不論機率都是 C。</li>
+        <li>第 4–7 天沒有降雨機率，改看天氣描述：有「雨」為 B，有「大雨」「豪雨」為 C。因此這幾天的燈號通常最多只到 B，詳情會列出原始天氣描述。這幾天以虛線顯示，僅供參考，請在出發前 3 天內再確認。</li>
+        <li>風速（平均風速）：未滿每秒 8 公尺（4 級以下）A；每秒 8.0–13.8 公尺（5–6 級）B；每秒 13.9 公尺以上（7 級以上）C。陣風通常比平均風速強 1.5–3 倍，稜線上請特別小心。</li>
+        <li>雷：天氣描述出現「雷」，C。</li>
+        <li>霧：天氣描述出現「霧」（例如「晴有霧」），B。</li>
+        <li>雪：天氣描述出現「下雪」「積冰」「暴風雪」，C；其他有「雪」的描述（例如「雨或雪」），B。</li>
+        <li>高溫：標高 1,000 公尺以下的山，體感溫度 36°C 以上為 B。</li>
+        <li>天氣特報：颱風警報、豪雨／大雨特報、陸上強風特報，C；低溫特報、濃霧特報，B。</li>
         <li>低溫不列入燈號，可以靠合適的保暖裝備應對；出發前請依詳情裡的氣溫與體感溫度準備衣物。</li>
         <li>各項取最差的結果作為該時段的燈號。</li>
       </ul>
       <h3>排序方式</h3>
-      <ul><li>今天、明天、後天：先比你選的登頂時段中「適合」的段數（已過的時段不計），再比當天所有時段「適合」的段數（今天已過的時段不計）。登頂時段若已全部過去，改依剩餘時段排序。</li><li>一週預報：先比 7 天中「適合」的天數，再比「注意」的天數；天數相同時，「注意」裡天氣描述為「陣雨」（非「短暫陣雨」）的天數較少者排前面。</li><li>以上條件都相同時，順序每天輪換一次（同一天內固定），讓不同的山都有機會出現在推薦裡，不代表哪座比較好。</li></ul>
+      <ul><li>今天、明天、後天：先比你選的登頂時段中 A（含 A+）的段數（已過的時段不計），再比其中 A+ 的段數，再比當天所有時段 A 的段數（今天已過的時段不計）。登頂時段若已全部過去，改依剩餘時段排序。</li><li>一週預報：先比 7 天中 A（含 A+）的天數，再比其中 A+ 的天數，再比 B 的天數；天數相同時，B 裡天氣描述為「陣雨」（非「短暫陣雨」）的天數較少者排前面。</li><li>以上條件都相同時，順序每天輪換一次（同一天內固定），讓不同的山都有機會出現在推薦裡，不代表哪座比較好。</li></ul>
       <h3>注意事項</h3>
       <ul>
         <li>本站不是氣象預報，也不取代氣象署的預報與特報。出發前請再查看氣象署最新資訊與步道開放狀態。</li>
@@ -356,7 +367,7 @@ footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);paddin
     </article>
   </main>
 
-  <footer>資料來源：交通部中央氣象署開放資料。山岳清單：氣象署登山預報點、運動部體育署「臺灣小百岳」。</footer>
+  <footer><span class="issued" id="issued"></span><br>資料來源：交通部中央氣象署開放資料。山岳清單：氣象署登山預報點、運動部體育署「臺灣小百岳」。</footer>
 </div>
 
 <div class="scrim" id="scrim" hidden></div>
