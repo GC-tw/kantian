@@ -36,12 +36,12 @@ let fails = 0; const ok = (c, m) => { console.log((c ? '✓ ' : '✗ ') + m); if
     ok(d.querySelectorAll('#matrix tbody tr').length === 235, `${m}：235 座都列出`);
     { // 計分排序（A+ 3、A 2、B 1、C 0；已過與無資料不計）：依畫面上的燈號重算，順序須為 總分 → A+ 數 → 全日總分 由高到低
       const peakCol = [...d.querySelectorAll('#matrix thead th')].slice(1).map(th => m === 'week' || th.classList.contains('peak'));
-      const keys = [...d.querySelectorAll('#matrix tbody tr')].map(tr => { let s1 = 0, p1 = 0, s2 = 0;
+      const keys = [...d.querySelectorAll('#matrix tbody tr')].map(tr => { let s1 = 0, p1 = 0, c1 = 0, s2 = 0, has = 0;
         [...tr.querySelectorAll('.lamp')].forEach((l, i) => { if (l.classList.contains('past') || l.classList.contains('na')) return;
           const pt = l.classList.contains('p') ? 3 : l.classList.contains('g') ? 2 : l.classList.contains('y') ? 1 : 0;
-          s2 += pt; if (peakCol[i]){ s1 += pt; if (pt === 3) p1++; } });
-        return [s1, p1, m === 'week' ? 0 : s2]; });
-      const cmp = (a, b) => a[0]-b[0] || a[1]-b[1] || a[2]-b[2];
+          has = 1; s2 += pt; if (peakCol[i]){ s1 += pt; if (pt === 3) p1++; if (pt === 0) c1++; } });
+        return [has, s1, p1, -c1, m === 'week' ? 0 : s2]; });
+      const cmp = (a, b) => a[0]-b[0] || a[1]-b[1] || a[2]-b[2] || a[3]-b[3] || a[4]-b[4];
       ok(keys.every((k, i) => !i || cmp(keys[i-1], k) >= 0) && new Set(keys.map(String)).size > 1, `${m}：依計分排序（最前 ${keys[0]}、最後 ${keys[keys.length-1]}）`);
     }
     click(w, d.getElementById('pick-info-btn'));
@@ -60,6 +60,17 @@ let fails = 0; const ok = (c, m) => { console.log((c ? '✓ ' : '✗ ') + m); if
     let bad = 0;
     d.querySelectorAll('#matrix tbody tr').forEach(tr => { click(w, tr.querySelector('td')); if (/undefined|NaN/.test(d.getElementById('drawer').innerHTML)) bad++; click(w, d.getElementById('d-close')); });
     ok(bad === 0, `${m}：235 座詳情都正常`);
+  }
+  { // 一週判定：各半天分別判斷；登頂時段都在 12 點前時，白天描述的「午後」不計
+    const J = (halves, am) => w.judgeDay({halves}, false, null, false, am);
+    const h = (wx, day) => ({wx, day, pop: 10, ws: 2});
+    ok(J([h('晴', true), h('多雲有霧', false)], false).lv === 1, '一週：晚上有霧時，即使白天晴也判 B');
+    ok(J([h('晴', true), h('雨或雪', false)], false).lv === 1 && J([h('下雪', false), h('晴', true)], false).lv === 2, '一週：另一個半天的雪也會判定');
+    const pm = J([h('晴午後短暫雷陣雨', true)], true);
+    ok(pm.lv === 0 && pm.plus && /午後/.test(pm.why.join()), '一週：登頂時段在 12 點前，「晴午後短暫雷陣雨」視為晴（A+），原因註明');
+    ok(J([h('晴午後短暫雷陣雨', true)], false).lv === 2, '一週：登頂時段有 12 點後，午後雷陣雨仍判 C');
+    ok(J([h('晴', true), h('晴', false)], false).plus && !J([h('晴', true), h('晴時多雲', false)], false).plus, '一週：所有半天都是晴才算 A+');
+    ok(w.eval('amOnly([6, 9])') && !w.eval('amOnly([9, 12])'), '一週：12 點前的判斷（09–12 算，12–15 不算）');
   }
   ok(plusTotal > 0, `天氣描述為「晴」的 A 時段顯示 A+（共 ${plusTotal} 格）`);
   // 一週：第 4–7 天沒有降雨機率時，詳情列出原始天氣描述

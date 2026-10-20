@@ -45,16 +45,26 @@ function useForecast(data){
 function slotForecast(p, di, hr){                           // 逐 3 小時：沒有資料時回傳 null
   return fcIndex.get(p.key)?.h3.get(dayAt(di).getTime() + hr*H) || null;
 }
-function dayForecast(p, di, slots){                         // 一週：把登頂時段對應到白天（06–18）或晚上（18–06），取最差情況
+// 一週：把登頂時段對應到白天（06–18）或晚上（18–06）。回傳對應到的各半天（判定時各半天分別判斷再取最差），
+// 以及合併後給詳情顯示的數值（天氣描述列出各半天原文）
+function dayForecast(p, di, slots){
   const idx = fcIndex.get(p.key); if (!idx) return null;
   const D = dayAt(di).getTime();
-  const s = [...new Set(slots.map(h => h>=6 && h<18 ? D+6*H : h>=18 ? D+18*H : D-6*H))].map(S => idx.week.get(S)).filter(Boolean);
+  const s = [...new Set(slots.map(h => h>=6 && h<18 ? D+6*H : h>=18 ? D+18*H : D-6*H))].sort((a,b)=>a-b).map(S => idx.week.get(S) && {...idx.week.get(S), day: S === D+6*H}).filter(Boolean);
   if (!s.length) return null;
-  const wx = x => x.wx || '';
-  const worst = s.find(x=>wx(x).includes('雷')) || s.find(x=>/大雨|豪雨/.test(wx(x))) || s.find(x=>wx(x).includes('雨')) || s[0];
   const max = k => { const v = s.map(x=>x[k]).filter(v=>v!=null); return v.length ? Math.max(...v) : null; };
   const ws = max('ws');
-  return {pop: di<3 ? max('pop') : null, ws, bf: ws!=null ? beaufort(ws) : max('bf'), t: max('t'), at: max('at'), wx: worst.wx, sunny: s.every(x => wx(x) === '晴')};
+  return {halves: s.map(x => di<3 ? x : {...x, pop: null}), pop: di<3 ? max('pop') : null, ws, bf: ws!=null ? beaufort(ws) : max('bf'), t: max('t'), at: max('at'), wx: [...new Set(s.map(x => x.wx).filter(Boolean))].join('／') || null};
+}
+// 一週白天的描述：登頂時段全部在 12 點前時，「午後」之後的部分不計（2026-10-20 使用者決定；降雨機率仍照 12 小時數值）
+const amOnly = slots => slots.every(h => h + 3 <= 12);
+const dropPM = wx => { const i = (wx || '').indexOf('午後'); return i > 0 ? wx.slice(0, i) : wx; };
+function judgeDay(fc, lowHill, alert, noPop, am){
+  if (!fc) return judge(null, lowHill, alert, noPop);
+  const js = fc.halves.map(x => judge(am && x.day ? {...x, wx: dropPM(x.wx)} : x, lowHill, alert, noPop));
+  const lv = Math.max(...js.map(j => j.lv)), why = [...new Set(js.flatMap(j => j.why))];
+  if (am && fc.halves.some(x => x.day && dropPM(x.wx) !== x.wx)) why.push('登頂時段在 12 點前，「午後」部分不計');
+  return {lv, why, heavy: js.some(j => j.heavy), plus: lv === 0 && js.every(j => j.plus)};
 }
 function alertFor(p, start, end){                           // 時段內生效、涵蓋這座山所在縣市的特報（取最嚴重）
   return (FC?.alerts || []).find(a => p.counties.includes(a.county) && (a.start == null || a.start < end) && (a.end == null || a.end > start)) || null;
@@ -79,7 +89,7 @@ function judge(fc, lowHill, alert, noPop){
   }
   if (fc.ws != null){ if (fc.ws>=13.9) up(2, '風速 '+fc.ws+' m/s'); else if (fc.ws>=8) up(1, '風速 '+fc.ws+' m/s'); }
   if (lowHill && fc.at != null && fc.at>=36) up(1, '高溫 體感 '+fc.at+'°C');
-  return {lv, why, heavy, plus: lv === 0 && (fc.sunny ?? wx === '晴')};
+  return {lv, why, heavy, plus: lv === 0 && wx === '晴'};
 }
 
 // ---------- 山岳模型（只在載入時建立一次）----------
@@ -122,29 +132,31 @@ const SCORE = c => c.plus ? 3 : 2 - c.lv;                 // A+ 3、A 2、B 1、
 function evaluate(){                                       // 依時段與登頂時段計算所有山的燈號並排序
   evalStamp = timeStamp(); dataStamp = FC?.fetchedAt || '';
   cols = buildCols();
-  const week = state.mode === 'week', slots = sortedSlots();
+  const week = state.mode === 'week', slots = sortedSlots(), am = week && amOnly(slots);
   const day = fmtDayKey();                               // 燈號相同時的順序：每天換一次（同一天內固定），避免永遠是同幾座山在前面
   all = MOUNTAINS.map(x => {
     const cells = cols.map(c => {
       const per = x.pts.map(p => {
         const fc = week ? dayForecast(p, c.di, slots) : slotForecast(p, c.di, c.hr);
         const al = alertFor(p, c.ws, c.we);
-        return {p, fc, al, j: judge(fc, x.low, al, week && c.di>=3)};
+        return {p, fc, al, j: week ? judgeDay(fc, x.low, al, c.di>=3, am) : judge(fc, x.low, al, false)};
       });
       const lv = Math.max(...per.map(y=>y.j.lv));
       return {lv, plus: lv === 0 && per.every(y => y.j.plus), per, ref:!!c.ref, past:!!c.past};   // 跨鄉鎮：每個鄉鎮都是 A+ 才算 A+
     });
     // 計分排序（2026-10-20 方案乙）：A+ 3、A 2、B 1、C 0；已過與無資料不計分
-    // s1：登頂時段總分（一週為 7 天總分）；p1：其中 A+ 數；s2：當天所有時段總分（只用於逐 3 小時）；k3：一週 B 之中「陣雨」（非短暫）的天數
-    let s1 = 0, p1 = 0, s2 = 0, k3 = 0;
+    // s1：登頂時段總分（一週為 7 天總分）；p1：其中 A+ 數；c1：其中 C 數（2026-10-20 加入，C 少的在前）；s2：當天所有時段總分（只用於逐 3 小時）
+    // k3：一週 B 之中「陣雨」（非短暫）的天數；nd：沒有任何資料（2026-10-20 加入，一律排最後）
+    let s1 = 0, p1 = 0, c1 = 0, s2 = 0, k3 = 0, has = false;
     cells.forEach((c, i) => {
       if (c.past || c.lv < 0) return;
+      has = true;
       const pt = SCORE(c);
-      if (week){ s1 += pt; if (c.plus) p1++; if (c.lv===1 && c.per.some(y => y.j.heavy)) k3++; }
-      else { s2 += pt; if (cols[i].peak){ s1 += pt; if (c.plus) p1++; } }
+      if (week){ s1 += pt; if (c.plus) p1++; if (c.lv===2) c1++; if (c.lv===1 && c.per.some(y => y.j.heavy)) k3++; }
+      else { s2 += pt; if (cols[i].peak){ s1 += pt; if (c.plus) p1++; if (c.lv===2) c1++; } }
     });
-    return {...x, cells, s1, p1, s2, k3, mix: hash(day + '|' + x.k)};
-  }).sort((a,b) => b.s1-a.s1 || b.p1-a.p1 || b.s2-a.s2 || a.k3-b.k3 || a.mix-b.mix);
+    return {...x, cells, s1, p1, c1, s2, k3, nd: has ? 0 : 1, mix: hash(day + '|' + x.k)};
+  }).sort((a,b) => a.nd-b.nd || b.s1-a.s1 || b.p1-a.p1 || a.c1-b.c1 || b.s2-a.s2 || a.k3-b.k3 || a.mix-b.mix);
   byKey = new Map(all.map(r => [r.k, r]));
   applyFilters();
 }
@@ -232,11 +244,11 @@ function pickInfo(week){
     '依氣象署預報檢查降雨機率、天氣描述（霧、雪、雷、大雨、豪雨）、平均風速、天氣特報；標高 1,000 公尺以下另看高溫。以最差的一項作為燈號。',
     '跨多個鄉鎮的山，取最差的鄉鎮。'];
   const score = '計分：A+ 3 分、A 2 分、B 1 分、C 0 分。已過的時段和無資料不計分。';
-  const tie = '以上所有條件都相同時：每天隨機排序一次同條件山岳。';
-  if (week) return '<h4>比較標準</h4>' + ul([...std, `每天依你選的登頂時段（${esc(slots)}）對應到白天或晚上，取最差的作為當天燈號。`, '第 4–7 天氣象署沒有降雨機率，只有天氣描述，僅供參考。'])
-    + '<h4>排序</h4>' + ul([score]) + '<p class="ip">依序比較：</p>' + ol(['7 天的總分，高的在前', 'A+ 的天數，多的在前', '「陣雨」（不含「短暫陣雨」）的天數，少的在前']) + ul([tie]);
+  const tie = '以上所有條件都相同時：每天隨機排序一次同條件山岳。', nodata = '完全沒有資料的山排在最後。';
+  if (week) return '<h4>比較標準</h4>' + ul([...std, `每天依你選的登頂時段（${esc(slots)}）對應到白天或晚上，取最差的作為當天燈號。登頂時段都在 12 點前時，白天描述的「午後」部分不計。`, '第 4–7 天氣象署沒有降雨機率，只有天氣描述，僅供參考。'])
+    + '<h4>排序</h4>' + ul([score]) + '<p class="ip">依序比較：</p>' + ol(['7 天的總分，高的在前', 'A+ 的天數，多的在前', 'C 的天數，少的在前', '「陣雨」（不含「短暫陣雨」）的天數，少的在前']) + ul([nodata, tie]);
   return '<h4>比較標準</h4>' + ul([...std, '每 3 小時一格，每格一個燈號。', ...(state.mode === 'today' ? ['今天已過的時段不計分。'] : [])])
-    + '<h4>排序</h4>' + ul([score]) + '<p class="ip">依序比較：</p>' + ol(['登頂時段的總分，高的在前', '登頂時段中 A+ 的數量，多的在前', '當天所有時段的總分，高的在前']) + ul(['登頂時段都過了，就改看當天剩下的時段。', tie]);
+    + '<h4>排序</h4>' + ul([score]) + '<p class="ip">依序比較：</p>' + ol(['登頂時段的總分，高的在前', '登頂時段中 A+ 的數量，多的在前', '登頂時段中 C 的數量，少的在前', '當天所有時段的總分，高的在前']) + ul(['登頂時段都過了，就改看當天剩下的時段。', nodata, tie]);
 }
 // 說明文字中的燈號（A+、A、B、C、—）換成小燈號方塊，顏色與列表一致（2026-10-20 使用者選「選項 1」）
 const GRADE_RE = /A\+|—|(?<![A-Za-z0-9])[ABC](?![A-Za-z])/g, GRADE_CLS = {'A+':'g p', 'A':'g', 'B':'y', 'C':'r', '—':'na'};
