@@ -95,6 +95,17 @@ let fails = 0; const ok = (c, m) => { console.log((c ? '✓ ' : '✗ ') + m); if
   const inp = d.getElementById('f-kw'); inp.value = '鹿山'; inp.dispatchEvent(new w.Event('input', {bubbles: true}));
   ok(lamps().length && lamps().every(x => x === 'na'), '缺少資料的預報點顯示「無資料」');
   inp.value = ''; inp.dispatchEvent(new w.Event('input', {bubbles: true}));
+  { // 篩選防呆：選百岳後「1,000 m 以下」和沒有百岳的縣市不能選；取消後恢復
+    const ht0 = d.querySelector('#f-ht [data-ht="0"]'), ph = d.querySelector('#f-county [data-co="澎湖縣"]'), hb = d.querySelector('#f-county [data-co="花蓮縣"]');
+    click(w, d.querySelector('#f-cat [data-c="百岳"]'));
+    ok(ht0.disabled && ph.disabled && !hb.disabled && !d.querySelector('#f-cat [data-c="百岳"]').disabled, '防呆：選百岳後，1,000 m 以下與澎湖縣不能選，花蓮縣可選');
+    click(w, ht0); ok(!w.eval('state.hts.has(0)'), '防呆：被鎖住的選項點了也不會選上');
+    click(w, d.querySelector('#f-ht [data-ht="3"]'));
+    ok(d.querySelector('#f-cat [data-c="小百岳"]').disabled && d.querySelector('#f-county [data-co="新北市"]').disabled, '防呆：再選 3,000 m 以上，小百岳與新北市不能選');
+    click(w, d.getElementById('ht-all')); click(w, d.getElementById('cat-all'));
+    ok(![...d.querySelectorAll('#f-cat .chip, #f-ht .chip, #f-county .chip')].some(b => b.disabled), '防呆：全部取消後所有選項恢復可選');
+    w.eval('saveFilters()');
+  }
   { // 開始搜尋時，類別、標高、縣市篩選回到預設並記住；登頂時段不變
     click(w, d.querySelector('#f-cat [data-c="小百岳"]')); click(w, d.querySelector('#f-slots [data-h="12"]'));
     w.eval('saveFilters()');

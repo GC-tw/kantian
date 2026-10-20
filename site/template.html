@@ -123,6 +123,7 @@ h2 .info{width:17px;height:17px;top:1.5px}
 .d-head h2 .star{font-size:22px;margin-left:6px}
 .chip.reset{border-style:dashed;color:var(--muted)}
 .chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.chip:disabled{opacity:.32;cursor:not-allowed;text-decoration:line-through;text-decoration-thickness:1px}   /* 篩選防呆：組合起來沒有山的選項 */
 .pick{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 10px 8px 12px;display:flex;flex-direction:column;gap:5px;cursor:pointer;text-align:left;font:inherit;color:inherit}
 .pick:hover{border-color:var(--accent)}
 .pick .p1{display:flex;align-items:baseline;gap:8px;min-width:0}

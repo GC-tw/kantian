@@ -331,7 +331,7 @@ function chipGroup(box, attr, set, {allId, parse = v => v, keepOne, onChange}){
     if (allId) $(allId).setAttribute('aria-pressed', !set.size);
   };
   box.addEventListener('click', e => {
-    const b = e.target.closest('button'); if (!b) return;
+    const b = e.target.closest('button'); if (!b || b.disabled) return;   // 防呆：鎖住的選項不能選
     if (allId && b.id === allId) set.clear();
     else if (b.hasAttribute(attr)){
       const v = parse(b.getAttribute(attr));
@@ -341,6 +341,21 @@ function chipGroup(box, attr, set, {allId, parse = v => v, keepOne, onChange}){
   });
   sync();
   return sync;
+}
+// 篩選防呆（2026-10-20 使用者決定）：類別、標高、縣市三組互相檢查，某個選項和另外兩組目前的選擇組合起來沒有任何山，
+// 就鎖住不給選（例如選了百岳，「1,000 m 以下」不能選）。同一組內是「或」，只會擴大範圍，所以不互相鎖。已選的選項一律可以取消。
+function lockChips(){
+  const G = [
+    {box:'f-cat', attr:'data-c', set:state.cats, parse:v => v, has:(x, v) => x.m.c === v},
+    {box:'f-county', attr:'data-co', set:state.counties, parse:v => v, has:(x, v) => x.counties.includes(v)},
+    {box:'f-ht', attr:'data-ht', set:state.hts, parse:Number, has:(x, v) => x.ht === v}];
+  G.forEach(g => {
+    const pool = MOUNTAINS.filter(x => G.every(o => o === g || !o.set.size || [...o.set].some(v => o.has(x, v))));
+    $(g.box).querySelectorAll(`[${g.attr}]`).forEach(b => {
+      const v = g.parse(b.getAttribute(g.attr)), off = !g.set.has(v) && !pool.some(x => g.has(x, v));
+      b.disabled = off; b.title = off ? '和目前其他篩選條件組合起來沒有山' : '';
+    });
+  });
 }
 const sameSet = (set, arr) => set.size === arr.length && arr.every(x => set.has(x));
 
@@ -352,15 +367,15 @@ const sameSet = (set, arr) => set.size === arr.length && arr.every(x => set.has(
 
   // 篩選面板裡的選擇先記下，按「完成」（或關閉面板）時才一次重新計算、排序，並回到列表最上面
   let pending = false;
-  const onPick = () => { pending = true; $('filter-n').textContent = filterCount() || ''; };
+  const onPick = () => { pending = true; $('filter-n').textContent = filterCount() || ''; lockChips(); };
   const syncs = [chipGroup($('f-county'), 'data-co', state.counties, {allId:'c-all', onChange: onPick}),
     chipGroup($('f-cat'), 'data-c', state.cats, {allId:'cat-all', onChange: onPick}),
     chipGroup($('f-ht'), 'data-ht', state.hts, {allId:'ht-all', parse: Number, onChange: onPick})];
   // 開始搜尋（搜尋框從空白變成有字）時，類別、標高、縣市篩選回到預設（全部）並記住；登頂時段不變（2026-10-20 使用者決定）
   const resetForSearch = () => { if (!state.cats.size && !state.counties.size && !state.hts.size) return;
-    state.cats.clear(); state.counties.clear(); state.hts.clear(); syncs.forEach(f => f()); saveFilters(); };
+    state.cats.clear(); state.counties.clear(); state.hts.clear(); syncs.forEach(f => f()); lockChips(); saveFilters(); };
   chipGroup($('f-slots'), 'data-h', state.slots, {parse: Number, keepOne: true, onChange: onPick});
-  saveFilters();
+  lockChips(); saveFilters();
 
   const seg = document.querySelectorAll('#seg button');
   const syncSeg = () => seg.forEach(b => b.setAttribute('aria-selected', b.dataset.mode === state.mode));
