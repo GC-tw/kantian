@@ -446,18 +446,18 @@ function showTyphoon(){
   const box = $('typhoon'), ts = FC?.typhoons || [];
   box.hidden = !ts.length; if (!ts.length) return;
   const when = t => { const d = tw(t); return t <= Date.now() ? '目前' : `${d.mo}/${d.d}（${WD[d.wd]}）${d.h < 12 ? '上午' : d.h < 18 ? '下午' : '晚上'}前後`; };
-  // 「第 5–7 天僅供參考」放在最前面（2026-10-21 使用者決定），收起時也看得到；文字接在同一段，不換行
+  // 文字接在同一段；「一週預報第 5–7 天僅供參考」一句已拿掉（2026-10-21 18:44 使用者決定）
   const nm = t => `${t.scale ? esc(t.scale) : '颱風'}${esc(t.name)}`;
-  box.innerHTML = `<div class="ty-body"><p><b>⚠ ${ts.map(nm).join('、')}</b>：一週預報的第 5–7 天僅供參考，燈號可能偏樂觀。`
+  box.innerHTML = `<div class="ty-body"><p><b>⚠ ${ts.map(nm).join('、')}</b>：`
     + ts.map(t => `${ts.length > 1 ? nm(t) + '：' : ''}${t.warn ? `氣象署已發布「${esc(t.warn.headline)}」。` : ''}${t.near ? `氣象署預測${when(t.near.t)}最接近臺灣，中心距臺灣陸地約 ${t.near.km} 公里。` : ''}`).join('')
     + `出發前請看<a href="https://www.cwa.gov.tw/V8/C/P/Typhoon/TY_NEWS.html" target="_blank" rel="noopener">氣象署颱風消息</a>。</p></div>`
     + '<svg class="ty-more" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>';
   fitTyphoon();
 }
-// 颱風提示只顯示前兩行，點擊展開／收起（2026-10-20 使用者決定）；內容本來就在兩行內時不需要展開
+// 颱風提示預設只顯示一行（2026-10-21 18:44 使用者決定，原本兩行），點擊展開／收起；內容本來就在一行內時不需要展開
 function fitTyphoon(){
-  const box = $('typhoon'), body = box.querySelector('.ty-body'); if (!body || box.hidden) return;
-  const more = box.classList.contains('open') || body.scrollHeight > body.clientHeight + 1;
+  const box = $('typhoon'), body = box.querySelector('.ty-body p'); if (!body || box.hidden) return;
+  const more = box.classList.contains('open') || body.scrollWidth > body.clientWidth + 1;
   box.classList.toggle('more', more);
   if (more){ box.tabIndex = 0; box.setAttribute('aria-expanded', box.classList.contains('open')); }
   else { box.removeAttribute('tabindex'); box.removeAttribute('aria-expanded'); }
