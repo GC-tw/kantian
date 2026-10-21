@@ -30,7 +30,7 @@ let fails = 0; const ok = (c, m) => { console.log((c ? '✓ ' : '✗ ') + m); if
     ok(!ty.hidden && /強烈颱風測試/.test(ty.textContent) && /最接近臺灣/.test(ty.textContent) && !/遠方/.test(ty.textContent), '颱風接近臺灣時顯示提示（遠方的颱風不顯示）'); }
   ok(/資料更新/.test(d.getElementById('issued').textContent), '顯示資料更新時間');
   let plusTotal = 0;
-  for (const m of ['today', 'tmr', 'd2', 'd3', 'we', 'week']){
+  for (const m of ['today', 'tmr', 'd2', 'd3', 'week']){
     click(w, d.querySelector(`#seg [data-mode="${m}"]`));
     for (let i = 0; i < 30; i++) click(w, d.getElementById('more'));
     const body = d.body.innerHTML.replace(/<script>[\s\S]*<\/script>/, '');
@@ -38,7 +38,7 @@ let fails = 0; const ok = (c, m) => { console.log((c ? '✓ ' : '✗ ') + m); if
     ok(new Set([...d.querySelectorAll('#matrix tbody tr[data-k]')].map(tr => tr.dataset.k)).size === 235, `${m}：235 座都列出`);
     { // 計分排序（A 3、B 2、C 1、D 0；已過與無資料不計）：依畫面上的燈號重算，順序須為 總分 → A 數 → D 少 → 全日總分
       const pk = [...d.querySelectorAll('#matrix thead th[data-c]')].map(th => th.classList.contains('peak'));
-      const peakCol = pk.map(x => m === 'week' || x);   // 計分範圍：登山時段（2026-10-21）；週末每天一列，時段欄相同
+      const peakCol = pk.map(x => m === 'week' || x);   // 計分範圍：登山時段（2026-10-21）
       const G = new Map();
       d.querySelectorAll('#matrix tbody tr[data-k]').forEach(tr => { if (!G.has(tr.dataset.k)) G.set(tr.dataset.k, []); G.get(tr.dataset.k).push(tr); });
       const keys = [...G.values()].map(trs => { let s1 = 0, p1 = 0, c1 = 0, s2 = 0, has = 0;
@@ -51,7 +51,7 @@ let fails = 0; const ok = (c, m) => { console.log((c ? '✓ ' : '✗ ') + m); if
     }
     click(w, d.getElementById('pick-info-btn'));
     const info = d.getElementById('pick-info');
-    ok(!info.hidden && /比較標準/.test(info.textContent) && /排序/.test(info.textContent) && (m === 'week' ? /7 天的總分/ : m === 'we' ? /兩天所有時段/ : /登山時段的總分/).test(info.textContent) && /燈號排序$/.test(d.getElementById('h-picks-t').textContent), `${m}：燈號排序旁的 i 顯示對應的比較標準與排序`);
+    ok(!info.hidden && /比較標準/.test(info.textContent) && /排序/.test(info.textContent) && (m === 'week' ? /7 天的總分/ : /登山時段的總分/).test(info.textContent) && /燈號排序$/.test(d.getElementById('h-picks-t').textContent), `${m}：燈號排序旁的 i 顯示對應的比較標準與排序`);
     click(w, d.getElementById('pick-info-x'));
     ok(!/第\s*\d+\s*名|最推薦/.test(d.getElementById('h-matrix').textContent), `${m}：標題不顯示名次與「最推薦」`);
     ok(!d.getElementById('picks') && !d.getElementById('reroll'), `${m}：推薦區與「換一批」已移除`);
@@ -179,9 +179,9 @@ let fails = 0; const ok = (c, m) => { console.log((c ? '✓ ' : '✗ ') + m); if
   { // 詳情切換日期（2026-10-21）：不影響列表
     click(w, d.querySelector('#seg [data-mode="today"]'));
     click(w, d.querySelector('#matrix tbody tr[data-k] td'));
-    click(w, d.querySelector('#drawer [data-dmode="we"]'));
-    const t = d.getElementById('drawer').textContent;
-    ok(/（六）/.test(t) && w.eval('state.mode') === 'today', '詳情可切換到週末，列表仍是今天');
+    click(w, d.querySelector('#drawer [data-dmode="tmr"]'));
+    ok(/明天/.test(d.querySelector('#drawer .pt h3').textContent) && w.eval('state.mode') === 'today', '詳情可切換到明天，列表仍是今天');
+    ok(!d.querySelector('[data-mode="we"],[data-dmode="we"]'), '沒有「週末」按鈕（2026-10-21 移除）');
     click(w, d.querySelector('#drawer [data-dmode="week"]'));
     ok(d.querySelectorAll('#drawer table.vt thead th').length >= 8, '詳情可切換到一週');
     click(w, d.getElementById('d-close'));

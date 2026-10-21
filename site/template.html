@@ -291,17 +291,11 @@ footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);paddin
 }
 
 /* 時段按鈕分兩組（2026-10-21）：單日逐 3 小時｜多日 */
-.seg-wrap{display:grid;grid-template-columns:4fr 2fr;gap:8px;max-width:760px}
+.seg-wrap{display:grid;grid-template-columns:4fr 1fr;gap:8px;max-width:760px}
 .seg-g{display:flex;flex-direction:column;gap:3px;min-width:0}
 .seg-l{font-size:11.5px;color:var(--muted);font-weight:500;padding-left:2px}
 .seg.s4{grid-template-columns:repeat(4,1fr);max-width:none}
-.seg.s2{grid-template-columns:repeat(2,1fr);max-width:none}
-/* 週末卡片：最左一欄寫星期，上面一列時段，下面每天一列燈號 */
-.pick .lights.two{grid-template-columns:2.3em repeat(8,minmax(0,1fr))}
-.pick .lights .dl{font-size:11px;font-weight:700;color:var(--we);align-self:center;white-space:nowrap}
-.matrix .dcol{font-size:12px;font-weight:700;white-space:nowrap;color:var(--we)}
-.matrix thead th.dcol{color:var(--muted)}
-.matrix tbody tr.r2 td{border-top:0}
+.seg.s1{grid-template-columns:1fr;max-width:none}
 /* 搜尋提示（2026-10-21） */
 @media (min-width:641px){header.top{position:relative}}
 .suggest{position:absolute;left:0;right:0;top:100%;z-index:30;margin-top:4px;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:8px;box-shadow:0 10px 24px rgba(0,0,0,.18);max-height:min(60vh,420px);overflow-y:auto;display:flex;flex-direction:column}
@@ -313,7 +307,7 @@ footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);paddin
 .suggest .al{font-size:12px;color:var(--muted);flex:none}
 .suggest .meta{font-size:12px;color:var(--muted);flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 /* 詳情裡的日期切換（2026-10-21） */
-.d-seg{flex:none;display:grid;grid-template-columns:repeat(6,1fr);border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.d-seg{flex:none;display:grid;grid-template-columns:repeat(5,1fr);border:1px solid var(--line);border-radius:8px;overflow:hidden}
 .d-seg button{font:inherit;font-weight:700;font-size:13px;background:none;border:0;border-left:1px solid var(--line);color:var(--muted);padding:6px 1px;cursor:pointer;display:flex;flex-direction:column;align-items:center;line-height:1.25;min-width:0}
 .d-seg button:first-child{border-left:0}
 .d-seg button small{font-weight:500;font-size:10px;white-space:nowrap;letter-spacing:-.03em}
@@ -345,7 +339,7 @@ footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);paddin
   </nav>
 
 
-  <!-- 時段按鈕分兩組（2026-10-21 使用者決定）：單日逐 3 小時｜多日（週末、一週） -->
+  <!-- 時段按鈕分兩組（2026-10-21 使用者決定）：單日逐 3 小時｜多日（一週；「週末」同日移除） -->
   <div class="seg-wrap find-only" role="tablist" aria-label="預報時段" id="seg">
     <div class="seg-g"><span class="seg-l">單日・逐 3 小時</span><div class="seg s4">
     <button type="button" role="tab" data-mode="today" aria-selected="true">今天<small class="sd">逐 3 小時預報</small></button>
@@ -353,8 +347,7 @@ footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);paddin
     <button type="button" role="tab" data-mode="d2" aria-selected="false">後天<small class="sd">逐 3 小時預報</small></button>
     <button type="button" role="tab" data-mode="d3" aria-selected="false">大後天<small class="sd">逐 3 小時預報</small></button>
     </div></div>
-    <div class="seg-g"><span class="seg-l">多日</span><div class="seg s2">
-    <button type="button" role="tab" data-mode="we" aria-selected="false">週末<small id="seg-we" class="we">週六、週日</small></button>
+    <div class="seg-g"><span class="seg-l">多日</span><div class="seg s1">
     <button type="button" role="tab" data-mode="week" aria-selected="false">一週<small id="seg-week">7 天</small></button>
     </div></div>
   </div>
@@ -445,7 +438,6 @@ footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);paddin
       <h3>特殊情況</h3>
       <ul>
         <li><b>跨多個鄉鎮的山：</b>各鄉鎮分別判定，取最差的；每個鄉鎮都是 A 才算 A。</li>
-        <li><b>週末：</b>週六、週日每 3 小時一格，上下並列。逐 3 小時預報還沒涵蓋的日子（例如週一到週三看週日），改用一週預報對應的白天或晚上，以虛線表示，僅供參考。</li>
         <li><b>一週預報：</b><ul><li>前 4 天（今天到大後天）用逐 3 小時預報：你選的登山時段中，取最差的一段作為當天燈號；今天已過的時段不算。和「今天～大後天」按鈕用的是同一份資料。</li><li>第 5–7 天用氣象署另一份一週預報，分成白天（06–18）和晚上（18–06）。本站依你選的登山時段對應到白天或晚上，取最差的作為當天燈號；登山時段都在 12 點前時，白天描述中「午後」的部分不計（例如「晴午後短暫雷陣雨」視為「晴」）。</li><li>因為兩份預報不同，同一座山第 4 天和第 5 天的燈號，判斷依據並不一樣。</li><li>對應到的都是「晴」，才算 A。</li><li>第 5–7 天氣象署沒有降雨機率，只有天氣描述，依雨的用語判定：<ul><li>「局部」「短暫」的雨（例如「多雲短暫陣雨」「午後局部雨」）：C</li><li>其他的雨（例如「陰陣雨」「陰有雨」）：D</li></ul>詳情會列出原始描述。請在出發前 3 天內再確認。</li></ul></li>
         <li><b>沒看過的天氣用語：</b>氣象署的天氣描述如果出現本站沒收錄的用語，改看氣象署的天氣代碼，代碼表示有雷、雪、霧或雨時，取較嚴格的燈號，原因會寫「天氣代碼」。</li>
       </ul>
@@ -453,7 +445,6 @@ footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);paddin
       <ul>
         <li><b>計分：</b>A 3 分、B 2 分、C 1 分、D 0 分。已過的時段和無資料不計分。分數只用來排序，網頁上不顯示。<ul><li>例：「A、B」共 5 分，排在「B、B」共 4 分前面。</li></ul></li>
         <li><b>今天／明天／後天／大後天</b>（每 3 小時一格），依序比較：<ol><li>登山時段中 D 的數量，少的在前（整段過程中有一段不建議，就排在後面）</li><li>登山時段的總分，高的在前</li><li>登山時段中 A 的數量，多的在前</li><li>當天所有時段的總分，高的在前</li></ol><ul><li>登山時段都過了，就改看當天剩下的時段。</li></ul></li>
-        <li><b>週末</b>（週六、週日，每 3 小時一格），依序比較兩天合計的：<ol><li>登山時段中 D 的數量，少的在前</li><li>登山時段的總分，高的在前</li><li>登山時段中 A 的數量，多的在前</li><li>兩天所有時段的總分，高的在前</li></ol></li>
         <li><b>一週預報</b>（每天一格），依序比較：<ol><li>7 天的總分，高的在前</li><li>A 的天數，多的在前</li><li>D 的天數，少的在前</li></ol></li>
         <li><b>完全沒有資料的山：</b>排在最後。</li>
         <li><b>以上所有條件都相同時：</b>每天隨機排序一次同條件山岳。</li>
