@@ -140,7 +140,6 @@ const state = {
   mode: (m => MODES[m] ? m : 'today')(store.get('mode')),
   slots: new Set((a => Array.isArray(a) && a.length ? a : DEF_SLOTS)(store.get('hike18'))),   // 儲存名稱 hike18：2026-10-21 預設改 06–18 時換名稱，讓舊的預設（06–15）一起換成新預設
   name: '', shown: PAGE,
-  nod: store.get('nod') === true,                          // 只看沒有 D 的山（2026-10-21）
 
   ...loadFilters()
 };
@@ -234,8 +233,7 @@ function applyFilters(){                                    // 篩選不需重�
   rows = all.filter(r => (!state.cats.size || state.cats.has(r.m.c))
     && (!state.counties.size || r.counties.some(c => state.counties.has(c)))
     && (!state.hts.size || state.hts.has(r.ht))
-    && (!q || r.search.includes(q))
-    && (!state.nod || state.mode === 'week' || !!q || (!r.nd && !r.c1)));   // 一週模式不提供開關（2026-10-21 17:55 使用者決定）   // 只看沒有 D：登山時段（一週為 7 天）沒有 D、也不是完全沒資料；搜尋時不套用，避免找不到指定的山
+    && (!q || r.search.includes(q)));
   favRows = all.filter(r => favs.has(r.k));
 }
 // 搜尋提示（2026-10-21）：打字時在搜尋框下方列出山名或別名符合的山（名稱相同 → 開頭相同 → 包含），點了把山名填進搜尋框、列出搜尋結果（2026-10-21 改，不再直接開詳情）
@@ -287,8 +285,6 @@ function condText(){
   $('c-ht').textContent = many(state.hts, '級', i => HT_SHORT[i]);
   [['c-slots', !sameSet(state.slots, DEF_SLOTS)], ['c-county', state.counties.size], ['c-cat', state.cats.size], ['c-ht', state.hts.size]]
     .forEach(([id, on]) => $(id).parentNode.classList.toggle('on', !!on));
-  $('f-nod').closest('.nod').hidden = state.mode === 'week';   // 一週不顯示開關（2026-10-21 17:55）
-  $('f-nod').checked = state.nod;
 }
 
 function render(){
@@ -554,7 +550,6 @@ const sameSet = (set, arr) => set.size === arr.length && arr.every(x => set.has(
   };
   // 「設定篩選條件」區塊（2026-10-21）：點了打開篩選面板
   $('cond').onclick = () => { setFilter(true); $('q').scrollTop = 0; };
-  $('f-nod').onchange = e => { state.nod = e.target.checked; store.set('nod', state.nod); refilter(); };
   $('filter-done').onclick = $('f-scrim').onclick = () => setFilter(false);
   const tyToggle = () => { const box = $('typhoon'); if (!box.classList.contains('more')) return; box.classList.toggle('open'); box.setAttribute('aria-expanded', box.classList.contains('open')); };
   $('typhoon').addEventListener('click', e => { if (!e.target.closest('a')) tyToggle(); });

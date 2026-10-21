@@ -51,7 +51,7 @@ let fails = 0; const ok = (c, m) => { console.log((c ? '✓ ' : '✗ ') + m); if
     }
     click(w, d.getElementById('pick-info-btn'));
     const info = d.getElementById('pick-info');
-    ok(!info.hidden && !/判定標準/.test(info.textContent) && /判定標準/.test(d.getElementById('info-ref').textContent) && /排序/.test(info.textContent) && (m === 'week' ? /7 天的總分/ : /登山時段的總分/).test(info.textContent) && /燈號排序$/.test(d.getElementById('h-picks-t').textContent), `${m}：燈號排序旁的 i 只說明排序，判定標準在圖例旁的 i`);
+    ok(!info.hidden && !/判定標準/.test(info.textContent) && /判定標準/.test(d.getElementById('info-ref').textContent) && /排序/.test(info.textContent) && (m === 'week' ? /7 天的總分/ : /登山時段的總分/).test(info.textContent) && /^(今天|明天|後天|大後天|一週)排序$/.test(d.getElementById('h-picks-t').textContent), `${m}：排序標題旁的 i 只說明排序，判定標準在圖例旁的 i`);
     click(w, d.getElementById('pick-info-x'));
     ok(!/第\s*\d+\s*名|最推薦/.test(d.getElementById('h-matrix').textContent), `${m}：標題不顯示名次與「最推薦」`);
     ok(!d.getElementById('picks') && !d.getElementById('reroll'), `${m}：推薦區與「換一批」已移除`);
