@@ -503,10 +503,9 @@ const sameSet = (set, arr) => set.size === arr.length && arr.every(x => set.has(
   syncSeg();
 
   $('f-kw').oninput = e => { const was = state.name.trim(); state.name = e.target.value; if (!was && state.name.trim()) resetForSearch();   // 從空白開始輸入時才重設篩選，搜尋中改篩選照常套用
- $('s-btn').classList.toggle('on', !!state.name.trim()); if ($('view-find').hidden) $('tab-find').click(); refilter(); };
-  const setSearch = open => { $('search').classList.toggle('open', open); $('search').closest('.row1').classList.toggle('searching', open); $('s-btn').setAttribute('aria-expanded', open); if (open) $('f-kw').focus(); };
-  $('s-btn').onclick = () => setSearch(!$('search').classList.contains('open'));
-  $('s-x').onclick = () => { const f = $('f-kw'); if (f.value){ f.value = ''; f.dispatchEvent(new Event('input')); } setSearch(false); $('s-btn').focus(); };
+ $('search').classList.toggle('has', !!state.name.trim()); if ($('view-find').hidden) $('tab-find').click(); refilter(); };
+  // 搜尋框一直展開（2026-10-21 使用者決定）；× 只清除文字
+  $('s-x').onclick = () => { const f = $('f-kw'); f.value = ''; f.dispatchEvent(new Event('input')); f.focus(); };
   // 搜尋提示（2026-10-21）：搜尋框下方列出符合的山，點了把山名填進搜尋框、列出搜尋結果（不開詳情）
   const sg = $('suggest');
   const showSuggest = () => { const list = document.activeElement === $('f-kw') ? suggestions(state.name) : [];
@@ -519,7 +518,7 @@ const sameSet = (set, arr) => set.size === arr.length && arr.every(x => set.has(
   $('f-kw').addEventListener('input', showSuggest);
   $('f-kw').addEventListener('focus', showSuggest);
   $('f-kw').addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); hideSuggest(); e.target.blur(); } });   // 按「搜尋」／Enter：收起手機鍵盤（搜尋框有字所以維持展開）
-  $('f-kw').addEventListener('blur', () => setTimeout(() => { hideSuggest(); if (!$('search').contains(document.activeElement) && !state.name.trim()) setSearch(false); }, 150));   // 離開搜尋框時：沒有打字才收起；有打字就維持展開（2026-10-20 使用者決定）
+  $('f-kw').addEventListener('blur', () => setTimeout(hideSuggest, 150));
   const setFilter = open => {
     $('q').classList.toggle('open', open); $('f-scrim').hidden = !open; $('filter-btn').setAttribute('aria-expanded', open);
     if (!open && pending){ pending = false; saveFilters(); state.shown = PAGE; refresh(); window.scrollTo(0, 0); }   // 按「完成」才套用並記住
@@ -530,7 +529,7 @@ const sameSet = (set, arr) => set.size === arr.length && arr.every(x => set.has(
   $('typhoon').addEventListener('click', e => { if (!e.target.closest('a')) tyToggle(); });
   $('typhoon').addEventListener('keydown', e => { if ((e.key === 'Enter' || e.key === ' ') && !e.target.closest('a')){ e.preventDefault(); tyToggle(); } });
   addEventListener('resize', fitTyphoon);
-  document.addEventListener('keydown', e => { if (e.key === 'Escape'){ setFilter(false); setSearch(false); hideSuggest(); } });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape'){ setFilter(false); hideSuggest(); if (document.activeElement === $('f-kw')) $('f-kw').blur(); } });
   $('q').onsubmit = e => e.preventDefault();
   $('brand').onclick = e => { e.preventDefault(); window.scrollTo({top: 0, behavior: 'smooth'}); };   // 點標題：回到最上方（不重新整理）
   $('reload-btn').onclick = () => location.reload();   // 「○○燈號排序」旁、篩選右側的重新整理圖示：重新整理網頁（篩選與登山時段會保留）
