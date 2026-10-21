@@ -37,6 +37,7 @@ header.top{display:flex;flex-direction:column;gap:10px}
 .row1{display:flex;align-items:center;justify-content:space-between;gap:12px;position:relative;min-width:0}
 .tools{display:flex;align-items:center;gap:6px;flex:none}
 body[data-view="rules"] .find-only{display:none}
+body[data-view="fav"] .find-x{display:none}   /* 「設定篩選條件」只在找山顯示（2026-10-21 移到日期按鈕上方） */
 h1 .brand{display:inline-flex;align-items:center;gap:.28em;color:inherit;text-decoration:none;cursor:pointer}   /* 點標題：回到最上方 */
 h1 .logo{width:1.05em;height:1.05em;flex:none}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) h1 .logo rect{stroke:#4a535b;stroke-width:12}}
@@ -376,6 +377,28 @@ footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);paddin
   </nav>
 
 
+  <!-- 條件列（2026-10-21 使用者決定）：先設定條件、再看天氣好的山。條件直接顯示，點任一項打開篩選面板；取代原本的「篩選」按鈕 -->
+  <div class="cond-wrap find-only find-x">
+    <button type="button" class="cond" id="cond" aria-controls="q" aria-expanded="false"><span class="cd-h"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M7 12h10M10 18h4"/></svg>設定篩選條件</span><span class="cd-s"><span>登山時段 <b id="c-slots"></b></span><span>地點 <b id="c-county"></b></span><span>類別 <b id="c-cat"></b></span><span>標高 <b id="c-ht"></b></span></span></button>
+    <!-- 篩選面板：點條件列打開；電腦版在條件列下方展開，手機版由底部滑出（2026-10-21 條件列取代「篩選」按鈕） -->
+    <form class="panel-search" id="q" autocomplete="off" aria-label="篩選">
+      <div class="sheet-head"><span class="sh-l"><b>篩選</b><button type="button" class="chip reset" id="filter-reset">恢復預設條件</button></span><button type="button" class="btn" id="filter-done">完成</button></div>
+      <div class="field wide"><span class="lab">登山時段（請選出整段登山時間，可多選，預設 06–18）</span><div class="chips" id="f-slots"></div></div>
+      <div class="field wide"><span class="lab">山岳類別（可多選，未選＝全部）</span><div class="chips" id="f-cat">
+        <button type="button" class="chip reset" id="cat-all" aria-pressed="true">全部</button>
+        <button type="button" class="chip" aria-pressed="false" data-c="百岳">百岳</button>
+        <button type="button" class="chip" aria-pressed="false" data-c="小百岳">小百岳</button>
+        <button type="button" class="chip" aria-pressed="false" data-c="其他山岳">其他山岳</button></div></div>
+      <div class="field wide"><span class="lab">標高（可多選，未選＝全部）</span><div class="chips" id="f-ht">
+        <button type="button" class="chip reset" id="ht-all" aria-pressed="true">全部</button>
+        <button type="button" class="chip" aria-pressed="false" data-ht="0">1,000 m 以下</button>
+        <button type="button" class="chip" aria-pressed="false" data-ht="1">1,000–2,000 m</button>
+        <button type="button" class="chip" aria-pressed="false" data-ht="2">2,000–3,000 m</button>
+        <button type="button" class="chip" aria-pressed="false" data-ht="3">3,000 m 以上</button></div></div>
+      <div class="field wide"><span class="lab">地點（縣市，可多選，未選＝全部）</span><div class="chips" id="f-county"></div></div>
+    </form>
+  </div>
+
   <!-- 時段按鈕分兩組（2026-10-21 使用者決定）：單日逐 3 小時｜多日（一週；「週末」同日移除） -->
   <div class="seg-wrap find-only" role="tablist" aria-label="預報時段" id="seg">
     <div class="seg-g"><span class="seg-l">單日・逐 3 小時</span><div class="seg s4">
@@ -391,27 +414,6 @@ footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);paddin
 
   <main id="view-find" style="display:flex;flex-direction:column;gap:18px">
 
-    <!-- 條件列（2026-10-21 使用者決定）：先設定條件、再看天氣好的山。條件直接顯示，點任一項打開篩選面板；取代原本的「篩選」按鈕 -->
-    <div class="cond-wrap">
-      <button type="button" class="cond" id="cond" aria-controls="q" aria-expanded="false"><span class="cd-h"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M7 12h10M10 18h4"/></svg>設定篩選條件</span><span class="cd-s"><span>登山時段 <b id="c-slots"></b></span><span>地點 <b id="c-county"></b></span><span>類別 <b id="c-cat"></b></span><span>標高 <b id="c-ht"></b></span></span></button>
-      <!-- 篩選面板：點條件列打開；電腦版在條件列下方展開，手機版由底部滑出（2026-10-21 條件列取代「篩選」按鈕） -->
-      <form class="panel-search" id="q" autocomplete="off" aria-label="篩選">
-        <div class="sheet-head"><span class="sh-l"><b>篩選</b><button type="button" class="chip reset" id="filter-reset">恢復預設條件</button></span><button type="button" class="btn" id="filter-done">完成</button></div>
-        <div class="field wide"><span class="lab">登山時段（請選出整段登山時間，可多選，預設 06–18）</span><div class="chips" id="f-slots"></div></div>
-        <div class="field wide"><span class="lab">山岳類別（可多選，未選＝全部）</span><div class="chips" id="f-cat">
-          <button type="button" class="chip reset" id="cat-all" aria-pressed="true">全部</button>
-          <button type="button" class="chip" aria-pressed="false" data-c="百岳">百岳</button>
-          <button type="button" class="chip" aria-pressed="false" data-c="小百岳">小百岳</button>
-          <button type="button" class="chip" aria-pressed="false" data-c="其他山岳">其他山岳</button></div></div>
-        <div class="field wide"><span class="lab">標高（可多選，未選＝全部）</span><div class="chips" id="f-ht">
-          <button type="button" class="chip reset" id="ht-all" aria-pressed="true">全部</button>
-          <button type="button" class="chip" aria-pressed="false" data-ht="0">1,000 m 以下</button>
-          <button type="button" class="chip" aria-pressed="false" data-ht="1">1,000–2,000 m</button>
-          <button type="button" class="chip" aria-pressed="false" data-ht="2">2,000–3,000 m</button>
-          <button type="button" class="chip" aria-pressed="false" data-ht="3">3,000 m 以上</button></div></div>
-        <div class="field wide"><span class="lab">地點（縣市，可多選，未選＝全部）</span><div class="chips" id="f-county"></div></div>
-      </form>
-    </div>
     <div style="display:flex;flex-direction:column;gap:10px">
       <div class="legend lg-1">
           <span class="lg-t">燈號說明：</span><span><i class="lamp sm g p">A</i>佳</span><span><i class="lamp sm g">B</i>可</span><span><i class="lamp sm y">C</i>注意</span><span><i class="lamp sm r">D</i>不建議</span><span><i class="lamp sm na">—</i>無資料<button type="button" class="info" id="info-btn" aria-expanded="false" aria-controls="info-ref" aria-label="燈號怎麼判定"><svg viewBox="0 0 20 20" aria-hidden="true"><circle class="ring" cx="10" cy="10" r="9.1"/><circle cx="10" cy="6.1" r="1.2"/><rect x="9.2" y="8.5" width="1.6" height="6.6" rx=".8"/></svg></button></span>
