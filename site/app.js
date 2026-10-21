@@ -339,6 +339,20 @@ function segLabel(mode){
   if (mode === 'week') return rng(dayAt(0), dayAt(6));
   return md(dayAt(MODES[mode].di));
 }
+// C、D 原因依項目合併（2026-10-21 設計檢查）：一週前 4 天的原因帶時段（例如「06–09 降雨機率 60%」），
+// 同一項目合成一句，例如「降雨機率：06–09 60%、15–18 60%」「有霧：06–09、09–12」；不帶時段的原因照原樣
+function mergeWhy(list){
+  const g = new Map(), out = [];
+  for (const w of list){
+    const m = /^(\d\d–\d\d) (.+)$/.exec(w);
+    if (!m){ out.push([w]); continue; }
+    const v = /^(降雨機率|風速|高溫 體感) (.+)$/.exec(m[2]);
+    const key = v ? v[1] : m[2], val = v ? m[1] + ' ' + v[2] : m[1];
+    if (!g.has(key)){ const a = [key]; g.set(key, a); out.push(a); }
+    g.get(key).push(val);
+  }
+  return out.map(a => a.length > 1 ? a[0] + '：' + a.slice(1).join('、') : a[0]).join('；');
+}
 function renderDetail(){
   const {k, mode} = dState, x = MBYK.get(k), week = mode === 'week', pts = x.pts;
   const dc = buildCols(mode), cells = cellsFor(x, mode, dc);
@@ -353,7 +367,7 @@ function renderDetail(){
     const cl = (c, col) => [c.ref ? 'ref' : '', c.past ? 'past' : '', col.peak ? 'peak' : '', week && col.wkd ? 'we wk' : ''].filter(Boolean).join(' ');
     const head = idx.map(j => { const col = dc[j]; return `<th class="${cl(cells[j], col)}">${week ? `${md(col.date)}<span class="wd">${dayName(col.date)}</span>` : col.short}</th>`; }).join('');
     const row = (name, f, cls = '') => `<tr class="${cls}"><th scope="row">${name}</th>${idx.map(j => { const c = cells[j]; return `<td class="${cl(c, dc[j])}">${f(c.per[k], c)}</td>`; }).join('')}</tr>`;
-    const whys = idx.map(j => { const c = cells[j], y = c.per[k]; return y.j.lv > 0 ? `<li><b>${dc[j].label}</b>${lamp({lv:y.j.lv, ref:c.ref, past:c.past}, true)}${esc(y.j.why.join('、'))}</li>` : ''; }).join('');
+    const whys = idx.map(j => { const c = cells[j], y = c.per[k]; return y.j.lv > 0 ? `<li><b>${dc[j].label}</b>${lamp({lv:y.j.lv, ref:c.ref, past:c.past}, true)}${esc(mergeWhy(y.j.why))}</li>` : ''; }).join('');
     return `<div class="pt"><h3>${esc(p.label)}・${title}</h3>${tr(p)}
       <table class="vt" style="--n:${idx.length}"><thead><tr><th></th>${head}</tr></thead><tbody>
       ${row('燈號', (y, c) => lamp({lv:y.j.lv, plus:y.j.plus, ref:c.ref, past:c.past}, true), 'lr')}
@@ -362,7 +376,7 @@ function renderDetail(){
       ${row('風<small>級</small>', y => v(y.fc?.bf ?? (y.fc?.ws != null ? beaufort(y.fc.ws) : null), n => n))}
       ${row('氣溫<small>°C</small>', y => v(y.fc?.t, n => n))}
       ${row('體感<small>°C</small>', y => v(y.fc?.at, n => n))}
-      </tbody></table>${whys ? `<div class="whys"><h4>C、D燈號原因</h4><ul>${whys}</ul></div>` : ''}</div>`;
+      </tbody></table>${whys ? `<div class="whys"><h4>C、D 燈號原因</h4><ul>${whys}</ul></div>` : ''}</div>`;
   };
   const groups = week ? [{idx: dc.map((_, j) => j), title: '一週'}]
     : [{idx: dc.map((_, j) => j), title: `${MODES[mode].name} ${md(dc[0].date)}（${WD[wdOf(dc[0].date)]}）逐 3 小時預報`}];
@@ -517,7 +531,10 @@ const sameSet = (set, arr) => set.size === arr.length && arr.every(x => set.has(
   // 篩選面板裡的選擇先記下，按「完成」（或關閉面板）時才一次重新計算、排序，並回到列表最上面
   let pending = false;
   const isDef = () => !state.cats.size && !state.counties.size && !state.hts.size && sameSet(state.slots, DEF_SLOTS);
-  const syncReset = () => { $('filter-reset').disabled = isDef(); };
+  // 「完成」按鈕寫出符合條件的座數（2026-10-21 設計檢查），按之前就知道結果有幾座
+  const matchN = () => { const q = norm(state.name); return MOUNTAINS.filter(r => (!state.cats.size || state.cats.has(r.m.c))
+    && (!state.counties.size || r.counties.some(c => state.counties.has(c))) && (!state.hts.size || state.hts.has(r.ht)) && (!q || r.search.includes(q))).length; };
+  const syncReset = () => { $('filter-reset').disabled = isDef(); const n = matchN(); $('filter-done').textContent = n ? `顯示 ${n} 座` : '沒有符合的山'; };
   const onPick = () => { pending = true; lockChips(); syncReset(); };
   const syncs = [chipGroup($('f-county'), 'data-co', state.counties, {allId:'c-all', onChange: onPick}),
     chipGroup($('f-cat'), 'data-c', state.cats, {allId:'cat-all', onChange: onPick}),
@@ -563,7 +580,7 @@ const sameSet = (set, arr) => set.size === arr.length && arr.every(x => set.has(
     if (!open && pending){ pending = false; saveFilters(); state.shown = PAGE; refresh(); window.scrollTo(0, 0); }   // 按「完成」才套用並記住
   };
   // 「設定篩選條件」區塊（2026-10-21）：點了打開篩選面板
-  $('cond').onclick = () => { setFilter(true); $('q').scrollTop = 0; };
+  $('cond').onclick = () => { syncReset(); setFilter(true); $('q').scrollTop = 0; };
   $('filter-done').onclick = $('f-scrim').onclick = () => setFilter(false);
   const tyToggle = () => { const box = $('typhoon'); if (!box.classList.contains('more')) return; box.classList.toggle('open'); box.setAttribute('aria-expanded', box.classList.contains('open')); };
   $('typhoon').addEventListener('click', e => { if (!e.target.closest('a')) tyToggle(); });
