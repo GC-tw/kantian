@@ -235,7 +235,7 @@ function applyFilters(){                                    // 篩選不需重�
     && (!state.counties.size || r.counties.some(c => state.counties.has(c)))
     && (!state.hts.size || state.hts.has(r.ht))
     && (!q || r.search.includes(q))
-    && (!state.nod || !!q || (!r.nd && !r.c1)));   // 只看沒有 D：登山時段（一週為 7 天）沒有 D、也不是完全沒資料；搜尋時不套用，避免找不到指定的山
+    && (!state.nod || state.mode === 'week' || !!q || (!r.nd && !r.c1)));   // 一週模式不提供開關（2026-10-21 17:55 使用者決定）   // 只看沒有 D：登山時段（一週為 7 天）沒有 D、也不是完全沒資料；搜尋時不套用，避免找不到指定的山
   favRows = all.filter(r => favs.has(r.k));
 }
 // 搜尋提示（2026-10-21）：打字時在搜尋框下方列出山名或別名符合的山（名稱相同 → 開頭相同 → 包含），點了把山名填進搜尋框、列出搜尋結果（2026-10-21 改，不再直接開詳情）
@@ -287,7 +287,7 @@ function condText(){
   $('c-ht').textContent = many(state.hts, '級', i => HT_SHORT[i]);
   [['c-slots', !sameSet(state.slots, DEF_SLOTS)], ['c-county', state.counties.size], ['c-cat', state.cats.size], ['c-ht', state.hts.size]]
     .forEach(([id, on]) => $(id).parentNode.classList.toggle('on', !!on));
-  $('nod-t').textContent = state.mode === 'week' ? '排除這 7 天有 D 的山' : '排除登山時段有 D 的山';
+  $('f-nod').closest('.nod').hidden = state.mode === 'week';   // 一週不顯示開關（2026-10-21 17:55）
   $('f-nod').checked = state.nod;
 }
 
