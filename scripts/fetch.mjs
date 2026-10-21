@@ -197,6 +197,7 @@ function saveSample(name, j){
 const TW_COAST = [[25.30,121.54],[25.01,122.00],[24.60,121.87],[23.97,121.62],[23.10,121.38],[22.40,120.95],[21.90,120.85],[22.37,120.59],[23.00,120.15],[23.60,120.20],[24.27,120.52],[24.83,120.92],[23.50,121.00]];   // 臺灣本島沿岸與中央的幾個點，用來估算颱風中心到陸地的距離
 const kmTo = (la, lo) => Math.min(...TW_COAST.map(([a, b]) => { const r = Math.PI/180, d1 = (a-la)*r, d2 = (b-lo)*r; return 2*6371*Math.asin(Math.sqrt(Math.sin(d1/2)**2 + Math.cos(la*r)*Math.cos(a*r)*Math.sin(d2/2)**2)); }));
 const TY_KM = 500;
+let tyWarnOK = false;   // 颱風警報（W-C0034-001）有沒有抓成功
 const tyScale = ws => ws >= 51 ? '強烈颱風' : ws >= 32.7 ? '中度颱風' : ws >= 17.2 ? '輕度颱風' : '熱帶性低氣壓';   // 氣象署颱風強度分級（近中心最大風速，公尺／秒）
 async function typhoons(){
   const out = [];
@@ -208,8 +209,11 @@ async function typhoons(){
     const w = await getDataset('W-C0034-001', {}, {tries: 2, timeout: 30000}); saveSample('typhoon-warning', w);
     const infos = []; (function walk(o){ if (!o || typeof o !== 'object') return; if (Array.isArray(o)) return o.forEach(walk); if ('headline' in o && 'expires' in o) infos.push(o); else Object.values(o).forEach(walk); })(w.records || w);
     const now = Date.now();
-    warns = infos.filter(i => Date.parse(i.expires) > now && !/解除/.test(i.headline || '') && !JSON.stringify(i['typhoon-info'] || '').includes('"END"'))
-      .map(i => ({headline: i.headline, expires: twTime(i.expires), name: (JSON.stringify(i).match(/"cwa_typhoon_name":"([^"]+)"/) || [])[1] || ''}));
+    warns = infos.filter(i => Date.parse(i.expires) > now && !/解除/.test(i.headline || '') && !/"value":"END"/.test(JSON.stringify(i)))
+      .map(i => ({headline: i.headline, expires: twTime(i.expires), name: (JSON.stringify(i).match(/"cwa_typhoon_name":"([^"]+)"/) || [])[1] || '',
+        // 陸上警戒縣市：只有「海上陸上颱風警報」才有；海上範圍沒有 geocode（氣象署 CAP 說明），所以只取有 geocode 的縣市
+        land: /陸上/.test(i.headline || '') ? [].concat(i.area || []).filter(a => a?.geocode?.value || a?.geocode).map(a => String(a.areaDesc || '').replace(/台/g, '臺')).filter(Boolean) : []}));
+    tyWarnOK = true;
   }catch(e){ warn('颱風警報抓取失敗：' + e.message); }
   for (const tc of tcs){
     const name = pick(tc, 'CwaTyphoonName') || '', en = pick(tc, 'TyphoonName') || '';
@@ -305,6 +309,16 @@ async function main(){
   // 4. 颱風：氣象署颱風路徑（W-C0034-005）與颱風警報（W-C0034-001）。
   // 一週預報常常還沒反映颱風，所以只要颱風預測路徑會到臺灣陸地 500 公里內、或氣象署已發布颱風警報，網頁最上方就顯示提示（燈號不變；2026-10-20 使用者決定）
   try{ result.typhoons = await typhoons(); }catch(e){ warn('颱風資料抓取失敗：' + e.message); }
+  // 颱風特報只套用在「海上陸上颱風警報」的陸上警戒縣市；只有海上警報時不影響燈號（2026-10-21）。
+  // 天氣警特報（W-C0033-001）分不出海上或陸上，所以以颱風警報（W-C0034-001）的警戒縣市為準；颱風警報沒抓到時維持原樣（寧可嚴格）
+  if (tyWarnOK){
+    const land = new Set(result.typhoons.flatMap(t => t.warn?.land || []));
+    const isTy = a => /颱風/.test(a.type);
+    const drop = result.alerts.filter(a => isTy(a) && !land.has(a.county)).map(a => a.county);
+    if (drop.length) console.log('颱風特報不在陸上警戒縣市，不採用：' + [...new Set(drop)].join('、'));
+    result.alerts = result.alerts.filter(a => !isTy(a) || land.has(a.county));
+    for (const c of land) if (!result.alerts.some(a => isTy(a) && a.county === c)) result.alerts.push({county: c, type: '颱風警報', lv: 2, start: null, end: null});
+  }
 
   fs.mkdirSync(path.dirname(OUT), {recursive: true});
   fs.writeFileSync(OUT, JSON.stringify(compact(result)));
