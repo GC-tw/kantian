@@ -246,7 +246,7 @@ function applyFilters(){                                    // 篩選不需重�
     && (!q || r.search.includes(q)));
   favRows = all.filter(r => favs.has(r.k));
 }
-// 搜尋提示（2026-10-21）：打字時在搜尋框下方列出山名或別名符合的山（名稱相同 → 開頭相同 → 包含），點了直接開詳情
+// 搜尋提示（2026-10-21）：打字時在搜尋框下方列出山名或別名符合的山（名稱相同 → 開頭相同 → 包含），點了把山名填進搜尋框、列出搜尋結果（2026-10-21 改，不再直接開詳情）
 function suggestions(q){
   q = norm(q); if (!q) return [];
   return MOUNTAINS.map((x, i) => {
@@ -536,14 +536,15 @@ const sameSet = (set, arr) => set.size === arr.length && arr.every(x => set.has(
   const setSearch = open => { $('search').classList.toggle('open', open); $('search').closest('.row1').classList.toggle('searching', open); $('s-btn').setAttribute('aria-expanded', open); if (open) $('f-kw').focus(); };
   $('s-btn').onclick = () => setSearch(!$('search').classList.contains('open'));
   $('s-x').onclick = () => { const f = $('f-kw'); if (f.value){ f.value = ''; f.dispatchEvent(new Event('input')); } setSearch(false); $('s-btn').focus(); };
-  // 搜尋提示（2026-10-21）：搜尋框下方列出符合的山，點了直接開詳情
+  // 搜尋提示（2026-10-21）：搜尋框下方列出符合的山，點了把山名填進搜尋框、列出搜尋結果（不開詳情）
   const sg = $('suggest');
   const showSuggest = () => { const list = document.activeElement === $('f-kw') ? suggestions(state.name) : [];
-    sg.innerHTML = list.map(o => `<button type="button" class="sg" data-k="${o.x.k}" role="option"><span class="nm">${esc(o.x.m.n)}</span>${o.alias ? `<span class="al">${esc(o.alias)}</span>` : ''}<span class="meta">${sub(o.x.m)}</span></button>`).join('');
+    sg.innerHTML = list.map(o => `<button type="button" class="sg" data-sg="${esc(o.x.m.n)}" role="option"><span class="nm">${esc(o.x.m.n)}</span>${o.alias ? `<span class="al">${esc(o.alias)}</span>` : ''}<span class="meta">${sub(o.x.m)}</span></button>`).join('');
     sg.hidden = !list.length; };
   const hideSuggest = () => { sg.hidden = true; };
   sg.addEventListener('pointerdown', e => e.preventDefault());   // 點提示時搜尋框不先失去焦點
-  sg.addEventListener('click', e => { if (e.target.closest('[data-k]')){ hideSuggest(); $('f-kw').blur(); } });   // 之後由下方共用的點擊處理打開詳情
+  sg.addEventListener('click', e => { const b = e.target.closest('[data-sg]'); if (!b) return;
+    const f = $('f-kw'); f.value = b.dataset.sg; f.dispatchEvent(new Event('input')); hideSuggest(); f.blur(); window.scrollTo(0, 0); });
   $('f-kw').addEventListener('input', showSuggest);
   $('f-kw').addEventListener('focus', showSuggest);
   $('f-kw').addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); hideSuggest(); e.target.blur(); } });   // 按「搜尋」／Enter：收起手機鍵盤（搜尋框有字所以維持展開）
