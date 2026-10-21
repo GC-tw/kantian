@@ -230,8 +230,11 @@ function render(){
   $('fav-matrix').tBodies[0].innerHTML = favRows.map(bodyRow).join('');
   $('fav-cards').innerHTML = favRows.map(r => pickCard(r, ph)).join('');
   $('matrix').tHead.innerHTML = head;
-  $('matrix').tBodies[0].innerHTML = rows.slice(0,state.shown).map(bodyRow).join('') || `<tr><td class="empty" colspan="${cols.length+1}">沒有符合條件的山。</td></tr>`;
-  $('matrix-cards').innerHTML = rows.slice(0,state.shown).map(r => pickCard(r, ph)).join('') || '<div class="empty">沒有符合條件的山。</div>';
+  // 分數不同的山之間加分隔線（2026-10-21 使用者決定；只用第 1 排序條件的分數分組，分數不顯示；沒有資料的山另成一組）
+  const shown = rows.slice(0,state.shown), grp = r => r.nd + '|' + r.s1;
+  const brk = i => i > 0 && grp(shown[i]) !== grp(shown[i-1]);
+  $('matrix').tBodies[0].innerHTML = shown.map((r, i) => i < shown.length-1 && brk(i+1) ? bodyRow(r).replace('<tr ', '<tr class="gend" ') : bodyRow(r)).join('') || `<tr><td class="empty" colspan="${cols.length+1}">沒有符合條件的山。</td></tr>`;
+  $('matrix-cards').innerHTML = shown.map((r, i) => (brk(i) ? '<hr class="grp" aria-hidden="true">' : '') + pickCard(r, ph)).join('') || '<div class="empty">沒有符合條件的山。</div>';
   $('more-box').hidden = rows.length <= state.shown;
   $('more').textContent = `顯示更多（還有 ${rows.length-state.shown} 座）`;
 }
@@ -389,15 +392,21 @@ const sameSet = (set, arr) => set.size === arr.length && arr.every(x => set.has(
 
   // 篩選面板裡的選擇先記下，按「完成」（或關閉面板）時才一次重新計算、排序，並回到列表最上面
   let pending = false;
-  const onPick = () => { pending = true; $('filter-n').textContent = filterCount() || ''; lockChips(); };
+  const isDef = () => !state.cats.size && !state.counties.size && !state.hts.size && sameSet(state.slots, DEF_SLOTS);
+  const syncReset = () => { $('filter-reset').disabled = isDef(); };
+  const onPick = () => { pending = true; $('filter-n').textContent = filterCount() || ''; lockChips(); syncReset(); };
   const syncs = [chipGroup($('f-county'), 'data-co', state.counties, {allId:'c-all', onChange: onPick}),
     chipGroup($('f-cat'), 'data-c', state.cats, {allId:'cat-all', onChange: onPick}),
     chipGroup($('f-ht'), 'data-ht', state.hts, {allId:'ht-all', parse: Number, onChange: onPick})];
   // 開始搜尋（搜尋框從空白變成有字）時，類別、標高、縣市篩選回到預設（全部）並記住；登頂時段不變（2026-10-20 使用者決定）
   const resetForSearch = () => { if (!state.cats.size && !state.counties.size && !state.hts.size) return;
-    state.cats.clear(); state.counties.clear(); state.hts.clear(); syncs.forEach(f => f()); lockChips(); saveFilters(); };
-  chipGroup($('f-slots'), 'data-h', state.slots, {parse: Number, keepOne: true, onChange: onPick});
-  lockChips(); saveFilters();
+    state.cats.clear(); state.counties.clear(); state.hts.clear(); syncs.forEach(f => f()); lockChips(); saveFilters(); syncReset(); };
+  const syncSlots = chipGroup($('f-slots'), 'data-h', state.slots, {parse: Number, keepOne: true, onChange: onPick});
+  // 「恢復預設條件」（2026-10-21）：登頂時段回到 09–12，類別、標高、縣市回到全部；和其他選項一樣按「完成」才套用
+  $('filter-reset').onclick = () => { if (isDef()) return;
+    state.cats.clear(); state.counties.clear(); state.hts.clear(); state.slots.clear(); DEF_SLOTS.forEach(h => state.slots.add(h));
+    syncs.forEach(f => f()); syncSlots(); onPick(); };
+  lockChips(); saveFilters(); syncReset();
 
   const seg = document.querySelectorAll('#seg button');
   const syncSeg = () => seg.forEach(b => b.setAttribute('aria-selected', b.dataset.mode === state.mode));
