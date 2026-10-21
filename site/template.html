@@ -120,7 +120,7 @@ h2 .info{width:17px;height:17px;top:1.5px}
 .fav-empty{background:var(--surface);border:1px dashed var(--line);border-radius:8px;padding:16px;text-align:left}
 .d-head h2 .star{font-size:22px;margin-left:6px}
 .chip.reset{border-style:dashed;color:var(--muted)}
-.f-reset{grid-column:1/-1;margin-top:-6px}   /* 篩選標題下方「恢復預設條件」（2026-10-21）：已是預設時變淡、不能點 */
+.sh-l{display:inline-flex;align-items:center;gap:12px}   /* 「篩選」右方「恢復預設條件」（2026-10-21）：已是預設時變淡、不能點 */
 #filter-reset{border-style:solid}
 #filter-reset:disabled{text-decoration:none}
 /* 「可優先參考」（2026-10-21）：把最前面一組框起來（綠框），且這組登山時段都是 A 或 B；一週不顯示；其他山之間不畫分隔線 */
@@ -351,8 +351,7 @@ footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);paddin
       <div class="sec-head" id="sec-picks"><h2 id="h-matrix"><span id="h-picks-t">燈號排序</span><button type="button" class="info" id="pick-info-btn" aria-expanded="false" aria-controls="pick-info" aria-label="怎麼比較與排序"><svg viewBox="0 0 20 20" aria-hidden="true"><circle class="ring" cx="10" cy="10" r="9.1"/><circle cx="10" cy="6.1" r="1.2"/><rect x="9.2" y="8.5" width="1.6" height="6.6" rx=".8"/></svg></button></h2><div class="sec-tools"><button type="button" class="filter-btn" id="filter-btn" aria-expanded="false" aria-controls="q" aria-label="篩選" title="篩選"><span class="fb-t">篩選</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M7 12h10M10 18h4"/></svg><span id="filter-n" class="badge"></span></button><button type="button" class="reload" id="reload-btn" aria-label="重新整理網頁" title="重新整理網頁"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v5h-5"/></svg></button></div></div>
       <!-- 篩選面板放在「○○燈號排序」下方：電腦版在篩選按鈕下方展開；手機版由底部滑出（2026-10-20） -->
       <form class="panel-search" id="q" autocomplete="off" aria-label="篩選">
-        <div class="sheet-head"><b>篩選</b><button type="button" class="btn" id="filter-done">完成</button></div>
-        <div class="f-reset"><button type="button" class="chip reset" id="filter-reset">恢復預設條件</button></div>
+        <div class="sheet-head"><span class="sh-l"><b>篩選</b><button type="button" class="chip reset" id="filter-reset">恢復預設條件</button></span><button type="button" class="btn" id="filter-done">完成</button></div>
         <div class="field wide"><span class="lab">登山時段（請選出整段登山時間，可多選，預設 06–18）</span><div class="chips" id="f-slots"></div></div>
         <div class="field wide"><span class="lab">山岳類別（可多選，未選＝全部）</span><div class="chips" id="f-cat">
           <button type="button" class="chip reset" id="cat-all" aria-pressed="true">全部</button>
