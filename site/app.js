@@ -218,6 +218,16 @@ const pickCard = (r, head) => `<div class="pick" data-k="${r.k}" tabindex="0" ro
 const grp = r => [r.nd, r.s1, r.p1, r.c1, r.s2].join('|');
 const brk = (list, i) => i > 0 && i < list.length && grp(list[i]) !== grp(list[i-1]);
 const grpRows = list => list.map((r, i) => brk(list, i+1) ? bodyRow(r).replace('<tr ', '<tr class="gend" ') : bodyRow(r)).join('');   // 電腦表格：該組最後一列加粗下框
+// 「可優先參考」（2026-10-21 使用者決定）：只標最前面一組（條件完全相同的山），而且這組的登山時段（未過的時段）都是 A 或 B（沒有 C、D）才顯示；
+// 一週模式不標示。回傳這組的座數（以整份列表計），不顯示時回傳 0
+const firstOK = list => {
+  if (state.mode === 'week' || !list.length || list[0].nd) return 0;
+  const win = list[0].cells.filter((c, i) => cols[i].win && !c.past && c.lv >= 0);
+  if (!win.length || win.some(c => c.lv > 0)) return 0;
+  const g = grp(list[0]); let n = 0; while (n < list.length && grp(list[n]) === g) n++;
+  return n;
+};
+const grpHead = n => `<b>可優先參考</b><span>${n} 座</span>`;
 const grpCards = (list, ph) => list.map((r, i) => (brk(list, i) ? '<hr class="grp" aria-hidden="true">' : '') + pickCard(r, ph)).join('');   // 手機卡片：卡片之間一條線
 
 function render(){
@@ -239,9 +249,9 @@ function render(){
   $('fav-matrix').tBodies[0].innerHTML = grpRows(favRows);
   $('fav-cards').innerHTML = grpCards(favRows, ph);
   $('matrix').tHead.innerHTML = head;
-  const shown = rows.slice(0,state.shown);
-  $('matrix').tBodies[0].innerHTML = grpRows(shown) || `<tr><td class="empty" colspan="${cols.length+1}">沒有符合條件的山。</td></tr>`;
-  $('matrix-cards').innerHTML = grpCards(shown, ph) || '<div class="empty">沒有符合條件的山。</div>';
+  const shown = rows.slice(0,state.shown), top = firstOK(rows);
+  $('matrix').tBodies[0].innerHTML = (top ? `<tr class="grp-row"><td colspan="${cols.length+1}"><div class="grp-h">${grpHead(top)}</div></td></tr>` : '') + grpRows(shown) || `<tr><td class="empty" colspan="${cols.length+1}">沒有符合條件的山。</td></tr>`;
+  $('matrix-cards').innerHTML = (top ? `<div class="grp-h">${grpHead(top)}</div>` : '') + grpCards(shown, ph) || '<div class="empty">沒有符合條件的山。</div>';
   $('more-box').hidden = rows.length <= state.shown;
   $('more').textContent = `顯示更多（還有 ${rows.length-state.shown} 座）`;
 }
@@ -294,11 +304,11 @@ function pickInfo(week){
     '依氣象署預報檢查降雨機率、天氣描述（霧、雪、雷）、平均風速，以及颱風、豪雨、大雨特報；標高 1,000 公尺以下另看高溫。以最差的一項作為燈號。',
     '跨多個鄉鎮的山，取最差的鄉鎮。'];
   const score = '計分：A 3 分、B 2 分、C 1 分、D 0 分。已過的時段和無資料不計分。';
-  const tie = '以上所有條件都相同時：每天隨機排序一次同條件山岳。', sep = '排序條件不同的山之間以分隔線區隔，同一段內是條件完全相同的山。', nodata = '完全沒有資料的山排在最後。';
+  const tie = '以上所有條件都相同時：每天隨機排序一次同條件山岳。', sep = '排序條件不同的山之間以分隔線區隔，同一段內是條件完全相同的山。', top = '最前面一組的登山時段都是 A 或 B 時，標示「可優先參考」。', nodata = '完全沒有資料的山排在最後。';
   if (week) return '<h4>比較標準</h4>' + ul([...std, `每天依你選的登山時段（${esc(slots)}）對應到白天或晚上，取最差的作為當天燈號。登山時段都在 12 點前時，白天描述的「午後」部分不計。`, '第 4–7 天氣象署沒有降雨機率，依天氣描述判定：「局部」「短暫」的雨為 C，其他的雨（例如「陣雨」「有雨」）為 D。僅供參考。'])
     + '<h4>排序</h4>' + ul([score]) + '<p class="ip">依序比較：</p>' + ol(['7 天的總分，高的在前', 'A 的天數，多的在前', 'D 的天數，少的在前']) + ul([nodata, tie, sep]);
   return '<h4>比較標準</h4>' + ul([...std, '每 3 小時一格，每格一個燈號。', ...(state.mode === 'today' ? ['今天已過的時段不計分。'] : [])])
-    + '<h4>排序</h4>' + ul([score]) + '<p class="ip">依序比較：</p>' + ol(['登山時段中 D 的數量，少的在前', '登山時段的總分，高的在前', '登山時段中 A 的數量，多的在前', '當天所有時段的總分，高的在前']) + ul(['登山時段都過了，就改看當天剩下的時段。', nodata, tie, sep]);
+    + '<h4>排序</h4>' + ul([score]) + '<p class="ip">依序比較：</p>' + ol(['登山時段中 D 的數量，少的在前', '登山時段的總分，高的在前', '登山時段中 A 的數量，多的在前', '當天所有時段的總分，高的在前']) + ul(['登山時段都過了，就改看當天剩下的時段。', nodata, tie, sep, top]);
 }
 // 說明文字中的燈號（A、B、C、D、—）換成小燈號方塊，顏色與列表一致（2026-10-20 使用者選「選項 1」）
 const GRADE_RE = /—|(?<![A-Za-z0-9°])[ABCD](?![A-Za-z0-9+])/g,   // 「°C」的 C 不是燈號（2026-10-20）

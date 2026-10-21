@@ -35,11 +35,11 @@ let fails = 0; const ok = (c, m) => { console.log((c ? '✓ ' : '✗ ') + m); if
     for (let i = 0; i < 30; i++) click(w, d.getElementById('more'));
     const body = d.body.innerHTML.replace(/<script>[\s\S]*<\/script>/, '');
     const L = lamps(), cnt = k => L.filter(x => x === k).length;
-    ok(d.querySelectorAll('#matrix tbody tr').length === 235, `${m}：235 座都列出`);
+    ok(d.querySelectorAll('#matrix tbody tr[data-k]').length === 235, `${m}：235 座都列出`);
     { // 計分排序（A 3、B 2、C 1、D 0；已過與無資料不計）：依畫面上的燈號重算，順序須為 總分 → A 數 → D 少 → 全日總分
       const pk = [...d.querySelectorAll('#matrix thead th')].slice(1).map(th => th.classList.contains('peak'));
       const peakCol = pk.map(x => m === 'week' || x);   // 計分範圍：登山時段（2026-10-21）
-      const keys = [...d.querySelectorAll('#matrix tbody tr')].map(tr => { let s1 = 0, p1 = 0, c1 = 0, s2 = 0, has = 0;
+      const keys = [...d.querySelectorAll('#matrix tbody tr[data-k]')].map(tr => { let s1 = 0, p1 = 0, c1 = 0, s2 = 0, has = 0;
         [...tr.querySelectorAll('.lamp')].forEach((l, i) => { if (l.classList.contains('past') || l.classList.contains('na')) return;
           const pt = l.classList.contains('p') ? 3 : l.classList.contains('g') ? 2 : l.classList.contains('y') ? 1 : 0;
           has = 1; s2 += pt; if (peakCol[i]){ s1 += pt; if (pt === 3) p1++; if (pt === 0) c1++; } });
@@ -61,7 +61,7 @@ let fails = 0; const ok = (c, m) => { console.log((c ? '✓ ' : '✗ ') + m); if
     ok(cnt('g') + cnt('y') + cnt('r') > 0, `${m}：有實際燈號（適合 ${cnt('g')}、注意 ${cnt('y')}、不建議 ${cnt('r')}、無資料 ${cnt('na')}）`);
     // 打開每座山的詳情
     let bad = 0;
-    d.querySelectorAll('#matrix tbody tr').forEach(tr => { click(w, tr.querySelector('td')); if (/undefined|NaN/.test(d.getElementById('drawer').innerHTML)) bad++; click(w, d.getElementById('d-close')); });
+    d.querySelectorAll('#matrix tbody tr[data-k]').forEach(tr => { click(w, tr.querySelector('td')); if (/undefined|NaN/.test(d.getElementById('drawer').innerHTML)) bad++; click(w, d.getElementById('d-close')); });
     ok(bad === 0, `${m}：235 座詳情都正常`);
   }
   { // 一週判定：各半天分別判斷；登山時段都在 12 點前時，白天描述的「午後」不計
@@ -86,7 +86,7 @@ let fails = 0; const ok = (c, m) => { console.log((c ? '✓ ' : '✗ ') + m); if
   click(w, d.querySelector('#seg [data-mode="week"]'));
   ok(d.querySelectorAll('#matrix tbody .lamp.ref').length > 0, '一週：第 4–7 天有虛線燈號');
   let shown = false;
-  for (const tr of [...d.querySelectorAll('#matrix tbody tr')].slice(0, 30)){
+  for (const tr of [...d.querySelectorAll('#matrix tbody tr[data-k]')].slice(0, 30)){
     click(w, tr.querySelector('td'));
     if (/陣雨（第 4–7 天無降雨機率）/.test(d.getElementById('drawer').innerHTML)) shown = true;
     click(w, d.getElementById('d-close'));
@@ -113,7 +113,7 @@ let fails = 0; const ok = (c, m) => { console.log((c ? '✓ ' : '✗ ') + m); if
     click(w, d.querySelector('#f-cat [data-c="小百岳"]')); click(w, d.querySelector('#f-slots [data-h="15"]'));
     w.eval('saveFilters()');
     inp.value = '玉山東峰'; inp.dispatchEvent(new w.Event('input', {bubbles: true}));
-    const found = [...d.querySelectorAll('#matrix tbody tr')].some(tr => /玉山東峰/.test(tr.textContent));
+    const found = [...d.querySelectorAll('#matrix tbody tr[data-k]')].some(tr => /玉山東峰/.test(tr.textContent));
     const saved = JSON.parse(w.localStorage.getItem('filters') || '{}');
     ok(found && w.eval('state.cats.size') === 0 && !saved.cats?.length && d.getElementById('cat-all').getAttribute('aria-pressed') === 'true' && w.eval('state.slots.has(15)'),
       '開始搜尋時，類別篩選回到「全部」並記住，登山時段保留，搜得到玉山東峰');
@@ -131,19 +131,19 @@ let fails = 0; const ok = (c, m) => { console.log((c ? '✓ ' : '✗ ') + m); if
   // 特報：宜蘭縣今天陸上強風（不採用）
   click(w, d.querySelector('#seg [data-mode="today"]'));
   inp.value = '南湖北山'; inp.dispatchEvent(new w.Event('input', {bubbles: true}));
-  click(w, d.querySelector('#matrix tbody tr td'));
+  click(w, d.querySelector('#matrix tbody tr[data-k] td'));
   ok(!/陸上強風/.test(d.getElementById('drawer').innerHTML), '陸上強風特報不顯示，也不列入燈號');
   click(w, d.getElementById('d-close'));
   click(w, d.querySelector('#seg [data-mode="tmr"]'));
   inp.value = '玉山北峰'; inp.dispatchEvent(new w.Event('input', {bubbles: true}));
-  click(w, d.querySelector('#matrix tbody tr td'));
+  click(w, d.querySelector('#matrix tbody tr[data-k] td'));
   ok(!/低溫/.test(d.getElementById('drawer').innerHTML), '低溫特報不顯示，也不列入燈號');
   click(w, d.querySelector('#seg [data-mode="today"]'));
   click(w, d.getElementById('d-close'));
   // 豪雨特報：屏東縣的山今天未過的時段都是 C
   inp.value = '笠頂山'; inp.dispatchEvent(new w.Event('input', {bubbles: true}));
   ok([...d.querySelectorAll('#matrix tbody .lamp:not(.past)')].every(x => x.classList.contains('r')), '豪雨特報期間，涵蓋縣市的山判 C');
-  click(w, d.querySelector('#matrix tbody tr td'));
+  click(w, d.querySelector('#matrix tbody tr[data-k] td'));
   ok(/豪雨特報・D/.test(d.getElementById('drawer').innerHTML), '詳情顯示豪雨特報・D');
   { // 燈號名稱（2026-10-20 定案）：A 佳、B 可、C 注意、D 不建議；說明頁的字母換成小燈號方塊，°C 不上色
     const lg = d.querySelector('.legend').textContent;
@@ -154,7 +154,7 @@ let fails = 0; const ok = (c, m) => { console.log((c ? '✓ ' : '✗ ') + m); if
   click(w, d.getElementById('d-close'));
   // 別名：搜「鳶山」找得到福德坑山，詳情顯示別名
   inp.value = '鳶山'; inp.dispatchEvent(new w.Event('input', {bubbles: true}));
-  const rows = [...d.querySelectorAll('#matrix tbody tr')];
+  const rows = [...d.querySelectorAll('#matrix tbody tr[data-k]')];
   ok(rows.length === 1 && /福德坑山/.test(rows[0].textContent), '用別名「鳶山」搜得到福德坑山');
   click(w, rows[0].querySelector('td'));
   ok(/別名：鳶山/.test(d.getElementById('drawer').innerHTML), '詳情顯示別名');
