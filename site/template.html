@@ -123,15 +123,17 @@ h2 .info{width:17px;height:17px;top:1.5px}
 .f-reset{grid-column:1/-1;margin-top:-6px}   /* 篩選標題下方「恢復預設條件」（2026-10-21）：已是預設時變淡、不能點 */
 #filter-reset{border-style:solid}
 #filter-reset:disabled{text-decoration:none}
-/* 燈號排序：分數不同的山之間加分隔線（2026-10-21；分數不顯示） */
-.cards hr.grp{border:0;border-top:1.5px solid var(--muted);opacity:.55;margin:3px 2px;width:auto}
-.matrix tbody tr.gend>*{border-bottom:2px solid var(--muted)}
-/* 「可優先參考」（2026-10-21）：只在最前面一組上方，且這組登山時段都是 A 或 B；一週不顯示 */
-.grp-h{display:flex;justify-content:space-between;align-items:baseline;gap:12px;font-size:13px;color:var(--muted);padding:2px 2px 6px;border-bottom:1.5px solid var(--go)}
+/* 「可優先參考」（2026-10-21）：把最前面一組框起來（綠框），且這組登山時段都是 A 或 B；一週不顯示；其他山之間不畫分隔線 */
+.grp-h{display:flex;justify-content:space-between;align-items:baseline;gap:12px;font-size:13px;color:var(--muted)}
 .grp-h b{color:var(--go);font-size:14px}
+.top-box{border:2px solid var(--go);border-radius:10px;padding:8px;display:flex;flex-direction:column;gap:8px;background:var(--go-soft)}
+.top-box .grp-h{padding:0 4px}
 .matrix tbody tr.grp-row{cursor:default}
-.matrix tbody tr.grp-row>td{padding:10px 12px 0;text-align:left;background:var(--surface);border-bottom:0}
-.matrix tbody tr.grp-row:hover>td{background:var(--surface)}
+.matrix tbody tr.grp-row>td{padding:10px 12px 6px;text-align:left;background:var(--go-soft);border:2px solid var(--go);border-bottom:0}
+.matrix tbody tr.grp-row:hover>td{background:var(--go-soft)}
+.matrix tbody tr.top>:first-child{border-left:2px solid var(--go)}
+.matrix tbody tr.top>:last-child{border-right:2px solid var(--go)}
+.matrix tbody tr.top-end>*{border-bottom:2px solid var(--go)}
 .chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
 .chip:disabled{opacity:.32;cursor:not-allowed;text-decoration:line-through;text-decoration-thickness:1px}   /* 篩選防呆：組合起來沒有山的選項 */
 .pick{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 10px 8px 12px;display:flex;flex-direction:column;gap:5px;cursor:pointer;text-align:left;font:inherit;color:inherit}
@@ -422,8 +424,7 @@ footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);paddin
         <li><b>一週預報</b>（每天一格），依序比較：<ol><li>7 天的總分，高的在前</li><li>A 的天數，多的在前</li><li>D 的天數，少的在前</li></ol></li>
         <li><b>完全沒有資料的山：</b>排在最後。</li>
         <li><b>以上所有條件都相同時：</b>每天隨機排序一次同條件山岳。</li>
-        <li><b>分隔線：</b>排序條件不同的山之間以分隔線區隔，同一段內是條件完全相同的山。</li>
-        <li><b>可優先參考：</b>今天／明天／後天／大後天，最前面一組的登山時段都是 A 或 B 時，在這組上方標示「可優先參考」與座數；有 C 或 D 時不標示。一週預報不標示。</li>
+        <li><b>可優先參考：</b>今天／明天／後天／大後天，最前面一組的登山時段都是 A 或 B 時，把這組框起來，標示「可優先參考」與座數；有 C 或 D 時不標示。一週預報不標示。</li>
       </ul>
       <h3>資料來源</h3>
       <ul>
