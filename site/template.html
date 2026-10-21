@@ -154,14 +154,16 @@ h2 .info{width:17px;height:17px;top:1.5px}
 .reload:hover{color:var(--ink)}
 .legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;color:var(--muted);align-items:center}
 .legend span{display:inline-flex;align-items:center;gap:5px}
-/* 找山的燈號圖例塞進一行（2026-10-21 使用者選「乙」：字縮小、用語縮短） */
-.legend.lg-1{flex-wrap:nowrap;font-size:11px;gap:0 6px;white-space:nowrap;min-width:0;letter-spacing:-.02em}
-.legend.lg-1 span{gap:2px}
-.legend.lg-1 span{line-height:16px}
-.legend.lg-1 .lamp.sm{width:16px;height:16px;min-width:16px;font-size:10px;line-height:1;letter-spacing:0;padding:0;box-sizing:border-box}   /* 字母在方塊正中：不繼承圖例的字距 */
-.legend.lg-1 .lamp.sm.p{font-size:10px;letter-spacing:0}
-.legend.lg-1 .info{margin-left:1px;top:0}   /* 圖例是一行置中排列，i 不再往下移 */
-@media (max-width:380px){.legend.lg-1{font-size:10.5px;gap:0 4px;letter-spacing:-.05em}}   /* 360 寬的一週模式也要塞得下 */
+/* 找山的燈號圖例塞進一行（2026-10-21）：「燈號說明：」＋ A～D、無資料、i；字級依畫面寬度盡量放大（360 寬剛好塞下） */
+.legend.lg-1{flex-wrap:nowrap;font-size:14px;gap:0 10px;white-space:nowrap;min-width:0}
+.legend.lg-1 span{gap:4px;line-height:22px}
+.legend.lg-1 .lg-t{color:var(--ink);font-weight:500}
+.legend.lg-1 .lamp.sm{width:22px;height:22px;min-width:22px;font-size:13px;line-height:1;letter-spacing:0;padding:0;box-sizing:border-box}   /* 字母在方塊正中：不繼承圖例的字距 */
+.legend.lg-1 .lamp.sm.p{font-size:13px;letter-spacing:0}
+.legend.lg-1 .info{margin-left:2px;top:0}   /* 圖例是一行置中排列，i 不再往下移 */
+@media (max-width:640px){.legend.lg-1{font-size:12.5px;gap:0 6px}.legend.lg-1 span{gap:3px;line-height:19px}.legend.lg-1 .lamp.sm,.legend.lg-1 .lamp.sm.p{width:19px;height:19px;min-width:19px;font-size:11.5px}}
+@media (max-width:400px){.legend.lg-1{font-size:12px;gap:0 5px}.legend.lg-1 span{gap:3px;line-height:18px}.legend.lg-1 .lamp.sm,.legend.lg-1 .lamp.sm.p{width:18px;height:18px;min-width:18px;font-size:11px}}
+@media (max-width:380px){.legend.lg-1{font-size:11.5px;gap:0 5px}.legend.lg-1 span{gap:2px;line-height:17px}.legend.lg-1 .lamp.sm,.legend.lg-1 .lamp.sm.p{width:17px;height:17px;min-width:17px;font-size:10.5px}}   /* 360 寬也要塞得下 */
 .matrix-box{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:8px}
 table.matrix{border-collapse:separate;border-spacing:0;width:100%;font-variant-numeric:tabular-nums}
 .matrix th,.matrix td{padding:6px 6px;border-bottom:1px solid var(--line);text-align:center;white-space:nowrap}
@@ -368,7 +370,7 @@ footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);paddin
 
     <div style="display:flex;flex-direction:column;gap:10px">
       <div class="legend lg-1">
-          <span><i class="lamp sm g p">A</i>佳</span><span><i class="lamp sm g">B</i>可</span><span><i class="lamp sm y">C</i>注意</span><span><i class="lamp sm r">D</i>不建議</span><span><i class="lamp sm na">—</i>無資料<button type="button" class="info" id="info-btn" aria-expanded="false" aria-controls="info-ref" aria-label="燈號怎麼判定"><svg viewBox="0 0 20 20" aria-hidden="true"><circle class="ring" cx="10" cy="10" r="9.1"/><circle cx="10" cy="6.1" r="1.2"/><rect x="9.2" y="8.5" width="1.6" height="6.6" rx=".8"/></svg></button></span>
+          <span class="lg-t">燈號說明：</span><span><i class="lamp sm g p">A</i>佳</span><span><i class="lamp sm g">B</i>可</span><span><i class="lamp sm y">C</i>注意</span><span><i class="lamp sm r">D</i>不建議</span><span><i class="lamp sm na">—</i>無資料<button type="button" class="info" id="info-btn" aria-expanded="false" aria-controls="info-ref" aria-label="燈號怎麼判定"><svg viewBox="0 0 20 20" aria-hidden="true"><circle class="ring" cx="10" cy="10" r="9.1"/><circle cx="10" cy="6.1" r="1.2"/><rect x="9.2" y="8.5" width="1.6" height="6.6" rx=".8"/></svg></button></span>
         </div>
       <div class="info-pop" id="info-ref" hidden>
         <div class="info-head"><b>燈號怎麼判定</b><button type="button" class="info-x" id="info-x" aria-label="關閉說明">×</button></div>
