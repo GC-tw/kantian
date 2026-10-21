@@ -38,18 +38,18 @@ let fails = 0; const ok = (c, m) => { console.log((c ? '✓ ' : '✗ ') + m); if
     ok(d.querySelectorAll('#matrix tbody tr').length === 235, `${m}：235 座都列出`);
     { // 計分排序（A 3、B 2、C 1、D 0；已過與無資料不計）：依畫面上的燈號重算，順序須為 總分 → A 數 → D 少 → 全日總分
       const pk = [...d.querySelectorAll('#matrix thead th')].slice(1).map(th => th.classList.contains('peak'));
-      const peakCol = pk.map((x, i) => m === 'week' || x || pk[i-1] || pk[i+1]);   // 計分範圍：登頂時段＋前後各一段
+      const peakCol = pk.map(x => m === 'week' || x);   // 計分範圍：登山時段（2026-10-21）
       const keys = [...d.querySelectorAll('#matrix tbody tr')].map(tr => { let s1 = 0, p1 = 0, c1 = 0, s2 = 0, has = 0;
         [...tr.querySelectorAll('.lamp')].forEach((l, i) => { if (l.classList.contains('past') || l.classList.contains('na')) return;
           const pt = l.classList.contains('p') ? 3 : l.classList.contains('g') ? 2 : l.classList.contains('y') ? 1 : 0;
           has = 1; s2 += pt; if (peakCol[i]){ s1 += pt; if (pt === 3) p1++; if (pt === 0) c1++; } });
         return [has, s1, p1, -c1, m === 'week' ? 0 : s2]; });
-      const cmp = (a, b) => a[0]-b[0] || a[1]-b[1] || a[2]-b[2] || a[3]-b[3] || a[4]-b[4];
+      const cmp = m === 'week' ? (a, b) => a[0]-b[0] || a[1]-b[1] || a[2]-b[2] || a[3]-b[3] : (a, b) => a[0]-b[0] || a[3]-b[3] || a[1]-b[1] || a[2]-b[2] || a[4]-b[4];   // 逐 3 小時：D 少優先（2026-10-21）
       ok(keys.every((k, i) => !i || cmp(keys[i-1], k) >= 0) && new Set(keys.map(String)).size > 1, `${m}：依計分排序（最前 ${keys[0]}、最後 ${keys[keys.length-1]}）`);
     }
     click(w, d.getElementById('pick-info-btn'));
     const info = d.getElementById('pick-info');
-    ok(!info.hidden && /比較標準/.test(info.textContent) && /排序/.test(info.textContent) && (m === 'week' ? /7 天的總分/ : /計分範圍.*的總分/).test(info.textContent) && /燈號排序$/.test(d.getElementById('h-picks-t').textContent), `${m}：燈號排序旁的 i 顯示對應的比較標準與排序`);
+    ok(!info.hidden && /比較標準/.test(info.textContent) && /排序/.test(info.textContent) && (m === 'week' ? /7 天的總分/ : /登山時段的總分/).test(info.textContent) && /燈號排序$/.test(d.getElementById('h-picks-t').textContent), `${m}：燈號排序旁的 i 顯示對應的比較標準與排序`);
     click(w, d.getElementById('pick-info-x'));
     ok(!/第\s*\d+\s*名|最推薦/.test(d.getElementById('h-matrix').textContent), `${m}：標題不顯示名次與「最推薦」`);
     ok(!d.getElementById('picks') && !d.getElementById('reroll'), `${m}：推薦區與「換一批」已移除`);
@@ -64,14 +64,14 @@ let fails = 0; const ok = (c, m) => { console.log((c ? '✓ ' : '✗ ') + m); if
     d.querySelectorAll('#matrix tbody tr').forEach(tr => { click(w, tr.querySelector('td')); if (/undefined|NaN/.test(d.getElementById('drawer').innerHTML)) bad++; click(w, d.getElementById('d-close')); });
     ok(bad === 0, `${m}：235 座詳情都正常`);
   }
-  { // 一週判定：各半天分別判斷；登頂時段都在 12 點前時，白天描述的「午後」不計
+  { // 一週判定：各半天分別判斷；登山時段都在 12 點前時，白天描述的「午後」不計
     const J = (halves, am) => w.judgeDay({halves}, false, null, false, am);
     const h = (wx, day) => ({wx, day, pop: 10, ws: 2});
     ok(J([h('晴', true), h('多雲有霧', false)], false).lv === 1, '一週：晚上有霧時，即使白天晴也判 B');
     ok(J([h('晴', true), h('雨或雪', false)], false).lv === 1 && J([h('下雪', false), h('晴', true)], false).lv === 2, '一週：另一個半天的雪也會判定');
     const pm = J([h('晴午後短暫雷陣雨', true)], true);
-    ok(pm.lv === 0 && pm.plus && /午後/.test(pm.why.join()), '一週：登頂時段在 12 點前，「晴午後短暫雷陣雨」視為晴（A），原因註明');
-    ok(J([h('晴午後短暫雷陣雨', true)], false).lv === 2, '一週：登頂時段有 12 點後，午後雷陣雨仍判 C');
+    ok(pm.lv === 0 && pm.plus && /午後/.test(pm.why.join()), '一週：登山時段在 12 點前，「晴午後短暫雷陣雨」視為晴（A），原因註明');
+    ok(J([h('晴午後短暫雷陣雨', true)], false).lv === 2, '一週：登山時段有 12 點後，午後雷陣雨仍判 C');
     ok(J([h('晴', true), h('晴', false)], false).plus && !J([h('晴', true), h('晴時多雲', false)], false).plus, '一週：所有半天都是晴才算 A');
     const R = wx => w.judge({wx, pop: null, ws: 2}, false, null, true).lv;
     ok(['多雲短暫陣雨', '陰短暫雨', '午後局部雨', '多雲局部短暫陣雨', '短暫雨或雪'].every(x => R(x) === 1), '第 4–7 天：「局部」「短暫」的雨判 B');
@@ -109,14 +109,14 @@ let fails = 0; const ok = (c, m) => { console.log((c ? '✓ ' : '✗ ') + m); if
     ok(![...d.querySelectorAll('#f-cat .chip, #f-ht .chip, #f-county .chip')].some(b => b.disabled), '防呆：全部取消後所有選項恢復可選');
     w.eval('saveFilters()');
   }
-  { // 開始搜尋時，類別、標高、縣市篩選回到預設並記住；登頂時段不變
-    click(w, d.querySelector('#f-cat [data-c="小百岳"]')); click(w, d.querySelector('#f-slots [data-h="12"]'));
+  { // 開始搜尋時，類別、標高、縣市篩選回到預設並記住；登山時段不變
+    click(w, d.querySelector('#f-cat [data-c="小百岳"]')); click(w, d.querySelector('#f-slots [data-h="15"]'));
     w.eval('saveFilters()');
     inp.value = '玉山東峰'; inp.dispatchEvent(new w.Event('input', {bubbles: true}));
     const found = [...d.querySelectorAll('#matrix tbody tr')].some(tr => /玉山東峰/.test(tr.textContent));
     const saved = JSON.parse(w.localStorage.getItem('filters') || '{}');
-    ok(found && w.eval('state.cats.size') === 0 && !saved.cats?.length && d.getElementById('cat-all').getAttribute('aria-pressed') === 'true' && w.eval('state.slots.has(12)'),
-      '開始搜尋時，類別篩選回到「全部」並記住，登頂時段保留，搜得到玉山東峰');
+    ok(found && w.eval('state.cats.size') === 0 && !saved.cats?.length && d.getElementById('cat-all').getAttribute('aria-pressed') === 'true' && w.eval('state.slots.has(15)'),
+      '開始搜尋時，類別篩選回到「全部」並記住，登山時段保留，搜得到玉山東峰');
     // 搜尋中再改篩選：照常套用，不符合就顯示「沒有符合條件的山」；繼續打字也不會再重設
     click(w, d.querySelector('#f-cat [data-c="小百岳"]')); w.eval('refilter()');
     inp.value = '玉山東'; inp.dispatchEvent(new w.Event('input', {bubbles: true}));

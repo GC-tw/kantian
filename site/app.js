@@ -26,7 +26,7 @@ const dayAt = i => { const d = new Date(); d.setHours(0,0,0,0); d.setDate(d.getD
 const beaufort = ws => BF.reduce((b, v, i) => ws >= v ? i : b, 0);
 const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));  // 外部資料（氣象署文字）放進畫面前先轉義
 const sortedSlots = () => [...state.slots].sort((a,b)=>a-b);
-const DEF_SLOTS = [9];                                      // 預設登頂時段 09–12（2026-10-20 由 06–12 改）
+const DEF_SLOTS = [6, 9, 12];                               // 預設登山時段 06–15（2026-10-21 由「登山時段 09–12」改為「登山時段」）
 const HT_BAND = h => h == null ? -1 : h < 1000 ? 0 : h < 2000 ? 1 : h < 3000 ? 2 : 3;   // 標高篩選：0＝1,000 m 以下、1＝1,000–2,000、2＝2,000–3,000、3＝3,000 m 以上（2026-10-20）
 const store = {                                             // 瀏覽器儲存：讀寫失敗時不影響畫面
   raw(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } },
@@ -57,7 +57,7 @@ function useForecast(data){
 function slotForecast(p, di, hr){                           // 逐 3 小時：沒有資料時回傳 null
   return fcIndex.get(p.key)?.h3.get(dayAt(di).getTime() + hr*H) || null;
 }
-// 一週：把登頂時段對應到白天（06–18）或晚上（18–06）。回傳對應到的各半天（判定時各半天分別判斷再取最差），
+// 一週：把登山時段對應到白天（06–18）或晚上（18–06）。回傳對應到的各半天（判定時各半天分別判斷再取最差），
 // 以及合併後給詳情顯示的數值（天氣描述列出各半天原文）
 function dayForecast(p, di, slots){
   const idx = fcIndex.get(p.key); if (!idx) return null;
@@ -68,14 +68,14 @@ function dayForecast(p, di, slots){
   const ws = max('ws');
   return {halves: s.map(x => di<3 ? x : {...x, pop: null}), pop: di<3 ? max('pop') : null, ws, bf: ws!=null ? beaufort(ws) : max('bf'), t: max('t'), at: max('at'), wx: [...new Set(s.map(x => x.wx).filter(Boolean))].join('／') || null};
 }
-// 一週白天的描述：登頂時段全部在 12 點前時，「午後」之後的部分不計（2026-10-20 使用者決定；降雨機率仍照 12 小時數值）
+// 一週白天的描述：登山時段全部在 12 點前時，「午後」之後的部分不計（2026-10-20 使用者決定；降雨機率仍照 12 小時數值）
 const amOnly = slots => slots.every(h => h + 3 <= 12);
 const dropPM = wx => { const i = (wx || '').indexOf('午後'); return i > 0 ? wx.slice(0, i) : wx; };
 function judgeDay(fc, lowHill, alert, noPop, am){
   if (!fc) return judge(null, lowHill, alert, noPop);
   const js = fc.halves.map(x => judge(am && x.day ? {...x, wx: dropPM(x.wx)} : x, lowHill, alert, noPop));
   const lv = Math.max(...js.map(j => j.lv)), why = [...new Set(js.flatMap(j => j.why))];
-  if (am && fc.halves.some(x => x.day && dropPM(x.wx) !== x.wx)) why.push('登頂時段在 12 點前，「午後」部分不計');
+  if (am && fc.halves.some(x => x.day && dropPM(x.wx) !== x.wx)) why.push('登山時段在 12 點前，「午後」部分不計');
   return {lv, why, plus: lv === 0 && js.every(j => j.plus)};
 }
 const ALERT_LV = type => /颱風|豪雨|大雨/.test(type || '') ? 2 : 0;
@@ -128,12 +128,12 @@ function loadFilters(){
 }
 const state = {
   mode: (m => MODES[m] ? m : 'today')(store.get('mode')),
-  slots: new Set((a => Array.isArray(a) && a.length ? a : DEF_SLOTS)(store.get('peak'))),   // 儲存名稱改為 peak：預設改 09–12 時，讓舊的 06–12 設定一起換成新預設
+  slots: new Set((a => Array.isArray(a) && a.length ? a : DEF_SLOTS)(store.get('hike'))),   // 儲存名稱改為 hike：2026-10-21 改成「登山時段」，讓舊的登山時段設定一起換成新預設 06–15
   name: '', shown: PAGE,
   ...loadFilters()
 };
-const filterCount = () => state.cats.size + state.counties.size + state.hts.size + (sameSet(state.slots, DEF_SLOTS) ? 0 : 1);   // 「篩選」按鈕：改了幾項（登頂時段不是預設算 1 項）
-const saveFilters = () => { store.set('peak', [...state.slots]); store.set('filters', {cats:[...state.cats], counties:[...state.counties], hts:[...state.hts]}); };
+const filterCount = () => state.cats.size + state.counties.size + state.hts.size + (sameSet(state.slots, DEF_SLOTS) ? 0 : 1);   // 「篩選」按鈕：改了幾項（登山時段不是預設算 1 項）
+const saveFilters = () => { store.set('hike', [...state.slots]); store.set('filters', {cats:[...state.cats], counties:[...state.counties], hts:[...state.hts]}); };
 const favs = new Set((a => Array.isArray(a) ? a : [])(store.get('favs')));
 let cols = [], all = [], rows = [], favRows = [], byKey = new Map();
 let evalStamp = '', dataStamp = '';
@@ -149,14 +149,14 @@ function buildCols(){
   const di = MODES[state.mode].di, date = dayAt(di), now = new Date();
   return SLOTS.map(h => {
     const end = dayAt(di); end.setHours(h+3);
-    const peak = state.slots.has(h), win = [h-3, h, h+3].some(x => state.slots.has(x));   // win：計分範圍＝登頂時段＋前後各一段（2026-10-20）
-    return {di, hr:h, date, ws:date.getTime()+h*H, we:date.getTime()+(h+3)*H, past: di===0 && end<=now, peak, win, label:slotLabel(h), short:pad(h), head:`${pad(h)}<span class="hr-to">–${pad(h+3)}</span>`, sub: peak?'<span class="pk-sub">登頂時段</span>':''};
+    const peak = state.slots.has(h), win = peak;   // win：計分範圍＝使用者選的登山時段（2026-10-21 起不再加前後各一段）
+    return {di, hr:h, date, ws:date.getTime()+h*H, we:date.getTime()+(h+3)*H, past: di===0 && end<=now, peak, win, label:slotLabel(h), short:pad(h), head:`${pad(h)}<span class="hr-to">–${pad(h+3)}</span>`, sub: peak?'<span class="pk-sub">登山時段</span>':''};
   });
 }
 const hash = t => { let h = 2166136261; for (const ch of t){ h ^= ch.codePointAt(0); h = Math.imul(h, 16777619); } return h >>> 0; };
 const fmtDayKey = () => { const d = new Date(Date.now() + 8*3600e3); return d.toISOString().slice(0, 10); };   // 台灣日期
 const SCORE = c => c.plus ? 3 : 2 - c.lv;                 // A 3、B 2、C 1、D 0
-function evaluate(){                                       // 依時段與登頂時段計算所有山的燈號並排序
+function evaluate(){                                       // 依時段與登山時段計算所有山的燈號並排序
   evalStamp = timeStamp(); dataStamp = FC?.fetchedAt || '';
   cols = buildCols();
   const week = state.mode === 'week', slots = sortedSlots(), am = week && amOnly(slots);
@@ -172,7 +172,7 @@ function evaluate(){                                       // 依時段與登頂
       return {lv, plus: lv === 0 && per.every(y => y.j.plus), per, ref:!!c.ref, past:!!c.past};   // 跨鄉鎮：每個鄉鎮都是 A 才算 A
     });
     // 計分排序（2026-10-20 方案乙）：A 3、B 2、C 1、D 0；已過與無資料不計分
-    // s1：計分範圍（登頂時段＋前後各一段）總分（一週為 7 天總分）；p1：其中 A 數；c1：其中 D 數（2026-10-20 加入，D 少的在前）；s2：當天所有時段總分（只用於逐 3 小時）
+    // s1：計分範圍（登山時段）總分（一週為 7 天總分）；p1：其中 A 數；c1：其中 D 數（2026-10-20 加入，D 少的在前）；s2：當天所有時段總分（只用於逐 3 小時）
     // nd：沒有任何資料（2026-10-20 加入，一律排最後）
     let s1 = 0, p1 = 0, c1 = 0, s2 = 0, has = false;
     cells.forEach((c, i) => {
@@ -183,7 +183,9 @@ function evaluate(){                                       // 依時段與登頂
       else { s2 += pt; if (cols[i].win){ s1 += pt; if (c.plus) p1++; if (c.lv===2) c1++; } }
     });
     return {...x, cells, s1, p1, c1, s2, nd: has ? 0 : 1, mix: hash(day + '|' + x.k)};
-  }).sort((a,b) => a.nd-b.nd || b.s1-a.s1 || b.p1-a.p1 || a.c1-b.c1 || b.s2-a.s2 || a.mix-b.mix);
+  }).sort(week   // 逐 3 小時（2026-10-21 方案甲，安全優先）：D 少 → 總分 → A 數 → 當天總分；一週維持：總分 → A 數 → D 少
+    ? (a,b) => a.nd-b.nd || b.s1-a.s1 || b.p1-a.p1 || a.c1-b.c1 || a.mix-b.mix
+    : (a,b) => a.nd-b.nd || a.c1-b.c1 || b.s1-a.s1 || b.p1-a.p1 || b.s2-a.s2 || a.mix-b.mix);
   byKey = new Map(all.map(r => [r.k, r]));
   applyFilters();
 }
@@ -207,7 +209,7 @@ const sub = m => `${m.h ? m.h.toLocaleString()+' m' : '標高待補'}・${m.c}�
 const headRow = () => `<tr><th class="mt">山岳</th>${cols.map(c=>`<th class="${c.ref?'ref ':''}${c.peak?'peak ':''}${c.wkd?'we':''}"><span class="dt"><span class="lg">${c.head||c.label}</span><span class="st">${c.short}</span></span>${c.sub}</th>`).join('')}</tr>`;
 const bodyRow = r => `<tr data-k="${r.k}" tabindex="0"><th class="mt" scope="row"><div class="mt-in"><span class="nm">${esc(r.m.n)}</span><span class="sub">${sub(r.m)}</span>${star(r.k)}</div></th>${r.cells.map(c=>`<td>${lamp(c)}</td>`).join('')}</tr>`;
 // 山岳卡片（手機列表與收藏；精簡兩列）：山名＋資訊＋收藏／燈號（不顯示比較結果，一週也不寫 A 天數；2026-10-20）
-// 小燈上方標出時段（逐 3 小時寫開始時刻，一週寫日期＋星期）；登頂時段實心深色底、週末紅色
+// 小燈上方標出時段（逐 3 小時寫開始時刻，一週寫日期＋星期）；登山時段實心深色底、週末紅色
 const pickHead = () => cols.map(c => `<span class="ph${c.peak?' peak':''}${c.wkd?' we':''}${c.ref?' ref':''}" aria-hidden="true">${c.short}</span>`).join('');
 const pickCard = (r, head) => `<div class="pick" data-k="${r.k}" tabindex="0" role="button"><div class="p1"><span class="nm">${esc(r.m.n)}</span><span class="meta">${sub(r.m)}</span>${star(r.k)}</div><div class="p2"><span class="lights" style="--n:${cols.length}">${head}${r.cells.map(c=>lamp(c,true)).join('')}</span></div></div>`;
 
@@ -244,7 +246,7 @@ function render(){
   $('more').textContent = `顯示更多（還有 ${rows.length-state.shown} 座）`;
 }
 const fresh = () => evalStamp === timeStamp() && dataStamp === (FC?.fetchedAt || '');
-const refresh = () => { evaluate(); render(); };                                            // 時段或登頂時段改變：重算燈號
+const refresh = () => { evaluate(); render(); };                                            // 時段或登山時段改變：重算燈號
 const refilter = () => { state.shown = PAGE; fresh() ? applyFilters() : evaluate(); render(); }; // 篩選改變：資料仍新就只重新篩選
 
 function openDetail(k){
@@ -279,7 +281,7 @@ function openDetail(k){
     ${r.m.al?.length?`<div class="note">別名：${esc(r.m.al.join('、'))}</div>`:''}
     ${r.m.note?`<div class="note">備註：${esc(r.m.note)}</div>`:''}
     ${pts.map(table).join('')}
-    <div class="note">${week ? '一週預報以你選的登頂時段（'+sortedSlots().map(slotLabel).join('、')+'）判定，取最差情況；第 4–7 天氣象署未提供降雨機率，以「—」表示，依天氣描述判定，請在出發前 3 天內再確認。' : '逐 3 小時預報；底色時段是你選的登頂時段，排序依登頂時段及前後各 3 小時計算。'}</div>`;
+    <div class="note">${week ? '一週預報以你選的登山時段（'+sortedSlots().map(slotLabel).join('、')+'）判定，取最差情況；第 4–7 天氣象署未提供降雨機率，以「—」表示，依天氣描述判定，請在出發前 3 天內再確認。' : '逐 3 小時預報；底色時段是你選的登山時段，排序依登山時段及前後各 3 小時計算。'}</div>`;
   dr.hidden = false; $('scrim').hidden = false;
   $('d-close').focus();
 }
@@ -293,10 +295,10 @@ function pickInfo(week){
     '跨多個鄉鎮的山，取最差的鄉鎮。'];
   const score = '計分：A 3 分、B 2 分、C 1 分、D 0 分。已過的時段和無資料不計分。';
   const tie = '以上所有條件都相同時：每天隨機排序一次同條件山岳。', sep = '排序條件不同的山之間以分隔線區隔，同一段內是條件完全相同的山。', nodata = '完全沒有資料的山排在最後。';
-  if (week) return '<h4>比較標準</h4>' + ul([...std, `每天依你選的登頂時段（${esc(slots)}）對應到白天或晚上，取最差的作為當天燈號。登頂時段都在 12 點前時，白天描述的「午後」部分不計。`, '第 4–7 天氣象署沒有降雨機率，依天氣描述判定：「局部」「短暫」的雨為 C，其他的雨（例如「陣雨」「有雨」）為 D。僅供參考。'])
+  if (week) return '<h4>比較標準</h4>' + ul([...std, `每天依你選的登山時段（${esc(slots)}）對應到白天或晚上，取最差的作為當天燈號。登山時段都在 12 點前時，白天描述的「午後」部分不計。`, '第 4–7 天氣象署沒有降雨機率，依天氣描述判定：「局部」「短暫」的雨為 C，其他的雨（例如「陣雨」「有雨」）為 D。僅供參考。'])
     + '<h4>排序</h4>' + ul([score]) + '<p class="ip">依序比較：</p>' + ol(['7 天的總分，高的在前', 'A 的天數，多的在前', 'D 的天數，少的在前']) + ul([nodata, tie, sep]);
   return '<h4>比較標準</h4>' + ul([...std, '每 3 小時一格，每格一個燈號。', ...(state.mode === 'today' ? ['今天已過的時段不計分。'] : [])])
-    + '<h4>排序</h4>' + ul([score]) + '<p class="ip">依序比較：</p>' + ol(['計分範圍（登頂時段及前後各 3 小時，作為上山與下山時間）的總分，高的在前', '計分範圍中 A 的數量，多的在前', '計分範圍中 D 的數量，少的在前', '當天所有時段的總分，高的在前']) + ul(['計分範圍都過了，就改看當天剩下的時段。', nodata, tie, sep]);
+    + '<h4>排序</h4>' + ul([score]) + '<p class="ip">依序比較：</p>' + ol(['登山時段中 D 的數量，少的在前', '登山時段的總分，高的在前', '登山時段中 A 的數量，多的在前', '當天所有時段的總分，高的在前']) + ul(['登山時段都過了，就改看當天剩下的時段。', nodata, tie, sep]);
 }
 // 說明文字中的燈號（A、B、C、D、—）換成小燈號方塊，顏色與列表一致（2026-10-20 使用者選「選項 1」）
 const GRADE_RE = /—|(?<![A-Za-z0-9°])[ABCD](?![A-Za-z0-9+])/g,   // 「°C」的 C 不是燈號（2026-10-20）
@@ -354,7 +356,7 @@ function showStatus(){
   s.textContent = msg; s.hidden = !msg;
 }
 
-// 多選按鈕群組：有「全部」按鈕者未選＝全部；登頂時段至少保留一項
+// 多選按鈕群組：有「全部」按鈕者未選＝全部；登山時段至少保留一項
 function chipGroup(box, attr, set, {allId, parse = v => v, keepOne, onChange}){
   const sync = () => {
     box.querySelectorAll(`[${attr}]`).forEach(b => b.setAttribute('aria-pressed', set.has(parse(b.getAttribute(attr)))));
@@ -403,11 +405,11 @@ const sameSet = (set, arr) => set.size === arr.length && arr.every(x => set.has(
   const syncs = [chipGroup($('f-county'), 'data-co', state.counties, {allId:'c-all', onChange: onPick}),
     chipGroup($('f-cat'), 'data-c', state.cats, {allId:'cat-all', onChange: onPick}),
     chipGroup($('f-ht'), 'data-ht', state.hts, {allId:'ht-all', parse: Number, onChange: onPick})];
-  // 開始搜尋（搜尋框從空白變成有字）時，類別、標高、縣市篩選回到預設（全部）並記住；登頂時段不變（2026-10-20 使用者決定）
+  // 開始搜尋（搜尋框從空白變成有字）時，類別、標高、縣市篩選回到預設（全部）並記住；登山時段不變（2026-10-20 使用者決定）
   const resetForSearch = () => { if (!state.cats.size && !state.counties.size && !state.hts.size) return;
     state.cats.clear(); state.counties.clear(); state.hts.clear(); syncs.forEach(f => f()); lockChips(); saveFilters(); syncReset(); };
   const syncSlots = chipGroup($('f-slots'), 'data-h', state.slots, {parse: Number, keepOne: true, onChange: onPick});
-  // 「恢復預設條件」（2026-10-21）：登頂時段回到 09–12，類別、標高、縣市回到全部；和其他選項一樣按「完成」才套用
+  // 「恢復預設條件」（2026-10-21）：登山時段回到 06–15，類別、標高、縣市回到全部；和其他選項一樣按「完成」才套用
   $('filter-reset').onclick = () => { if (isDef()) return;
     state.cats.clear(); state.counties.clear(); state.hts.clear(); state.slots.clear(); DEF_SLOTS.forEach(h => state.slots.add(h));
     syncs.forEach(f => f()); syncSlots(); onPick(); };
@@ -438,7 +440,7 @@ const sameSet = (set, arr) => set.size === arr.length && arr.every(x => set.has(
   document.addEventListener('keydown', e => { if (e.key === 'Escape'){ setFilter(false); setSearch(false); } });
   $('q').onsubmit = e => e.preventDefault();
   $('brand').onclick = e => { e.preventDefault(); window.scrollTo({top: 0, behavior: 'smooth'}); };   // 點標題：回到最上方（不重新整理）
-  $('reload-btn').onclick = () => location.reload();   // 「○○燈號排序」旁、篩選右側的重新整理圖示：重新整理網頁（篩選與登頂時段會保留）
+  $('reload-btn').onclick = () => location.reload();   // 「○○燈號排序」旁、篩選右側的重新整理圖示：重新整理網頁（篩選與登山時段會保留）
   $('more').onclick = () => { state.shown += PAGE; if (!fresh()) evaluate(); render(); };
   $('info-btn').onclick = () => setInfo($('info-ref').hidden);
   $('info-x').onclick = () => { setInfo(false); $('info-btn').focus(); };
@@ -452,7 +454,7 @@ const sameSet = (set, arr) => set.size === arr.length && arr.every(x => set.has(
     tabs.forEach(o => o.setAttribute('aria-selected', o === b));
     ['find','fav','rules'].forEach(x => $('view-'+x).hidden = v !== x);
     document.body.dataset.view = v;
-    if (v === 'rules') setFilter(false);                       // 排序規則頁隱藏登頂時段與預報時段
+    if (v === 'rules') setFilter(false);                       // 排序規則頁隱藏登山時段與預報時段
     window.scrollTo(0, 0);                                // 切換分頁時回到頁面頂端
   });
 
