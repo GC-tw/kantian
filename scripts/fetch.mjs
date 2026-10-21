@@ -124,7 +124,8 @@ function normalize(v, daily){
     ws, bf: num(v.BeaufortScale) ?? (ws != null ? beaufort(ws) : null),
     t: num(daily ? (v.MaxTemperature ?? v.Temperature) : (v.Temperature ?? v.MaxTemperature)),
     at: num(daily ? (v.MaxApparentTemperature ?? v.ApparentTemperature) : (v.ApparentTemperature ?? v.MaxApparentTemperature)),
-    wx: v.Weather ?? null
+    wx: v.Weather ?? null,
+    tn: daily ? num(v.MinTemperature) : null              // 一週預報的最低溫度（2026-10-21：詳情顯示最高、最低氣溫用）
   };
   if (Object.values(out).every(x => x == null)) return null;
   out.wc = num(v.WeatherCode);                            // 天氣代碼：只在 compact() 用來找未收錄的用語，不放進網站資料
@@ -360,8 +361,7 @@ function compact(result){
   const t0 = twMidnight(Date.now()), wx = [], wi = new Map();
   const wxIdx = w => { if (w == null) return null; if (!wi.has(w)){ wi.set(w, wx.length); wx.push(w); } return wi.get(w); };
   const enc = (rows, base, step) => (rows || []).map(r => {
-    const a = [(r.s - base) / step, r.pop, r.ws, r.t, r.at, wxIdx(r.wx)];
-    if (r.bf != null && (r.ws == null || beaufort(r.ws) !== r.bf)) a.push(r.bf);
+    const a = [(r.s - base) / step, r.pop, r.ws, r.t, r.at, wxIdx(r.wx), r.bf != null && (r.ws == null || beaufort(r.ws) !== r.bf) ? r.bf : null, r.tn ?? null];   // 第 8 個是一週最低溫度（2026-10-21）
     while (a.length > 1 && a[a.length - 1] == null) a.pop();
     return a;
   });

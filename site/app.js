@@ -45,8 +45,8 @@ let FC = null, fcIndex = new Map(), loadError = '', offline = false, WXH = {};  
 function decodeRows(rows, base, step, wx){
   return (rows || []).map(r => {
     if (!Array.isArray(r)) return r;
-    const [i, pop = null, ws = null, t = null, at = null, w = null, bf] = r;
-    return {s: base + i*step, pop, ws, bf: bf ?? (ws != null ? beaufort(ws) : null), t, at, wx: w == null ? null : wx[w]};
+    const [i, pop = null, ws = null, t = null, at = null, w = null, bf = null, tn = null] = r;
+    return {s: base + i*step, pop, ws, bf: bf ?? (ws != null ? beaufort(ws) : null), t, at, tn, wx: w == null ? null : wx[w]};
   });
 }
 function useForecast(data){
@@ -187,6 +187,16 @@ function dayPer(p, x, c, slots, am){
   }
   const fc = dayForecast(p, c.di, slots), al = alertFor(p, c.ws, c.we);
   return {p, fc, al, half: true, ref: c.di >= 3, j: judgeDay(fc, x.low, al, c.di>=3, am)};
+}
+// 詳情的最高、最低氣溫（2026-10-21 使用者決定）：不限登山時段，看整段期間（單日＝全天、一週＝7 天），今天已過的時段不算。
+// 前 4 天用逐 3 小時的氣溫；逐 3 小時資料之後改用一週預報的最高、最低溫度。只呈現氣象署數值，不影響燈號
+function tempRange(p, start, end){
+  const idx = fcIndex.get(p.key); if (!idx) return null;
+  const now = Date.now(), v = [];
+  let last = start;
+  for (const r of idx.h3.values()) if (r.s >= start && r.s < end){ last = Math.max(last, r.s + 3*H); if (r.s + 3*H > now && r.t != null) v.push(r.t); }
+  for (const r of idx.week.values()) if (r.s >= last && r.s < end && r.s + 12*H > now) v.push(...[r.t, r.tn].filter(x => x != null));
+  return v.length ? {lo: Math.min(...v), hi: Math.max(...v)} : null;
 }
 // 一座山在某個模式下的所有格子（列表與詳情共用；詳情可自己切換日期）
 function cellsFor(x, mode, cs){
@@ -336,12 +346,15 @@ function renderDetail(){
   const v = (y, f) => y == null ? '—' : f(y);
   // 詳情表格：時段橫排（tenki.jp 做法，2026-10-20 使用者選「選項 1」）。欄是時段、列是項目，手機也不需左右滑動；
   // C、D 的原因列在表格下方
+  const today = !week && dc[0].di === 0;
+  const tr = p => { const r = tempRange(p, dc[0].ws, dc[dc.length-1].we);
+    return r ? `<div class="trange">${week ? '一週氣溫' : today ? '今天剩下時段的氣溫' : '全天氣溫'}：最低 <b>${r.lo}°C</b>、最高 <b>${r.hi}°C</b></div>` : ''; };
   const table = (p, k, idx, title) => {
     const cl = (c, col) => [c.ref ? 'ref' : '', c.past ? 'past' : '', col.peak ? 'peak' : '', week && col.wkd ? 'we wk' : ''].filter(Boolean).join(' ');
     const head = idx.map(j => { const col = dc[j]; return `<th class="${cl(cells[j], col)}">${week ? `${md(col.date)}<span class="wd">${dayName(col.date)}</span>` : col.short}</th>`; }).join('');
     const row = (name, f, cls = '') => `<tr class="${cls}"><th scope="row">${name}</th>${idx.map(j => { const c = cells[j]; return `<td class="${cl(c, dc[j])}">${f(c.per[k], c)}</td>`; }).join('')}</tr>`;
     const whys = idx.map(j => { const c = cells[j], y = c.per[k]; return y.j.lv > 0 ? `<li><b>${dc[j].label}</b>${lamp({lv:y.j.lv, ref:c.ref, past:c.past}, true)}${esc(y.j.why.join('、'))}</li>` : ''; }).join('');
-    return `<div class="pt"><h3>${esc(p.label)}・${title}</h3>
+    return `<div class="pt"><h3>${esc(p.label)}・${title}</h3>${tr(p)}
       <table class="vt" style="--n:${idx.length}"><thead><tr><th></th>${head}</tr></thead><tbody>
       ${row('燈號', (y, c) => lamp({lv:y.j.lv, plus:y.j.plus, ref:c.ref, past:c.past}, true), 'lr')}
       ${row('天氣', y => v(y.fc?.wx, esc), 'wx')}
@@ -387,7 +400,8 @@ function stdInfo(mode){   // 燈號的判定標準：放在燈號圖例旁的 i�
   const ul = a => '<ul>' + a.map(x => '<li>' + x + '</li>').join('') + '</ul>';
   const std = ['A：佳，各項都適合，且天氣描述是「晴」；B：可，各項都適合；C：注意；D：不建議。',
     '依氣象署預報檢查降雨機率、天氣描述（霧、雪、雷）、平均風速，以及颱風、豪雨、大雨特報；標高 1,000 公尺以下另看高溫。以最差的一項作為燈號。',
-    '跨多個鄉鎮的山，取最差的鄉鎮。'];
+    '跨多個鄉鎮的山，取最差的鄉鎮。',
+    '燈號只看天氣，不代表路線難度、體能需求或步道狀況。'];   // 2026-10-21 使用者決定（新手角度）
   if (mode === 'week') return '<h4>判定標準</h4>' + ul([...std, `前 4 天（今天到大後天）用逐 3 小時預報：你選的登山時段（${esc(slots)}）中，取最差的一段作為當天燈號；今天已過的時段不算。`, `第 5–7 天用一週預報：登山時段對應到白天或晚上，取最差的；登山時段都在 12 點前時，白天描述的「午後」部分不計。氣象署沒有降雨機率，依天氣描述判定：「局部」「短暫」的雨為 C，其他的雨（例如「陣雨」「有雨」）為 D。僅供參考。`]);
   return '<h4>判定標準</h4>' + ul([...std, '每 3 小時一格，每格一個燈號。']);
 }

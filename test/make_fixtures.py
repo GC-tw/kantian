@@ -32,7 +32,7 @@ json.dump({'success': 'true', 'records': {'locations': [{'datasetDescription': '
 def new_fmt(desc, groups):
     return {'success': 'true', 'records': {'Locations': [{'DatasetDescription': desc, 'LocationsName': g, 'Location': L} for g, L in groups.items()]}}
 def week_elements(start):
-    els = {'天氣現象': [], '12小時降雨機率': [], '最高溫度': [], '最高體感溫度': [], '風速': []}
+    els = {'天氣現象': [], '12小時降雨機率': [], '最高溫度': [], '最低溫度': [], '最高體感溫度': [], '風速': []}
     for i in range(15):
         s = start + dt.timedelta(hours=12*i); e = s + dt.timedelta(hours=12)
         p = random.choice([0, 20, 40, 70]) if i < 6 else ' '
@@ -40,7 +40,9 @@ def week_elements(start):
         w = wx(p) if p != ' ' else random.choice(['陰陣雨', '陰短暫陣雨', '晴時多雲'])   # 第 4 天起沒有降雨機率，用真實資料常見的描述
         els['天氣現象'].append(tt('', {'Weather': w, 'WeatherCode': '04'}))
         els['12小時降雨機率'].append(tt('', {'ProbabilityOfPrecipitation': str(p)}))
-        els['最高溫度'].append(tt('', {'MaxTemperature': str(random.randint(5, 30))}))
+        mx = random.randint(5, 30)
+        els['最高溫度'].append(tt('', {'MaxTemperature': str(mx)}))
+        els['最低溫度'].append(tt('', {'MinTemperature': str(mx - random.randint(2, 8))}))
         els['最高體感溫度'].append(tt('', {'MaxApparentTemperature': str(random.choice([20, 30, 37]))}))
         els['風速'].append(tt('', {'WindSpeed': str(round(random.uniform(1, 15), 1)), 'BeaufortScale': '4'}))
     return [{'ElementName': k, 'Time': v} for k, v in els.items()]

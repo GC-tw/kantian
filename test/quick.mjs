@@ -20,5 +20,11 @@ ok(dup.length === 0, '沒有重複的元素 id' + (dup.length ? '：' + dup.join
 const used = [...scripts.join('\n').matchAll(/\$\('([\w-]+)'\)/g)].map(m => m[1]);
 const missing = [...new Set(used)].filter(x => !ids.includes(x));
 ok(missing.length === 0, '程式用到的元素都存在' + (missing.length ? '：缺少 ' + missing.join('、') : ''));
+// 樣式的大括號要成對：少一個右括號時，後面的樣式都會變成只在手機生效，電腦版整個跑掉（2026-10-21 踩到）
+for (const [, css] of html.matchAll(/<style>([\s\S]*?)<\/style>/g)){
+  let d = 0, bad = false;
+  for (const ch of css.replace(/\/\*[\s\S]*?\*\//g, '').replace(/"[^"]*"|'[^']*'/g, '')){ if (ch === '{') d++; else if (ch === '}' && --d < 0) bad = true; }
+  ok(d === 0 && !bad, '樣式的大括號成對' + (d ? `（少了 ${d} 個右括號）` : bad ? '（多了右括號）' : ''));
+}
 console.log(fails ? `\n${fails} 項未通過` : '\n快速檢查通過');
 process.exit(fails ? 1 : 0);
