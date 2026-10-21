@@ -305,11 +305,14 @@ function openDetail(k){
   dr.hidden = false; $('scrim').hidden = false;
   $('d-close').focus();
 }
-// 氣象署原始預報（2026-10-21 使用者決定）：登山預報點用預報點代碼，鄉鎮用氣象署鄉鎮代碼（資料裡的 8 碼取前 7 碼），讓使用者自己查核
+// 氣象署原始預報（2026-10-21 使用者決定）：登山預報點用預報點代碼，鄉鎮用氣象署網頁的 7 碼鄉鎮代碼，讓使用者自己查核
+// 資料裡的鄉鎮代碼是 8 碼＝縣市 5 碼＋鄉鎮序號 2 碼＋0。氣象署網頁：一般縣市＝縣市 5 碼＋序號 2 碼（宜蘭市 10002010 → 1000201）；
+// 直轄市（63～68 開頭）＝前 2 碼＋序號 3 碼＋00（臺南市南化區 67000NN0 → 670NN00）。依氣象署網站地圖核對（2026-10-21）
+const townTID = g => !/^\d{8}$/.test(g || '') ? '' : /^6[3-8]000/.test(g) ? g.slice(0, 2) + '0' + g.slice(5, 7) + '00' : g.slice(0, 7);
 function cwaUrl(p){
   if (p.code) return 'https://www.cwa.gov.tw/V8/C/L/Mountain/Mountain.html?PID=' + encodeURIComponent(p.code);
-  const g = fcIndex.get(p.key)?.geo;
-  return /^\d{8}$/.test(g || '') ? 'https://www.cwa.gov.tw/V8/C/W/Town/Town.html?TID=' + g.slice(0, 7) : '';
+  const t = townTID(fcIndex.get(p.key)?.geo);
+  return t ? 'https://www.cwa.gov.tw/V8/C/W/Town/Town.html?TID=' + t : '';
 }
 function closeDetail(){ $('drawer').hidden = true; $('scrim').hidden = true; }
 // 燈號排序旁的 i：依目前模式說明比較標準與排序，用字與「排序規則與說明」頁一致（2026-10-20）
