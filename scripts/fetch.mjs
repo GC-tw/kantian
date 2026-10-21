@@ -100,7 +100,7 @@ function locations(j){
       }
       const ps = [].concat(pick(pick(loc, 'ParameterSet') || {}, 'Parameter') || []);   // 登山預報點代碼（例如 D001）
       const id = ps.find(x => /^id$/i.test(pick(x, 'ParameterName') || ''))?.ParameterValue || null;
-      out.push({county, id, name: pick(loc, 'LocationName', 'locationName'), lat: num(pick(loc, 'Latitude', 'lat')), lon: num(pick(loc, 'Longitude', 'lon')), recs});
+      out.push({county, id, geo: pick(loc, 'Geocode', 'geocode') || null, name: pick(loc, 'LocationName', 'locationName'), lat: num(pick(loc, 'Latitude', 'lat')), lon: num(pick(loc, 'Longitude', 'lon')), recs});
     }
   }
   return out;
@@ -277,6 +277,7 @@ async function main(){
       const key = (l.county + l.name).replace(/台/g, '臺');
       if (!townsNeeded.has(key)) continue;
       const p = result.points[key] ||= {name: key, lat: l.lat, lon: l.lon};
+      if (l.geo) p.geo = String(l.geo);                       // 鄉鎮代碼：網頁做「氣象署原始預報」連結用
       p[kind] = kind === 'h3' ? slots3h(l) : periods12h(l);
     }
   }
@@ -350,7 +351,7 @@ function compact(result){
     while (a.length > 1 && a[a.length - 1] == null) a.pop();
     return a;
   });
-  const points = Object.fromEntries(Object.entries(result.points).map(([k, p]) => [k, {h3: enc(p.h3, t0, 3*H), week: enc(p.week, t0 - 6*H, 12*H)}]));
+  const points = Object.fromEntries(Object.entries(result.points).map(([k, p]) => [k, {h3: enc(p.h3, t0, 3*H), week: enc(p.week, t0 - 6*H, 12*H), ...(p.geo ? {geo: p.geo} : {})}]));
   return {...result, t0, wx, wxHint: wxHints(Object.values(result.points)), points};
 }
 // 天氣用語紀錄 data/wx-log.json：累積每次執行出現的天氣描述，搭配當時有效的特報，

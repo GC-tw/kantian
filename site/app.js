@@ -49,7 +49,7 @@ function useForecast(data){
   FC = data; fcIndex = new Map(); WXH = data.wxHint || {};
   const t0 = data.t0, wx = data.wx || [];
   for (const [key, p] of Object.entries(data.points || {}))
-    fcIndex.set(key, {h3: new Map(decodeRows(p.h3, t0, 3*H, wx).map(r => [r.s, r])), week: new Map(decodeRows(p.week, t0 - 6*H, 12*H, wx).map(r => [r.s, r]))});
+    fcIndex.set(key, {geo: p.geo || '', h3: new Map(decodeRows(p.h3, t0, 3*H, wx).map(r => [r.s, r])), week: new Map(decodeRows(p.week, t0 - 6*H, 12*H, wx).map(r => [r.s, r]))});
   // 特報：只採用颱風、豪雨、大雨（列入燈號，D）。陸上強風、低溫、高溫、濃霧特報不採用、不顯示：
   // 氣象署資料只到縣市層級，無法對應到每座山；改看各山的風速、氣溫、天氣描述預報（2026-10-20 使用者決定）
   FC.alerts = (data.alerts || []).filter(a => ALERT_LV(a.type) > 0).map(a => ({...a, lv: ALERT_LV(a.type)})).sort((a, b) => b.lv - a.lv);
@@ -294,6 +294,7 @@ function openDetail(k){
   dr.innerHTML = `
     <div class="d-head"><div><h2 id="d-title">${esc(r.m.n)}${star(r.k)}</h2><div class="sub">${sub(r.m)}</div></div><button class="close" type="button" id="d-close" aria-label="關閉">×</button></div>
     <div class="src"><span><b>採用預報</b>：${esc(pts.map(p=>p.label+(p.code?'（'+p.code+'）':'')).join('、'))}</span>
+      ${(() => { const ls = pts.map(p => [p, cwaUrl(p)]).filter(x => x[1]); return ls.length ? `<span class="cwa">${ls.map(([p, u]) => `<a href="${u}" target="_blank" rel="noopener">${ls.length > 1 ? esc(p.key.slice(3)) + ' ' : ''}氣象署原始預報 ↗</a>`).join('')}</span>` : ''; })()}
       <span>${pts.length>1?'跨多個鄉鎮，各自列出；燈號取最差的鄉鎮。':''}${r.low?'標高 1,000 公尺以下，另判斷高溫。':''}</span>
       <span class="issued">資料來源：交通部中央氣象署・本站更新 ${FC ? fmtTime(Date.parse(FC.fetchedAt)) : '—'}</span></div>
     ${alerts.map(a=>`<div class="alert"><b>${esc(a.type)}・${SYM[a.lv]}</b>　${esc(a.county)}${a.end?`，有效至 ${fmtTime(a.end)}`:''}</div>`).join('')}
@@ -303,6 +304,12 @@ function openDetail(k){
     <div class="note">${week ? '一週預報以你選的登山時段（'+sortedSlots().map(slotLabel).join('、')+'）判定，取最差情況；第 4–7 天氣象署未提供降雨機率，以「—」表示，依天氣描述判定，請在出發前 3 天內再確認。' : '逐 3 小時預報；底色時段是你選的登山時段，排序依登山時段計算。'}</div>`;
   dr.hidden = false; $('scrim').hidden = false;
   $('d-close').focus();
+}
+// 氣象署原始預報（2026-10-21 使用者決定）：登山預報點用預報點代碼，鄉鎮用氣象署鄉鎮代碼（資料裡的 8 碼取前 7 碼），讓使用者自己查核
+function cwaUrl(p){
+  if (p.code) return 'https://www.cwa.gov.tw/V8/C/L/Mountain/Mountain.html?PID=' + encodeURIComponent(p.code);
+  const g = fcIndex.get(p.key)?.geo;
+  return /^\d{8}$/.test(g || '') ? 'https://www.cwa.gov.tw/V8/C/W/Town/Town.html?TID=' + g.slice(0, 7) : '';
 }
 function closeDetail(){ $('drawer').hidden = true; $('scrim').hidden = true; }
 // 燈號排序旁的 i：依目前模式說明比較標準與排序，用字與「排序規則與說明」頁一致（2026-10-20）
