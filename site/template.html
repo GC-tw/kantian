@@ -290,6 +290,36 @@ footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);paddin
   #f-scrim{z-index:22}
 }
 
+/* 時段按鈕分兩組（2026-10-21）：單日逐 3 小時｜多日 */
+.seg-wrap{display:grid;grid-template-columns:4fr 2fr;gap:8px;max-width:760px}
+.seg-g{display:flex;flex-direction:column;gap:3px;min-width:0}
+.seg-l{font-size:11.5px;color:var(--muted);font-weight:500;padding-left:2px}
+.seg.s4{grid-template-columns:repeat(4,1fr);max-width:none}
+.seg.s2{grid-template-columns:repeat(2,1fr);max-width:none}
+/* 週末卡片：最左一欄寫星期，上面一列時段，下面每天一列燈號 */
+.pick .lights.two{grid-template-columns:2.3em repeat(8,minmax(0,1fr))}
+.pick .lights .dl{font-size:11px;font-weight:700;color:var(--we);align-self:center;white-space:nowrap}
+.matrix .dcol{font-size:12px;font-weight:700;white-space:nowrap;color:var(--we)}
+.matrix thead th.dcol{color:var(--muted)}
+.matrix tbody tr.r2 td{border-top:0}
+/* 搜尋提示（2026-10-21） */
+@media (min-width:641px){header.top{position:relative}}
+.suggest{position:absolute;left:0;right:0;top:100%;z-index:30;margin-top:4px;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:8px;box-shadow:0 10px 24px rgba(0,0,0,.18);max-height:min(60vh,420px);overflow-y:auto;display:flex;flex-direction:column}
+.suggest[hidden]{display:none}
+.suggest .sg{font:inherit;text-align:left;background:none;border:0;border-bottom:1px solid var(--line);color:inherit;padding:9px 12px;display:flex;align-items:baseline;gap:8px;cursor:pointer;min-width:0}
+.suggest .sg:last-child{border-bottom:0}
+.suggest .sg:hover,.suggest .sg:focus-visible{background:var(--accent-soft)}
+.suggest .nm{font-family:var(--f-display);font-weight:800;font-size:16px;flex:none}
+.suggest .al{font-size:12px;color:var(--muted);flex:none}
+.suggest .meta{font-size:12px;color:var(--muted);flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* 詳情裡的日期切換（2026-10-21） */
+.d-seg{flex:none;display:grid;grid-template-columns:repeat(6,1fr);border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.d-seg button{font:inherit;font-weight:700;font-size:13px;background:none;border:0;border-left:1px solid var(--line);color:var(--muted);padding:6px 1px;cursor:pointer;display:flex;flex-direction:column;align-items:center;line-height:1.25;min-width:0}
+.d-seg button:first-child{border-left:0}
+.d-seg button small{font-weight:500;font-size:10px;white-space:nowrap;letter-spacing:-.03em}
+.d-seg button[aria-selected="true"]{background:var(--accent);color:var(--accent-ink)}
+.src .town{color:var(--muted)}
+@media (max-width:640px){.suggest{left:10px;right:10px}.seg-wrap{gap:6px}}
 </style>
 
 <div class="wrap">
@@ -302,6 +332,7 @@ footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);paddin
       <div class="search" id="search"><button type="button" class="s-btn" id="s-btn" aria-label="搜尋山名或別名" aria-expanded="false" aria-controls="f-kw"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></svg></button><input id="f-kw" name="kw" type="search" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" aria-label="搜尋山名或別名" placeholder="搜尋山名或別名"><button type="button" class="s-x" id="s-x" aria-label="清除並關閉搜尋">×</button></div>
       </div>
     </div>
+    <div class="suggest" id="suggest" role="listbox" aria-label="搜尋提示" hidden></div>
   </header>
 
   <div class="ty-alert" id="typhoon" role="alert" hidden></div>
@@ -314,25 +345,31 @@ footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);paddin
   </nav>
 
 
-  <div class="seg find-only" role="tablist" aria-label="預報時段" id="seg">
+  <!-- 時段按鈕分兩組（2026-10-21 使用者決定）：單日逐 3 小時｜多日（週末、一週） -->
+  <div class="seg-wrap find-only" role="tablist" aria-label="預報時段" id="seg">
+    <div class="seg-g"><span class="seg-l">單日・逐 3 小時</span><div class="seg s4">
     <button type="button" role="tab" data-mode="today" aria-selected="true">今天<small class="sd">逐 3 小時預報</small></button>
     <button type="button" role="tab" data-mode="tmr" aria-selected="false">明天<small class="sd">逐 3 小時預報</small></button>
     <button type="button" role="tab" data-mode="d2" aria-selected="false">後天<small class="sd">逐 3 小時預報</small></button>
     <button type="button" role="tab" data-mode="d3" aria-selected="false">大後天<small class="sd">逐 3 小時預報</small></button>
+    </div></div>
+    <div class="seg-g"><span class="seg-l">多日</span><div class="seg s2">
+    <button type="button" role="tab" data-mode="we" aria-selected="false">週末<small id="seg-we" class="we">週六、週日</small></button>
     <button type="button" role="tab" data-mode="week" aria-selected="false">一週<small id="seg-week">7 天</small></button>
+    </div></div>
   </div>
 
   <main id="view-find" style="display:flex;flex-direction:column;gap:18px">
 
     <div style="display:flex;flex-direction:column;gap:10px">
       <div class="legend">
-          <span><i class="lamp sm g p">A</i>佳</span><span><i class="lamp sm g">B</i>可</span><span><i class="lamp sm y">C</i>注意</span><span><i class="lamp sm r">D</i>不建議</span><span><i class="lamp sm na">—</i>已過或無資料</span><span id="lg-ref" class="lg-ref"><i class="lamp sm ref dash" aria-hidden="true"></i>虛線＝第 4–7 天，僅供參考<button type="button" class="info" id="info-btn" aria-expanded="false" aria-controls="info-ref" aria-label="為什麼第 4–7 天只供參考"><svg viewBox="0 0 20 20" aria-hidden="true"><circle class="ring" cx="10" cy="10" r="9.1"/><circle cx="10" cy="6.1" r="1.2"/><rect x="9.2" y="8.5" width="1.6" height="6.6" rx=".8"/></svg></button></span>
+          <span><i class="lamp sm g p">A</i>佳</span><span><i class="lamp sm g">B</i>可</span><span><i class="lamp sm y">C</i>注意</span><span><i class="lamp sm r">D</i>不建議</span><span><i class="lamp sm na">—</i>無資料；淡色＝已過</span><span id="lg-ref" class="lg-ref"><i class="lamp sm ref dash" aria-hidden="true"></i>虛線＝第 5–7 天，僅供參考<button type="button" class="info" id="info-btn" aria-expanded="false" aria-controls="info-ref" aria-label="為什麼第 5–7 天只供參考"><svg viewBox="0 0 20 20" aria-hidden="true"><circle class="ring" cx="10" cy="10" r="9.1"/><circle cx="10" cy="6.1" r="1.2"/><rect x="9.2" y="8.5" width="1.6" height="6.6" rx=".8"/></svg></button></span>
         </div>
       <div class="info-pop" id="info-ref" hidden>
-        <div class="info-head"><b>為什麼第 4–7 天只供參考？</b><button type="button" class="info-x" id="info-x" aria-label="關閉說明">×</button></div>
+        <div class="info-head"><b>為什麼第 5–7 天只供參考？</b><button type="button" class="info-x" id="info-x" aria-label="關閉說明">×</button></div>
         <ul>
-          <li>氣象署的一週預報，只有前 3 天提供「降雨機率」。</li>
-          <li>第 4–7 天只有天氣描述（例如「多雲短暫陣雨」），會不會下雨只能看描述判斷，比較粗略。</li>
+          <li>一週的前 4 天（今天到大後天），本站用逐 3 小時預報判定，有降雨機率。</li>
+          <li>第 5–7 天只有氣象署一週預報的天氣描述（例如「多雲短暫陣雨」），沒有降雨機率，會不會下雨只能看描述判斷，比較粗略。</li>
           <li>描述有「局部」「短暫」的雨為 C，其他的雨（例如「陣雨」「有雨」）為 D；請點開詳情看天氣描述。</li>
           <li>預報的日子越遠，準確度本來就越低。</li>
           <li>建議用來初步安排行程，出發前 3 天內再回來確認。</li>
@@ -371,7 +408,7 @@ footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);paddin
 
   <main id="view-fav" hidden style="display:flex;flex-direction:column;gap:10px">
     <div class="sec-head"><h2 id="h-favs">我的收藏</h2></div>
-    <div class="legend"><span><i class="lamp sm g p">A</i>佳</span><span><i class="lamp sm g">B</i>可</span><span><i class="lamp sm y">C</i>注意</span><span><i class="lamp sm r">D</i>不建議</span><span><i class="lamp sm na">—</i>已過或無資料</span><span class="lg-ref"><i class="lamp sm ref dash" aria-hidden="true"></i>虛線＝第 4–7 天，僅供參考</span></div>
+    <div class="legend"><span><i class="lamp sm g p">A</i>佳</span><span><i class="lamp sm g">B</i>可</span><span><i class="lamp sm y">C</i>注意</span><span><i class="lamp sm r">D</i>不建議</span><span><i class="lamp sm na">—</i>無資料；淡色＝已過</span><span class="lg-ref"><i class="lamp sm ref dash" aria-hidden="true"></i>虛線＝第 5–7 天，僅供參考</span></div>
     <div class="matrix-box" id="fav-box"><table class="matrix" id="fav-matrix"><thead></thead><tbody></tbody></table><div class="cards" id="fav-cards"></div></div>
     <div class="fav-empty" id="fav-empty">還沒有收藏。到「找山」點山名旁的 ♡，就能把山加到這裡，快速查看它們的天氣。</div>
   </main>
@@ -386,8 +423,9 @@ footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);paddin
         <li><b>B</b>：可。各項都適合</li>
         <li><b>C</b>：注意</li>
         <li><b>D</b>：不建議</li>
-        <li><b>—</b>：時段已過，或沒有資料</li>
-        <li><b>虛線</b>：第 4–7 天的預報，僅供參考</li>
+        <li><b>—</b>：沒有資料</li>
+        <li><b>淡色</b>：時段已過</li>
+        <li><b>虛線</b>：第 5–7 天的預報，僅供參考</li>
       </ul>
       <h3>登山時段</h3>
       <ul>
@@ -407,13 +445,15 @@ footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);paddin
       <h3>特殊情況</h3>
       <ul>
         <li><b>跨多個鄉鎮的山：</b>各鄉鎮分別判定，取最差的；每個鄉鎮都是 A 才算 A。</li>
-        <li><b>一週預報：</b><ul><li>氣象署的一週資料分成白天（06–18）和晚上（18–06）。本站依你選的登山時段對應到白天或晚上，取最差的作為當天燈號。</li><li>登山時段都在 12 點前時，白天描述中「午後」的部分不計（例如「晴午後短暫雷陣雨」視為「晴」）；降雨機率仍照整個白天的數值。</li><li>對應到的都是「晴」，才算 A。</li><li>第 4–7 天氣象署沒有降雨機率，只有天氣描述，依雨的用語判定：<ul><li>「局部」「短暫」的雨（例如「多雲短暫陣雨」「午後局部雨」）：C</li><li>其他的雨（例如「陰陣雨」「陰有雨」）：D</li></ul>詳情會列出原始描述。請在出發前 3 天內再確認。</li></ul></li>
+        <li><b>週末：</b>週六、週日每 3 小時一格，上下並列。逐 3 小時預報還沒涵蓋的日子（例如週一到週三看週日），改用一週預報對應的白天或晚上，以虛線表示，僅供參考。</li>
+        <li><b>一週預報：</b><ul><li>前 4 天（今天到大後天）用逐 3 小時預報：你選的登山時段中，取最差的一段作為當天燈號；今天已過的時段不算。和「今天～大後天」按鈕用的是同一份資料。</li><li>第 5–7 天用氣象署另一份一週預報，分成白天（06–18）和晚上（18–06）。本站依你選的登山時段對應到白天或晚上，取最差的作為當天燈號；登山時段都在 12 點前時，白天描述中「午後」的部分不計（例如「晴午後短暫雷陣雨」視為「晴」）。</li><li>因為兩份預報不同，同一座山第 4 天和第 5 天的燈號，判斷依據並不一樣。</li><li>對應到的都是「晴」，才算 A。</li><li>第 5–7 天氣象署沒有降雨機率，只有天氣描述，依雨的用語判定：<ul><li>「局部」「短暫」的雨（例如「多雲短暫陣雨」「午後局部雨」）：C</li><li>其他的雨（例如「陰陣雨」「陰有雨」）：D</li></ul>詳情會列出原始描述。請在出發前 3 天內再確認。</li></ul></li>
         <li><b>沒看過的天氣用語：</b>氣象署的天氣描述如果出現本站沒收錄的用語，改看氣象署的天氣代碼，代碼表示有雷、雪、霧或雨時，取較嚴格的燈號，原因會寫「天氣代碼」。</li>
       </ul>
       <h3>排序方式</h3>
       <ul>
         <li><b>計分：</b>A 3 分、B 2 分、C 1 分、D 0 分。已過的時段和無資料不計分。分數只用來排序，網頁上不顯示。<ul><li>例：「A、B」共 5 分，排在「B、B」共 4 分前面。</li></ul></li>
         <li><b>今天／明天／後天／大後天</b>（每 3 小時一格），依序比較：<ol><li>登山時段中 D 的數量，少的在前（整段過程中有一段不建議，就排在後面）</li><li>登山時段的總分，高的在前</li><li>登山時段中 A 的數量，多的在前</li><li>當天所有時段的總分，高的在前</li></ol><ul><li>登山時段都過了，就改看當天剩下的時段。</li></ul></li>
+        <li><b>週末</b>（週六、週日，每 3 小時一格），依序比較兩天合計的：<ol><li>登山時段中 D 的數量，少的在前</li><li>登山時段的總分，高的在前</li><li>登山時段中 A 的數量，多的在前</li><li>兩天所有時段的總分，高的在前</li></ol></li>
         <li><b>一週預報</b>（每天一格），依序比較：<ol><li>7 天的總分，高的在前</li><li>A 的天數，多的在前</li><li>D 的天數，少的在前</li></ol></li>
         <li><b>完全沒有資料的山：</b>排在最後。</li>
         <li><b>以上所有條件都相同時：</b>每天隨機排序一次同條件山岳。</li>
@@ -421,7 +461,7 @@ footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);paddin
       <h3>資料來源</h3>
       <ul>
         <li><b>百岳與部分山岳：</b>氣象署登山預報（共 151 個預報點），詳情會標示預報點代號。</li>
-        <li><b>其他小百岳：</b>氣象署鄉鎮預報。</li>
+        <li><b>其他小百岳：</b>氣象署鄉鎮預報。因氣象署無直接對應點位，鄉鎮預報代表的是鄉鎮，不是山頂，僅供參考。</li>
         <li><b>天氣特報：</b>氣象署警特報。</li>
         <li><b>更新時間：</b>氣象署每天約 <span class="kbd">05:30</span> <span class="kbd">11:30</span> <span class="kbd">17:30</span> <span class="kbd">23:30</span> 發布，本站在每次發布後更新。</li>
       </ul>
