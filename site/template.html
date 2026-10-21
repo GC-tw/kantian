@@ -13,7 +13,7 @@
 /* Layout: 地形圖紙面 — 上方查詢列，下方「山 × 日期」燈號矩陣，點山名開右側詳情面板 */
 :root{
   --bg:#f0f1f2; --surface:#fcfcfc; --ink:#1c2126; --muted:#5f666d; --line:#d3d6da; --contour:#e3e5e8;
-  --accent:#3a4149; --accent-ink:#ffffff; --accent-soft:#e2e5e9; --we:#d23a2e; --we-soft:#fcefed;
+  --accent:#3a4149; --accent-ink:#ffffff; --accent-soft:#e2e5e9; --we:#2f6fb5; --we-soft:#e9f0f8;
   --bar:#2f363d; --bar-ink:#f4f5f6; --bar-muted:#b4bcc4;   /* 手機標題列與底部分頁列 */
   --go:#2f8a55; --go-soft:#d9efe1; --warn:#c48a12; --warn-soft:#f6ead0; --stop:#c0463a; --stop-soft:#f5dcd8;
   --f-display:"Noto Serif TC","Songti TC","PMingLiU",serif;
@@ -22,11 +22,11 @@
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --bg:#141618; --surface:#1c1f22; --ink:#e6e8ea; --muted:#9ba1a7; --line:#33383d; --contour:#1f2225;
-  --accent:#c9ced4; --accent-ink:#15181b; --accent-soft:#2b3036; --we:#f27a6d; --we-soft:#33262a; --bar:#2a3036; --bar-ink:#eef0f2; --bar-muted:#a3abb3;
+  --accent:#c9ced4; --accent-ink:#15181b; --accent-soft:#2b3036; --we:#7fb0e8; --we-soft:#1e2833; --bar:#2a3036; --bar-ink:#eef0f2; --bar-muted:#a3abb3;
   --go:#5cc287; --go-soft:#173826; --warn:#e3b24a; --warn-soft:#3a2f14; --stop:#ec7a6c; --stop-soft:#43221e; color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#141618; --surface:#1c1f22; --ink:#e6e8ea; --muted:#9ba1a7; --line:#33383d; --contour:#1f2225;
-  --accent:#c9ced4; --accent-ink:#15181b; --accent-soft:#2b3036; --we:#f27a6d; --we-soft:#33262a; --bar:#2a3036; --bar-ink:#eef0f2; --bar-muted:#a3abb3;
+  --accent:#c9ced4; --accent-ink:#15181b; --accent-soft:#2b3036; --we:#7fb0e8; --we-soft:#1e2833; --bar:#2a3036; --bar-ink:#eef0f2; --bar-muted:#a3abb3;
   --go:#5cc287; --go-soft:#173826; --warn:#e3b24a; --warn-soft:#3a2f14; --stop:#ec7a6c; --stop-soft:#43221e; color-scheme:dark}
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.6;
@@ -69,7 +69,11 @@ header.top.s-on .row1 .tools{width:min(340px,40%)}
 .cd-s{display:flex;flex-wrap:wrap;gap:2px 14px;font-size:13px;color:var(--muted)}
 .cd-s b{color:var(--ink);font-weight:600}
 .cd-s .on b{color:var(--accent);text-decoration:underline;text-underline-offset:3px}
-@media (max-width:640px){.cd-s{gap:2px 12px;font-size:12.5px}@media (max-width:380px){.cond{padding-left:10px;padding-right:28px}.cond::after{right:11px}.cd-s{gap:2px 9px;font-size:12px}}}
+/* 「設定篩選條件」壓成一行（2026-10-21 設計檢查，選丙）：只留篩選圖示＋目前條件；文字留給讀屏軟體 */
+.cond{flex-direction:row;align-items:center;gap:8px;padding:9px 30px 9px 11px}
+.cd-h{font-size:0;gap:0}.cd-h svg{width:18px;height:18px}
+.cd-s{flex-wrap:nowrap;white-space:nowrap;gap:0 9px;min-width:0;overflow:hidden}
+@media (max-width:640px){.cd-s{gap:0 9px;font-size:12.5px}@media (max-width:380px){.cond{padding-left:9px;padding-right:26px;gap:6px}.cond::after{right:10px}.cd-s{gap:0 7px;font-size:12px}}}
 /* 篩選：平常收起，按「篩選」才打開（電腦版在頁面中展開，手機版從底部滑出） */
 #q:not(.open){display:none}
 .sheet-head{display:flex;justify-content:space-between;align-items:center;grid-column:1/-1}
@@ -159,7 +163,7 @@ h2 .info{width:17px;height:17px;top:1.5px}
 .pick .ph.ref{color:var(--muted)}
 .pick .ph.we{color:var(--we)}
 .pick .lights>*{position:relative;z-index:1}
-.pick .lights>.wk-bg{z-index:0;background:var(--we-soft);border-radius:5px;margin:-2px -1.5px}   /* 一週模式週六、週日整欄淡紅底（2026-10-21） */
+.pick .lights>.wk-bg{z-index:0;background:var(--we-soft);border-radius:5px;margin:-2px -1.5px}   /* 一週模式週六、週日整欄淡藍底（2026-10-21；同日由淡紅改藍） */
 .sec-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:6px 16px}
 .sec-head p{margin:0;color:var(--muted);font-size:13px}
 .sec-tools{display:flex;align-items:center;gap:8px;flex:none}
@@ -248,7 +252,8 @@ table.vt{border-collapse:collapse;width:100%;table-layout:fixed;font-variant-num
 .vt tr.lr td .lamp{width:100%;max-width:30px}
 .vt td.ref,.vt td.past,.vt thead th.ref,.vt thead th.past{color:var(--muted)}
 .matrix th.wk,.matrix td.wk,.vt th.wk,.vt td.wk{background:var(--we-soft)}
-.vt thead th.we{color:var(--we)}.vt thead th.peak.we{color:var(--accent-ink)}   /* 週末紅色（第 4–7 天也是） */
+.vt thead th.we{color:var(--we)}.vt thead th.peak.we{color:var(--accent-ink)}   /* 週末藍色（2026-10-21 由紅改藍，避免和 D 混淆；表格數值不上色） */
+.vt td.we{color:var(--ink)}.vt td.we.ref,.vt td.we.past{color:var(--muted)}
 .whys{margin-top:10px}
 .whys h4{margin:0 0 4px;font-size:14px}
 .whys ul{margin:0;padding:0;list-style:none;font-size:14px;line-height:1.5}
@@ -264,7 +269,7 @@ table.vt{border-collapse:collapse;width:100%;table-layout:fixed;font-variant-num
 .doc p{margin:0}
 .doc ul ul,.doc ol{margin-top:4px}
 .doc ol{margin-bottom:0;padding-left:1.4em;display:flex;flex-direction:column;gap:4px}
-.doc .warn{color:var(--we);font-weight:700}
+.doc .warn{color:var(--stop);font-weight:700}
 .lamp.chip{vertical-align:text-bottom;margin:0 2px;width:auto;min-width:20px;padding:0 3px}   /* 說明文字中的燈號：與文字上下置中（2026-10-20 由 -4px 改 text-bottom，原本偏低約 6px） */
 .kbd{font-family:var(--f-mono);font-size:13px;background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:0 5px}
 footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);padding-top:12px}
@@ -341,7 +346,10 @@ footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);paddin
 .d-seg button small{font-weight:500;font-size:11px;white-space:nowrap;letter-spacing:-.03em}
 .d-seg button[aria-selected="true"]{background:var(--accent);color:var(--accent-ink)}
 .src .town{color:var(--muted)}
-@media (max-width:640px){.suggest{left:10px;right:10px}.seg-wrap{gap:6px}}
+@media (max-width:640px){.suggest{left:10px;right:10px}.seg-wrap{gap:6px}
+  /* 手機往下捲時，日期按鈕固定在標題列下方（2026-10-21 設計檢查，選丙）；--hh 是標題列高度，由 app.js 量 */
+  .seg-wrap{position:sticky;top:var(--hh,62px);z-index:13;background:var(--bg);margin:0 -16px;padding:6px 16px 8px}
+  .seg-wrap.stuck{box-shadow:0 4px 10px rgba(0,0,0,.1)}}
 </style>
 
 <div class="wrap">

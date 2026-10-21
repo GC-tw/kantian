@@ -271,8 +271,8 @@ const headRow = () => {
 const nameCell = (r, span) => `<th class="mt" scope="row"${span > 1 ? ` rowspan="${span}"` : ''}><div class="mt-in"><span class="nm">${esc(r.m.n)}</span><span class="sub">${sub(r.m)}</span>${star(r.k)}</div></th>`;
 const bodyRow = r => `<tr data-k="${r.k}" tabindex="0">${nameCell(r)}${r.cells.map((c, i)=>`<td${cols[i].wkd?' class="wk"':''}>${lamp(c)}</td>`).join('')}</tr>`;
 // 山岳卡片（手機列表與收藏；精簡兩列）：山名＋資訊＋收藏／燈號（不顯示比較結果，一週也不寫 A 天數；2026-10-20）
-// 小燈上方標出時段（逐 3 小時寫開始時刻，一週寫日期＋星期）；登山時段實心深色底、週末紅色
-// 一週模式的週六、週日：整欄淡紅底（2026-10-21 使用者選「甲」）。底色是另外放在同一欄後面的方塊，所以時段標示與燈號都明確指定欄位
+// 小燈上方標出時段（逐 3 小時寫開始時刻，一週寫日期＋星期）；登山時段實心深色底、週末藍色
+// 一週模式的週六、週日：整欄淡藍底（2026-10-21 使用者選「甲」；同日由紅改藍）。底色是另外放在同一欄後面的方塊，所以時段標示與燈號都明確指定欄位
 const gc = (i, row) => ` style="grid-column:${i+1};grid-row:${row}"`;
 const pickHead = () => {
   return cols.map((c, i) => (c.wkd ? `<span class="wk-bg"${gc(i, '1 / 3')} aria-hidden="true"></span>` : '')
@@ -586,6 +586,12 @@ const sameSet = (set, arr) => set.size === arr.length && arr.every(x => set.has(
   $('typhoon').addEventListener('click', e => { if (!e.target.closest('a')) tyToggle(); });
   $('typhoon').addEventListener('keydown', e => { if ((e.key === 'Enter' || e.key === ' ') && !e.target.closest('a')){ e.preventDefault(); tyToggle(); } });
   addEventListener('resize', fitTyphoon);
+  // 手機日期按鈕固定在標題列下方（2026-10-21）：量標題列高度（搜尋框展開時會變高）；固定住時加陰影
+  const hdr = document.querySelector('header.top'), segW = $('seg');
+  const setHH = () => document.documentElement.style.setProperty('--hh', hdr.offsetHeight + 'px');
+  if (window.ResizeObserver) new ResizeObserver(setHH).observe(hdr); setHH();
+  const stuck = () => segW.classList.toggle('stuck', segW.getBoundingClientRect().top <= hdr.offsetHeight + 1 && scrollY > 0 && getComputedStyle(segW).position === 'sticky');
+  addEventListener('scroll', stuck, {passive: true});
   document.addEventListener('keydown', e => { if (e.key === 'Escape'){ setFilter(false); hideSuggest(); if (document.activeElement === $('f-kw')) $('f-kw').blur(); } });
   $('q').onsubmit = e => e.preventDefault();
   $('brand').onclick = e => { e.preventDefault(); window.scrollTo({top: 0, behavior: 'smooth'}); };   // 點標題：回到最上方（不重新整理）
