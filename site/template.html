@@ -154,6 +154,12 @@ h2 .info{width:17px;height:17px;top:1.5px}
 .reload:hover{color:var(--ink)}
 .legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;color:var(--muted);align-items:center}
 .legend span{display:inline-flex;align-items:center;gap:5px}
+/* 找山的燈號圖例塞進一行（2026-10-21 使用者選「乙」：字縮小、用語縮短） */
+.legend.lg-1{flex-wrap:nowrap;font-size:11px;gap:0 6px;white-space:nowrap;min-width:0;letter-spacing:-.02em}
+.legend.lg-1 span{gap:2px}
+.legend.lg-1 .lamp.sm{width:16px;height:16px;min-width:16px;font-size:9px;line-height:14px}
+.legend.lg-1 .info{margin-left:1px}
+@media (max-width:380px){.legend.lg-1{font-size:10.5px;gap:0 4px;letter-spacing:-.05em}}   /* 360 寬的一週模式也要塞得下 */
 .matrix-box{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:8px}
 table.matrix{border-collapse:separate;border-spacing:0;width:100%;font-variant-numeric:tabular-nums}
 .matrix th,.matrix td{padding:6px 6px;border-bottom:1px solid var(--line);text-align:center;white-space:nowrap}
@@ -359,8 +365,8 @@ footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);paddin
   <main id="view-find" style="display:flex;flex-direction:column;gap:18px">
 
     <div style="display:flex;flex-direction:column;gap:10px">
-      <div class="legend">
-          <span><i class="lamp sm g p">A</i>佳</span><span><i class="lamp sm g">B</i>可</span><span><i class="lamp sm y">C</i>注意</span><span><i class="lamp sm r">D</i>不建議</span><span><i class="lamp sm na">—</i>無資料；淡色＝已過</span><span id="lg-ref" class="lg-ref"><i class="lamp sm ref dash" aria-hidden="true"></i>虛線＝第 5–7 天，僅供參考<button type="button" class="info" id="info-btn" aria-expanded="false" aria-controls="info-ref" aria-label="為什麼第 5–7 天只供參考"><svg viewBox="0 0 20 20" aria-hidden="true"><circle class="ring" cx="10" cy="10" r="9.1"/><circle cx="10" cy="6.1" r="1.2"/><rect x="9.2" y="8.5" width="1.6" height="6.6" rx=".8"/></svg></button></span>
+      <div class="legend lg-1">
+          <span><i class="lamp sm g p">A</i>佳</span><span><i class="lamp sm g">B</i>可</span><span><i class="lamp sm y">C</i>注意</span><span><i class="lamp sm r">D</i>不建議</span><span><i class="lamp sm na">—</i>無資料</span><span>淡色已過</span><span id="lg-ref" class="lg-ref"><i class="lamp sm ref dash" aria-hidden="true"></i>參考<button type="button" class="info" id="info-btn" aria-expanded="false" aria-controls="info-ref" aria-label="為什麼第 5–7 天只供參考"><svg viewBox="0 0 20 20" aria-hidden="true"><circle class="ring" cx="10" cy="10" r="9.1"/><circle cx="10" cy="6.1" r="1.2"/><rect x="9.2" y="8.5" width="1.6" height="6.6" rx=".8"/></svg></button></span>
         </div>
       <div class="info-pop" id="info-ref" hidden>
         <div class="info-head"><b>為什麼第 5–7 天只供參考？</b><button type="button" class="info-x" id="info-x" aria-label="關閉說明">×</button></div>
