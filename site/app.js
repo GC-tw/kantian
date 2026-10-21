@@ -140,9 +140,10 @@ const state = {
   mode: (m => MODES[m] ? m : 'today')(store.get('mode')),
   slots: new Set((a => Array.isArray(a) && a.length ? a : DEF_SLOTS)(store.get('hike18'))),   // 儲存名稱 hike18：2026-10-21 預設改 06–18 時換名稱，讓舊的預設（06–15）一起換成新預設
   name: '', shown: PAGE,
+  nod: store.get('nod') === true,                          // 只看沒有 D 的山（2026-10-21）
+
   ...loadFilters()
 };
-const filterCount = () => state.cats.size + state.counties.size + state.hts.size + (sameSet(state.slots, DEF_SLOTS) ? 0 : 1);   // 「篩選」按鈕：改了幾項（登山時段不是預設算 1 項）
 const saveFilters = () => { store.set('hike18', [...state.slots]); store.set('filters', {cats:[...state.cats], counties:[...state.counties], hts:[...state.hts]}); };
 const favs = new Set((a => Array.isArray(a) ? a : [])(store.get('favs')));
 let cols = [], all = [], rows = [], favRows = [], byKey = new Map();
@@ -233,7 +234,8 @@ function applyFilters(){                                    // 篩選不需重�
   rows = all.filter(r => (!state.cats.size || state.cats.has(r.m.c))
     && (!state.counties.size || r.counties.some(c => state.counties.has(c)))
     && (!state.hts.size || state.hts.has(r.ht))
-    && (!q || r.search.includes(q)));
+    && (!q || r.search.includes(q))
+    && (!state.nod || !!q || (!r.nd && !r.c1)));   // 只看沒有 D：登山時段（一週為 7 天）沒有 D、也不是完全沒資料；搜尋時不套用，避免找不到指定的山
   favRows = all.filter(r => favs.has(r.k));
 }
 // 搜尋提示（2026-10-21）：打字時在搜尋框下方列出山名或別名符合的山（名稱相同 → 開頭相同 → 包含），點了把山名填進搜尋框、列出搜尋結果（2026-10-21 改，不再直接開詳情）
@@ -270,6 +272,25 @@ const pickHead = () => {
 };
 const pickCard = (r, head) => `<div class="pick" data-k="${r.k}" tabindex="0" role="button"><div class="p1"><span class="nm">${esc(r.m.n)}</span><span class="meta">${sub(r.m)}</span>${star(r.k)}</div><div class="p2"><span class="lights" style="--n:${cols.length}">${head}${r.cells.map((c, i)=>lamp(c,true).replace('<i ', `<i${gc(i, 2)} `)).join('')}</span></div></div>`;
 
+// 條件列（2026-10-21）：顯示目前條件，點了打開篩選面板
+const HT_SHORT = ['1,000 m 以下', '1–2 千 m', '2–3 千 m', '3,000 m 以上'];
+function slotsText(){
+  const a = sortedSlots(); if (!a.length) return '—';
+  const run = a.every((h, i) => !i || h === a[i-1] + 3);
+  return run ? `${pad(a[0])}–${pad(a[a.length-1] + 3)}` : `${a.length} 段`;
+}
+const many = (set, unit, f = x => x) => !set.size ? '全部' : set.size === 1 ? f([...set][0]) : `${set.size} ${unit}`;
+function condText(){
+  $('c-slots').textContent = slotsText();
+  $('c-county').textContent = many(state.counties, '縣市');
+  $('c-cat').textContent = many(state.cats, '類');
+  $('c-ht').textContent = many(state.hts, '級', i => HT_SHORT[i]);
+  [['c-slots', !sameSet(state.slots, DEF_SLOTS)], ['c-county', state.counties.size], ['c-cat', state.cats.size], ['c-ht', state.hts.size]]
+    .forEach(([id, on]) => $(id).parentNode.classList.toggle('on', !!on));
+  $('nod-t').textContent = state.mode === 'week' ? '只看這 7 天都沒有 D 的山' : '只看登山時段沒有 D 的山';
+  $('f-nod').checked = state.nod;
+}
+
 function render(){
   const week = state.mode === 'week';
   $('h-picks-t').textContent = (week ? '這週' : MODES[state.mode].name) + '燈號排序';
@@ -283,7 +304,7 @@ function render(){
   const ph = pickHead();
   const head = headRow();
   $('fav-tab-n').textContent = favRows.length || '';
-  $('filter-n').textContent = filterCount() || '';
+  condText();
   $('fav-box').hidden = !favRows.length; $('fav-empty').hidden = !!favRows.length;
   $('fav-matrix').tHead.innerHTML = head;
   $('fav-matrix').tBodies[0].innerHTML = favRows.map(bodyRow).join('');
@@ -487,7 +508,7 @@ const sameSet = (set, arr) => set.size === arr.length && arr.every(x => set.has(
   let pending = false;
   const isDef = () => !state.cats.size && !state.counties.size && !state.hts.size && sameSet(state.slots, DEF_SLOTS);
   const syncReset = () => { $('filter-reset').disabled = isDef(); };
-  const onPick = () => { pending = true; $('filter-n').textContent = filterCount() || ''; lockChips(); syncReset(); };
+  const onPick = () => { pending = true; lockChips(); syncReset(); };
   const syncs = [chipGroup($('f-county'), 'data-co', state.counties, {allId:'c-all', onChange: onPick}),
     chipGroup($('f-cat'), 'data-c', state.cats, {allId:'cat-all', onChange: onPick}),
     chipGroup($('f-ht'), 'data-ht', state.hts, {allId:'ht-all', parse: Number, onChange: onPick})];
@@ -508,8 +529,11 @@ const sameSet = (set, arr) => set.size === arr.length && arr.every(x => set.has(
 
   $('f-kw').oninput = e => { const was = state.name.trim(); state.name = e.target.value; if (!was && state.name.trim()) resetForSearch();   // 從空白開始輸入時才重設篩選，搜尋中改篩選照常套用
  $('search').classList.toggle('has', !!state.name.trim()); if ($('view-find').hidden) $('tab-find').click(); refilter(); };
-  // 搜尋框一直展開（2026-10-21 使用者決定）；× 只清除文字
-  $('s-x').onclick = () => { const f = $('f-kw'); f.value = ''; f.dispatchEvent(new Event('input')); f.focus(); };
+  // 搜尋（2026-10-21 17:08 使用者決定）：右上角放大鏡，點了展開並把游標放進搜尋框；沒有字時離開搜尋框就收起，有字就維持展開
+  const setSearch = on => { document.querySelector('header.top').classList.toggle('s-on', on); $('s-open').setAttribute('aria-expanded', on); if (on) $('f-kw').focus(); };
+  $('s-open').onclick = () => setSearch(true);
+  $('s-x').onclick = () => { const f = $('f-kw'); f.value = ''; f.dispatchEvent(new Event('input')); f.focus(); };   // × 只清除文字
+  $('f-kw').addEventListener('blur', () => setTimeout(() => { if (!state.name.trim() && document.activeElement !== $('f-kw')) setSearch(false); }, 160));
   // 搜尋提示（2026-10-21）：搜尋框下方列出符合的山，點了把山名填進搜尋框、列出搜尋結果（不開詳情）
   const sg = $('suggest');
   const showSuggest = () => { const list = document.activeElement === $('f-kw') ? suggestions(state.name) : [];
@@ -524,10 +548,18 @@ const sameSet = (set, arr) => set.size === arr.length && arr.every(x => set.has(
   $('f-kw').addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); hideSuggest(); e.target.blur(); } });   // 按「搜尋」／Enter：收起手機鍵盤（搜尋框有字所以維持展開）
   $('f-kw').addEventListener('blur', () => setTimeout(hideSuggest, 150));
   const setFilter = open => {
-    $('q').classList.toggle('open', open); $('f-scrim').hidden = !open; $('filter-btn').setAttribute('aria-expanded', open);
+    $('q').classList.toggle('open', open); $('f-scrim').hidden = !open;
+    document.querySelectorAll('#cond .cbtn').forEach(b => b.setAttribute('aria-expanded', open));
     if (!open && pending){ pending = false; saveFilters(); state.shown = PAGE; refresh(); window.scrollTo(0, 0); }   // 按「完成」才套用並記住
   };
-  $('filter-btn').onclick = () => { if (!$('view-find').hidden || !$('view-fav').hidden) setFilter(!$('q').classList.contains('open')); else { $('tab-find').click(); setFilter(true); } };
+  // 點條件列任一項：打開篩選面板並捲到那一項（2026-10-21 取代「篩選」按鈕）
+  document.querySelectorAll('#cond .cbtn').forEach(b => b.onclick = () => {
+    setFilter(true);
+    const f = $(b.dataset.f).closest('.field'), q = $('q');
+    if (getComputedStyle(q).position === 'fixed') q.scrollTop = Math.max(0, f.offsetTop - q.querySelector('.sheet-head').offsetHeight - 24);
+    else f.scrollIntoView({block: 'nearest'});
+  });
+  $('f-nod').onchange = e => { state.nod = e.target.checked; store.set('nod', state.nod); refilter(); };
   $('filter-done').onclick = $('f-scrim').onclick = () => setFilter(false);
   const tyToggle = () => { const box = $('typhoon'); if (!box.classList.contains('more')) return; box.classList.toggle('open'); box.setAttribute('aria-expanded', box.classList.contains('open')); };
   $('typhoon').addEventListener('click', e => { if (!e.target.closest('a')) tyToggle(); });
