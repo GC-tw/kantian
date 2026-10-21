@@ -279,7 +279,6 @@ function render(){
   ['matrix','fav-matrix'].forEach(id => $(id).style.setProperty('--n', cols.length));
   const showRef = week || all.some(r => r.cells.some(c => c.ref));
   document.querySelectorAll('.lg-ref').forEach(e => e.hidden = !showRef);
-  if (!showRef) setInfo(false);
   const ph = pickHead();
   const head = headRow();
   $('fav-tab-n').textContent = favRows.length || '';
