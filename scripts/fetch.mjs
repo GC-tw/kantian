@@ -91,6 +91,7 @@ function locations(j){
             if (ev && 'value' in ev){                        // 舊格式：{value, measures}
               const key = OLD_CODES[code] || code;
               if (key === 'WindSpeed' && /蒲福/.test(ev.measures || '')) vals.BeaufortScale = ev.value;
+              else if (key === 'Weather' && vals.Weather !== undefined && /^\d+$/.test(String(ev.value))) vals.WeatherCode = ev.value;   // 舊格式：第二個值是天氣代碼
               else if (vals[key] === undefined) vals[key] = ev.value;
             } else Object.assign(vals, ev);                  // 新格式：{Temperature: "20"}
           }
@@ -125,7 +126,9 @@ function normalize(v, daily){
     at: num(daily ? (v.MaxApparentTemperature ?? v.ApparentTemperature) : (v.ApparentTemperature ?? v.MaxApparentTemperature)),
     wx: v.Weather ?? null
   };
-  return Object.values(out).every(x => x == null) ? null : out;
+  if (Object.values(out).every(x => x == null)) return null;
+  out.wc = num(v.WeatherCode);                            // 天氣代碼：只在 compact() 用來找未收錄的用語，不放進網站資料
+  return out;
 }
 
 
@@ -312,6 +315,29 @@ async function main(){
   if (!n.some(p => p.h3?.length)) throw new Error('沒有任何可用的預報資料，停止更新網站');
   try{ logWx(n, result.alerts); }catch(e){ warn('天氣用語紀錄失敗：' + e.message); }
 }
+// 天氣代碼當備援（2026-10-21 使用者選「甲」）：燈號仍依天氣描述文字判斷；但如果氣象署代碼表示有雷、霧、雨、雪，
+// 文字卻沒有對應的字（本站沒收錄的新用語），就把代碼的意思記在 wxHint，網頁取較嚴格的燈號，並記成警告（會寄通知信）。
+// 代碼依氣象署天氣描述代碼表（Weather_Icon.pdf，代碼 1–42）：T 雷、F 霧、R 雨、S 雪（注意）、X 下雪／積冰／暴風雪（不建議）
+const inR = (c, ...rs) => rs.some(r => Array.isArray(r) ? c >= r[0] && c <= r[1] : c === r);
+const codeFlags = c => c == null ? '' : [
+  inR(c, [15,18], 21, 22, [33,36], 41) ? 'T' : '',
+  inR(c, [24,28], 31, 32, [35,39], 41) ? 'F' : '',
+  inR(c, [8,22], [29,39], 41) ? 'R' : '',
+  c === 42 ? 'X' : inR(c, 23, 37) ? 'S' : ''].join('');
+const textFlags = w => (/雷/.test(w) ? 'T' : '') + (/霧/.test(w) ? 'F' : '') + (/雨/.test(w) ? 'R' : '') + (/下雪|積冰|暴風雪/.test(w) ? 'X' : /雪|冰/.test(w) ? 'S' : '');
+function wxHints(points){
+  const hint = {};
+  for (const p of points) for (const r of [...(p.h3 || []), ...(p.week || [])]){
+    if (!r.wx || r.wc == null) continue;
+    const have = textFlags(r.wx), miss = [...codeFlags(r.wc)].filter(f => !have.includes(f) && !(f === 'S' && have.includes('X')));
+    if (!miss.length) continue;
+    const h = hint[r.wx] ||= {f: '', c: []};
+    for (const f of miss) if (!h.f.includes(f)) h.f += f;
+    if (!h.c.includes(r.wc)) h.c.push(r.wc);
+  }
+  for (const [w, h] of Object.entries(hint)) warn(`天氣描述「${w}」是本站沒收錄的用語，已改依氣象署天氣代碼 ${h.c.join('、')} 判斷，請檢查燈號規則`);
+  return Object.fromEntries(Object.entries(hint).map(([w, h]) => [w, h.f]));
+}
 // 網站用的精簡格式（version 2，2026-10-20）：每筆是陣列 [時段序號, 降雨機率, 風速, 氣溫, 體感, 天氣描述序號, 風級]，
 // 結尾沒有資料的項目省略；時段序號從 t0（今天 0 時）起算，逐 3 小時每格 3 小時、一週每格 12 小時（從 t0 − 6 小時起）；
 // 天氣描述放在共用清單 wx；風級只在和風速換算結果不同時才寫。網頁的 useForecast() 會還原成原本的欄位
@@ -325,7 +351,7 @@ function compact(result){
     return a;
   });
   const points = Object.fromEntries(Object.entries(result.points).map(([k, p]) => [k, {h3: enc(p.h3, t0, 3*H), week: enc(p.week, t0 - 6*H, 12*H)}]));
-  return {...result, t0, wx, points};
+  return {...result, t0, wx, wxHint: wxHints(Object.values(result.points)), points};
 }
 // 天氣用語紀錄 data/wx-log.json：累積每次執行出現的天氣描述，搭配當時有效的特報，
 // 用來觀察颱風、豪雨期間的用語，以及霧、雪、雨的燈號規則實際觸發的頻率（只紀錄，不影響燈號）

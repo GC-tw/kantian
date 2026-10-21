@@ -73,3 +73,9 @@ jobs:
           path: dist
       - id: deploy
         uses: actions/deploy-pages@v5
+      # 部分失敗也通知（2026-10-21 使用者決定）：網站照常更新後，如果這次抓資料有警告（例如某縣市資料沒抓到），
+      # 讓這次執行顯示失敗（紅色叉叉），GitHub 就會寄通知信給你；警告內容寫在執行紀錄與 data/last-run.json
+      - name: 檢查有沒有部分失敗（有就寄通知信）
+        if: steps.reuse.outputs.ok != 'true'
+        run: |
+          node -e "const r=require('./data/last-run.json'); const w=r.warnings||[]; w.forEach(m=>console.log('::error::'+m)); if(w.length){console.log('網站已更新，但有 '+w.length+' 則警告'); process.exit(1)}"

@@ -24,6 +24,7 @@ const html = `<!doctype html><html lang="zh-Hant-TW"><head><meta charset="utf-8"
 fs.mkdirSync(path.join(ROOT, 'dist'), {recursive: true});
 fs.writeFileSync(path.join(ROOT, 'dist/index.html'), html);
 fs.writeFileSync(path.join(ROOT, 'dist/.nojekyll'), '');
+fs.copyFileSync(path.join(ROOT, 'site/sw.js'), path.join(ROOT, 'dist/sw.js'));   // 離線查看（2026-10-21）
 for (const f of fs.readdirSync(path.join(ROOT, 'site/icons')))     // 圖示（分頁縮圖、加到主畫面的 App 圖示）與 manifest
   fs.copyFileSync(path.join(ROOT, 'site/icons', f), path.join(ROOT, 'dist', f));
 console.log('已產生 dist/index.html（' + Math.round(html.length / 1024) + ' KB）');

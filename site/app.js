@@ -36,7 +36,7 @@ const store = {                                             // 瀏覽器儲存�
 const fmtTime = ms => { const d = new Date(ms); return `${d.getMonth()+1}/${d.getDate()} ${pad(d.getHours())}:${pad(d.getMinutes())}`; };
 
 // ---------- 預報資料（forecast.json；格式見 scripts/fetch.mjs）----------
-let FC = null, fcIndex = new Map(), loadError = '';
+let FC = null, fcIndex = new Map(), loadError = '', offline = false, WXH = {};   // WXH：未收錄用語的天氣代碼提示（fetch.mjs 的 wxHints）   // offline：沒有網路，正在用手機裡存的資料（sw.js）
 // version 2 是精簡格式（每筆是陣列，見 fetch.mjs 的 compact()），還原成 {s, pop, ws, bf, t, at, wx}；舊格式直接使用
 function decodeRows(rows, base, step, wx){
   return (rows || []).map(r => {
@@ -46,7 +46,7 @@ function decodeRows(rows, base, step, wx){
   });
 }
 function useForecast(data){
-  FC = data; fcIndex = new Map();
+  FC = data; fcIndex = new Map(); WXH = data.wxHint || {};
   const t0 = data.t0, wx = data.wx || [];
   for (const [key, p] of Object.entries(data.points || {}))
     fcIndex.set(key, {h3: new Map(decodeRows(p.h3, t0, 3*H, wx).map(r => [r.s, r])), week: new Map(decodeRows(p.week, t0 - 6*H, 12*H, wx).map(r => [r.s, r]))});
@@ -105,6 +105,12 @@ function judge(fc, lowHill, alert, noPop){
   else if (wx.includes('雨')) up(1, '可能下雨');
   if (fc.ws != null){ if (fc.ws>=13.9) up(2, '風速 '+beaufort(fc.ws)+' 級'); else if (fc.ws>=8) up(1, '風速 '+beaufort(fc.ws)+' 級'); }   // 風速只顯示「級」（2026-10-20）
   if (lowHill && fc.at != null && fc.at>=36) up(1, '高溫 體感 '+fc.at+'°C');
+  // 天氣代碼當備援（2026-10-21 使用者選「甲」）：描述是本站沒收錄的用語、但氣象署代碼表示有雷／雪／霧／雨時，依代碼取較嚴格的燈號
+  const hint = WXH[wx] || '';
+  if (hint.includes('T')) up(2, '天氣代碼：有雷');
+  if (hint.includes('X')) up(2, '天氣代碼：下雪或積冰'); else if (hint.includes('S')) up(1, '天氣代碼：有雪');
+  if (hint.includes('F')) up(1, '天氣代碼：有霧');
+  if (hint.includes('R') && (noPop || fc.pop == null)) up(noPop ? 2 : 1, noPop ? '天氣代碼：有雨（第 4–7 天無降雨機率）' : '天氣代碼：可能下雨');
   return {lv, why, plus: lv === 0 && wx === '晴'};
 }
 
@@ -206,12 +212,15 @@ const lamp = (c, sm) => { const t = c.plus ? 'A' : SYM[LV(c.lv)];
   return `<i class="lamp ${CLS[LV(c.lv)]}${c.plus?' p':''}${c.ref?' ref':''}${c.past?' past':''}${sm?' sm':''}" title="${c.plus ? 'A 佳（晴）' : SYM[LV(c.lv)] + ' ' + WORD[LV(c.lv)]}${c.ref?'（參考）':''}${c.past?'（已過）':''}">${t}</i>`; };
 const sub = m => `${m.h ? m.h.toLocaleString()+' m' : '標高待補'}・${m.c}・${esc(m.co)}`;   // 標高、類別、縣市（不顯示編號）
 // 列表與卡片都不顯示比較結果（段數、A 天數；2026-10-20 拿掉），排序仍照規則
-const headRow = () => `<tr><th class="mt">山岳</th>${cols.map(c=>`<th class="${c.ref?'ref ':''}${c.peak?'peak ':''}${c.wkd?'we':''}"><span class="dt"><span class="lg">${c.head||c.label}</span><span class="st">${c.short}</span></span>${c.sub}</th>`).join('')}</tr>`;
-const bodyRow = r => `<tr data-k="${r.k}" tabindex="0"><th class="mt" scope="row"><div class="mt-in"><span class="nm">${esc(r.m.n)}</span><span class="sub">${sub(r.m)}</span>${star(r.k)}</div></th>${r.cells.map(c=>`<td>${lamp(c)}</td>`).join('')}</tr>`;
+const headRow = () => `<tr><th class="mt">山岳</th>${cols.map(c=>`<th class="${c.ref?'ref ':''}${c.peak?'peak ':''}${c.wkd?'we wk':''}"><span class="dt"><span class="lg">${c.head||c.label}</span><span class="st">${c.short}</span></span>${c.sub}</th>`).join('')}</tr>`;
+const bodyRow = r => `<tr data-k="${r.k}" tabindex="0"><th class="mt" scope="row"><div class="mt-in"><span class="nm">${esc(r.m.n)}</span><span class="sub">${sub(r.m)}</span>${star(r.k)}</div></th>${r.cells.map((c, i)=>`<td${cols[i].wkd?' class="wk"':''}>${lamp(c)}</td>`).join('')}</tr>`;
 // 山岳卡片（手機列表與收藏；精簡兩列）：山名＋資訊＋收藏／燈號（不顯示比較結果，一週也不寫 A 天數；2026-10-20）
 // 小燈上方標出時段（逐 3 小時寫開始時刻，一週寫日期＋星期）；登山時段實心深色底、週末紅色
-const pickHead = () => cols.map(c => `<span class="ph${c.peak?' peak':''}${c.wkd?' we':''}${c.ref?' ref':''}" aria-hidden="true">${c.short}</span>`).join('');
-const pickCard = (r, head) => `<div class="pick" data-k="${r.k}" tabindex="0" role="button"><div class="p1"><span class="nm">${esc(r.m.n)}</span><span class="meta">${sub(r.m)}</span>${star(r.k)}</div><div class="p2"><span class="lights" style="--n:${cols.length}">${head}${r.cells.map(c=>lamp(c,true)).join('')}</span></div></div>`;
+// 一週模式的週六、週日：整欄淡紅底（2026-10-21 使用者選「甲」）。底色是另外放在同一欄後面的方塊，所以時段標示與燈號都明確指定欄位
+const gc = (i, row) => ` style="grid-column:${i+1};grid-row:${row}"`;
+const pickHead = () => cols.map((c, i) => (c.wkd ? `<span class="wk-bg"${gc(i, '1 / 3')} aria-hidden="true"></span>` : '')
+  + `<span class="ph${c.peak?' peak':''}${c.wkd?' we':''}${c.ref?' ref':''}"${gc(i, 1)} aria-hidden="true">${c.short}</span>`).join('');
+const pickCard = (r, head) => `<div class="pick" data-k="${r.k}" tabindex="0" role="button"><div class="p1"><span class="nm">${esc(r.m.n)}</span><span class="meta">${sub(r.m)}</span>${star(r.k)}</div><div class="p2"><span class="lights" style="--n:${cols.length}">${head}${r.cells.map((c, i)=>lamp(c,true).replace('<i ', `<i${gc(i, 2)} `)).join('')}</span></div></div>`;
 
 // 「可優先參考」（2026-10-21 使用者決定）：只把最前面一組（排序條件完全相同的山）框起來，而且這組的登山時段（未過的時段）都是 A 或 B（沒有 C、D）才顯示；
 // 一週模式不標示；其他山之間不畫分隔線（2026-10-21 使用者決定拿掉）。firstOK 回傳這組的座數（以整份列表計），不顯示時回傳 0
@@ -267,7 +276,7 @@ function openDetail(k){
   // 詳情表格：時段橫排（tenki.jp 做法，2026-10-20 使用者選「選項 1」）。欄是時段、列是項目，手機也不需左右滑動；
   // C、D 的原因列在表格下方
   const table = (p, k) => {
-    const cl = (c, col) => [c.ref ? 'ref' : '', c.past ? 'past' : '', col.peak ? 'peak' : '', week && col.wkd ? 'we' : ''].filter(Boolean).join(' ');
+    const cl = (c, col) => [c.ref ? 'ref' : '', c.past ? 'past' : '', col.peak ? 'peak' : '', week && col.wkd ? 'we wk' : ''].filter(Boolean).join(' ');
     const head = cols.map((col, j) => `<th class="${cl(r.cells[j], col)}">${week ? `${col.date.getMonth()+1}/${col.date.getDate()}<span class="wd">週${WD[col.date.getDay()]}</span>` : col.short}</th>`).join('');
     const row = (name, f, cls = '') => `<tr class="${cls}"><th scope="row">${name}</th>${r.cells.map((c, j) => `<td class="${cl(c, cols[j])}">${f(c.per[k], c)}</td>`).join('')}</tr>`;
     const whys = r.cells.map((c, j) => { const x = c.per[k]; return x.j.lv > 0 ? `<li><b>${cols[j].label}</b>${lamp({lv:x.j.lv, ref:c.ref, past:c.past}, true)}${esc(x.j.why.join('、'))}</li>` : ''; }).join('');
@@ -291,7 +300,7 @@ function openDetail(k){
     ${r.m.al?.length?`<div class="note">別名：${esc(r.m.al.join('、'))}</div>`:''}
     ${r.m.note?`<div class="note">備註：${esc(r.m.note)}</div>`:''}
     ${pts.map(table).join('')}
-    <div class="note">${week ? '一週預報以你選的登山時段（'+sortedSlots().map(slotLabel).join('、')+'）判定，取最差情況；第 4–7 天氣象署未提供降雨機率，以「—」表示，依天氣描述判定，請在出發前 3 天內再確認。' : '逐 3 小時預報；底色時段是你選的登山時段，排序依登山時段及前後各 3 小時計算。'}</div>`;
+    <div class="note">${week ? '一週預報以你選的登山時段（'+sortedSlots().map(slotLabel).join('、')+'）判定，取最差情況；第 4–7 天氣象署未提供降雨機率，以「—」表示，依天氣描述判定，請在出發前 3 天內再確認。' : '逐 3 小時預報；底色時段是你選的登山時段，排序依登山時段計算。'}</div>`;
   dr.hidden = false; $('scrim').hidden = false;
   $('d-close').focus();
 }
@@ -333,7 +342,7 @@ async function loadForecast(){
     const r = await fetch('forecast.json?t=' + Date.now(), {cache: 'no-store'});
     if (!r.ok) throw new Error('HTTP ' + r.status);
     const data = await r.json();
-    loadError = '';
+    loadError = ''; offline = r.headers?.get?.('x-kantian-offline') === '1';
     if (data.fetchedAt !== FC?.fetchedAt){ useForecast(data); refresh(); }
   }catch(e){ loadError = '暫時無法取得天氣資料，請稍後重新整理。'; }
   showStatus();
@@ -361,6 +370,7 @@ function showStatus(){
   const s = $('status'), at = FC ? Date.parse(FC.fetchedAt) : 0;
   $('issued').textContent = FC ? '資料更新：' + fmtTime(at) : (loadError ? '' : '資料載入中…');
   const msg = loadError && !FC ? loadError
+    : offline ? `目前沒有網路，顯示的是手機裡存的資料（資料更新 ${fmtTime(at)}）。`
     : loadError ? `無法取得最新資料，以下是 ${fmtTime(at)} 的資料。`
     : FC && Date.now() - at > STALE ? `天氣資料可能不是最新：上次更新是 ${fmtTime(at)}，出發前請到氣象署網站確認。` : '';
   s.textContent = msg; s.hidden = !msg;
@@ -490,6 +500,8 @@ const sameSet = (set, arr) => set.size === arr.length && arr.every(x => set.has(
   });
 
   gradeChips(document.querySelector('article.doc')); gradeChips($('info-ref'));
+  // 離線查看（2026-10-21）：sw.js 把最近一次的網頁與預報存在手機裡，沒有網路時改用存著的版本
+  if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) navigator.serviceWorker.register('sw.js').catch(() => {});
   refresh();                                                // 先顯示山岳清單，資料到了再補上燈號
   loadForecast();
   // 網頁開著時：每分鐘檢查是否跨時段；每 15 分鐘或回到網頁時，檢查是否有新資料
