@@ -287,13 +287,13 @@ function condText(){
   $('c-ht').textContent = many(state.hts, '級', i => HT_SHORT[i]);
   [['c-slots', !sameSet(state.slots, DEF_SLOTS)], ['c-county', state.counties.size], ['c-cat', state.cats.size], ['c-ht', state.hts.size]]
     .forEach(([id, on]) => $(id).parentNode.classList.toggle('on', !!on));
-  $('nod-t').textContent = state.mode === 'week' ? '只看這 7 天都沒有 D 的山' : '只看登山時段沒有 D 的山';
+  $('nod-t').textContent = state.mode === 'week' ? '排除這 7 天有 D 的山' : '排除登山時段有 D 的山';
   $('f-nod').checked = state.nod;
 }
 
 function render(){
   const week = state.mode === 'week';
-  $('h-picks-t').textContent = (week ? '這週' : MODES[state.mode].name) + '燈號排序';
+  $('h-picks-t').textContent = MODES[state.mode].name + '排序';
   $('pick-info-body').innerHTML = pickInfo(state.mode); gradeChips($('pick-info-body'));
   $('info-std').innerHTML = stdInfo(state.mode); gradeChips($('info-std'));
   document.querySelectorAll('#seg .sd').forEach((e, i) => { const d = dayAt(i); e.innerHTML = `${md(d)}<span class="sw">${dayName(d)}</span>`; e.classList.toggle('we', isWE(d)); });
@@ -549,16 +549,11 @@ const sameSet = (set, arr) => set.size === arr.length && arr.every(x => set.has(
   $('f-kw').addEventListener('blur', () => setTimeout(hideSuggest, 150));
   const setFilter = open => {
     $('q').classList.toggle('open', open); $('f-scrim').hidden = !open;
-    document.querySelectorAll('#cond .cbtn').forEach(b => b.setAttribute('aria-expanded', open));
+    $('cond').setAttribute('aria-expanded', open);
     if (!open && pending){ pending = false; saveFilters(); state.shown = PAGE; refresh(); window.scrollTo(0, 0); }   // 按「完成」才套用並記住
   };
-  // 點條件列任一項：打開篩選面板並捲到那一項（2026-10-21 取代「篩選」按鈕）
-  document.querySelectorAll('#cond .cbtn').forEach(b => b.onclick = () => {
-    setFilter(true);
-    const f = $(b.dataset.f).closest('.field'), q = $('q');
-    if (getComputedStyle(q).position === 'fixed') q.scrollTop = Math.max(0, f.offsetTop - q.querySelector('.sheet-head').offsetHeight - 24);
-    else f.scrollIntoView({block: 'nearest'});
-  });
+  // 「設定篩選條件」區塊（2026-10-21）：點了打開篩選面板
+  $('cond').onclick = () => { setFilter(true); $('q').scrollTop = 0; };
   $('f-nod').onchange = e => { state.nod = e.target.checked; store.set('nod', state.nod); refilter(); };
   $('filter-done').onclick = $('f-scrim').onclick = () => setFilter(false);
   const tyToggle = () => { const box = $('typhoon'); if (!box.classList.contains('more')) return; box.classList.toggle('open'); box.setAttribute('aria-expanded', box.classList.contains('open')); };
@@ -568,7 +563,6 @@ const sameSet = (set, arr) => set.size === arr.length && arr.every(x => set.has(
   document.addEventListener('keydown', e => { if (e.key === 'Escape'){ setFilter(false); hideSuggest(); if (document.activeElement === $('f-kw')) $('f-kw').blur(); } });
   $('q').onsubmit = e => e.preventDefault();
   $('brand').onclick = e => { e.preventDefault(); window.scrollTo({top: 0, behavior: 'smooth'}); };   // 點標題：回到最上方（不重新整理）
-  $('reload-btn').onclick = () => location.reload();   // 「○○燈號排序」旁、篩選右側的重新整理圖示：重新整理網頁（篩選與登山時段會保留）
   $('more').onclick = () => { state.shown += PAGE; if (!fresh()) evaluate(); render(); };
   $('info-btn').onclick = () => setInfo($('info-ref').hidden);
   $('info-x').onclick = () => { setInfo(false); $('info-btn').focus(); };
