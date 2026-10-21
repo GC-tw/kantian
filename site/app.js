@@ -211,6 +211,12 @@ const bodyRow = r => `<tr data-k="${r.k}" tabindex="0"><th class="mt" scope="row
 const pickHead = () => cols.map(c => `<span class="ph${c.peak?' peak':''}${c.wkd?' we':''}${c.ref?' ref':''}" aria-hidden="true">${c.short}</span>`).join('');
 const pickCard = (r, head) => `<div class="pick" data-k="${r.k}" tabindex="0" role="button"><div class="p1"><span class="nm">${esc(r.m.n)}</span><span class="meta">${sub(r.m)}</span>${star(r.k)}</div><div class="p2"><span class="lights" style="--n:${cols.length}">${head}${r.cells.map(c=>lamp(c,true)).join('')}</span></div></div>`;
 
+// 分數不同的山之間加分隔線（2026-10-21 使用者決定；燈號排序列表與我的收藏都有；分數不顯示；沒有資料的山另成一組）
+const grp = r => r.nd + '|' + r.s1;
+const brk = (list, i) => i > 0 && i < list.length && grp(list[i]) !== grp(list[i-1]);
+const grpRows = list => list.map((r, i) => brk(list, i+1) ? bodyRow(r).replace('<tr ', '<tr class="gend" ') : bodyRow(r)).join('');   // 電腦表格：該組最後一列加粗下框
+const grpCards = (list, ph) => list.map((r, i) => (brk(list, i) ? '<hr class="grp" aria-hidden="true">' : '') + pickCard(r, ph)).join('');   // 手機卡片：卡片之間一條線
+
 function render(){
   const week = state.mode === 'week';
   $('h-picks-t').textContent = (week ? '這週' : MODES[state.mode].name) + '燈號排序';
@@ -227,14 +233,12 @@ function render(){
   $('filter-n').textContent = filterCount() || '';
   $('fav-box').hidden = !favRows.length; $('fav-empty').hidden = !!favRows.length;
   $('fav-matrix').tHead.innerHTML = head;
-  $('fav-matrix').tBodies[0].innerHTML = favRows.map(bodyRow).join('');
-  $('fav-cards').innerHTML = favRows.map(r => pickCard(r, ph)).join('');
+  $('fav-matrix').tBodies[0].innerHTML = grpRows(favRows);
+  $('fav-cards').innerHTML = grpCards(favRows, ph);
   $('matrix').tHead.innerHTML = head;
-  // 分數不同的山之間加分隔線（2026-10-21 使用者決定；只用第 1 排序條件的分數分組，分數不顯示；沒有資料的山另成一組）
-  const shown = rows.slice(0,state.shown), grp = r => r.nd + '|' + r.s1;
-  const brk = i => i > 0 && grp(shown[i]) !== grp(shown[i-1]);
-  $('matrix').tBodies[0].innerHTML = shown.map((r, i) => i < shown.length-1 && brk(i+1) ? bodyRow(r).replace('<tr ', '<tr class="gend" ') : bodyRow(r)).join('') || `<tr><td class="empty" colspan="${cols.length+1}">沒有符合條件的山。</td></tr>`;
-  $('matrix-cards').innerHTML = shown.map((r, i) => (brk(i) ? '<hr class="grp" aria-hidden="true">' : '') + pickCard(r, ph)).join('') || '<div class="empty">沒有符合條件的山。</div>';
+  const shown = rows.slice(0,state.shown);
+  $('matrix').tBodies[0].innerHTML = grpRows(shown) || `<tr><td class="empty" colspan="${cols.length+1}">沒有符合條件的山。</td></tr>`;
+  $('matrix-cards').innerHTML = grpCards(shown, ph) || '<div class="empty">沒有符合條件的山。</div>';
   $('more-box').hidden = rows.length <= state.shown;
   $('more').textContent = `顯示更多（還有 ${rows.length-state.shown} 座）`;
 }
