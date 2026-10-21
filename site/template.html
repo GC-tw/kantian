@@ -368,16 +368,17 @@ footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);paddin
 
     <div style="display:flex;flex-direction:column;gap:10px">
       <div class="legend lg-1">
-          <span><i class="lamp sm g p">A</i>佳</span><span><i class="lamp sm g">B</i>可</span><span><i class="lamp sm y">C</i>注意</span><span><i class="lamp sm r">D</i>不建議</span><span><i class="lamp sm na">—</i>無資料<button type="button" class="info" id="info-btn" aria-expanded="false" aria-controls="info-ref" aria-label="淡色與虛線的意思"><svg viewBox="0 0 20 20" aria-hidden="true"><circle class="ring" cx="10" cy="10" r="9.1"/><circle cx="10" cy="6.1" r="1.2"/><rect x="9.2" y="8.5" width="1.6" height="6.6" rx=".8"/></svg></button></span>
+          <span><i class="lamp sm g p">A</i>佳</span><span><i class="lamp sm g">B</i>可</span><span><i class="lamp sm y">C</i>注意</span><span><i class="lamp sm r">D</i>不建議</span><span><i class="lamp sm na">—</i>無資料<button type="button" class="info" id="info-btn" aria-expanded="false" aria-controls="info-ref" aria-label="燈號怎麼判定"><svg viewBox="0 0 20 20" aria-hidden="true"><circle class="ring" cx="10" cy="10" r="9.1"/><circle cx="10" cy="6.1" r="1.2"/><rect x="9.2" y="8.5" width="1.6" height="6.6" rx=".8"/></svg></button></span>
         </div>
       <div class="info-pop" id="info-ref" hidden>
-        <div class="info-head"><b>燈號的淡色<span class="lg-ref">與虛線</span></b><button type="button" class="info-x" id="info-x" aria-label="關閉說明">×</button></div>
+        <div class="info-head"><b>燈號怎麼判定</b><button type="button" class="info-x" id="info-x" aria-label="關閉說明">×</button></div>
+        <div id="info-std"></div>
+        <h4>淡色<span class="lg-ref">與虛線</span></h4>
         <p class="ip"><b>淡色</b>（例如 <i class="lamp sm chip g past">B</i>）：時段已過，不計分。</p>
         <div class="lg-ref"><p class="ip"><b>虛線</b>（例如 <i class="lamp sm chip g ref">B</i>）：一週預報的第 5–7 天，僅供參考。為什麼？</p>
         <ul>
           <li>一週的前 4 天（今天到大後天），本站用逐 3 小時預報判定，有降雨機率。</li>
           <li>第 5–7 天只有氣象署一週預報的天氣描述（例如「多雲短暫陣雨」），沒有降雨機率，會不會下雨只能看描述判斷，比較粗略。</li>
-          <li>描述有「局部」「短暫」的雨為 C，其他的雨（例如「陣雨」「有雨」）為 D；請點開詳情看天氣描述。</li>
           <li>預報的日子越遠，準確度本來就越低。</li>
           <li>建議用來初步安排行程，出發前 3 天內再回來確認。</li>
         </ul></div>

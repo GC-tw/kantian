@@ -274,6 +274,7 @@ function render(){
   const week = state.mode === 'week';
   $('h-picks-t').textContent = (week ? '這週' : MODES[state.mode].name) + '燈號排序';
   $('pick-info-body').innerHTML = pickInfo(state.mode); gradeChips($('pick-info-body'));
+  $('info-std').innerHTML = stdInfo(state.mode); gradeChips($('info-std'));
   document.querySelectorAll('#seg .sd').forEach((e, i) => { const d = dayAt(i); e.innerHTML = `${md(d)}<span class="sw">${dayName(d)}</span>`; e.classList.toggle('we', isWE(d)); });
   $('seg-week').innerHTML = `${md(dayAt(0))}–<span class="sw">${md(dayAt(6))}</span>`;   // 一週按鈕下方寫日期區間：起始日、結束日各一行
   ['matrix','fav-matrix'].forEach(id => $(id).style.setProperty('--n', cols.length));
@@ -364,18 +365,22 @@ function cwaUrl(p){
 }
 function closeDetail(){ $('drawer').hidden = true; $('scrim').hidden = true; }
 // 燈號排序旁的 i：依目前模式說明比較標準與排序，用字與「排序規則與說明」頁一致（2026-10-20）
-function pickInfo(mode){
-  const week = mode === 'week', slots = sortedSlots().map(slotLabel).join('、');
-  const ul = a => '<ul>' + a.map(x => '<li>' + x + '</li>').join('') + '</ul>', ol = a => '<ol>' + a.map(x => '<li>' + x + '</li>').join('') + '</ol>';
+function stdInfo(mode){   // 燈號的判定標準：放在燈號圖例旁的 i（2026-10-21 由燈號排序旁的 i 移過來）
+  const slots = sortedSlots().map(slotLabel).join('、');
+  const ul = a => '<ul>' + a.map(x => '<li>' + x + '</li>').join('') + '</ul>';
   const std = ['A：佳，各項都適合，且天氣描述是「晴」；B：可，各項都適合；C：注意；D：不建議。',
     '依氣象署預報檢查降雨機率、天氣描述（霧、雪、雷）、平均風速，以及颱風、豪雨、大雨特報；標高 1,000 公尺以下另看高溫。以最差的一項作為燈號。',
     '跨多個鄉鎮的山，取最差的鄉鎮。'];
+  if (mode === 'week') return '<h4>判定標準</h4>' + ul([...std, `前 4 天（今天到大後天）用逐 3 小時預報：你選的登山時段（${esc(slots)}）中，取最差的一段作為當天燈號；今天已過的時段不算。`, `第 5–7 天用一週預報：登山時段對應到白天或晚上，取最差的；登山時段都在 12 點前時，白天描述的「午後」部分不計。氣象署沒有降雨機率，依天氣描述判定：「局部」「短暫」的雨為 C，其他的雨（例如「陣雨」「有雨」）為 D。僅供參考。`]);
+  return '<h4>判定標準</h4>' + ul([...std, '每 3 小時一格，每格一個燈號。']);
+}
+function pickInfo(mode){   // 燈號排序旁的 i：只說明排序（判定標準移到燈號圖例旁的 i，2026-10-21）
+  const week = mode === 'week';
+  const ul = a => '<ul>' + a.map(x => '<li>' + x + '</li>').join('') + '</ul>', ol = a => '<ol>' + a.map(x => '<li>' + x + '</li>').join('') + '</ol>';
   const score = '計分：A 3 分、B 2 分、C 1 分、D 0 分。已過的時段和無資料不計分。';
   const tie = '以上所有條件都相同時：每天隨機排序一次同條件山岳。', nodata = '完全沒有資料的山排在最後。';
-  if (week) return '<h4>比較標準</h4>' + ul([...std, `前 4 天（今天到大後天）用逐 3 小時預報：你選的登山時段（${esc(slots)}）中，取最差的一段作為當天燈號；今天已過的時段不算。`, `第 5–7 天用一週預報：登山時段對應到白天或晚上，取最差的；登山時段都在 12 點前時，白天描述的「午後」部分不計。氣象署沒有降雨機率，依天氣描述判定：「局部」「短暫」的雨為 C，其他的雨（例如「陣雨」「有雨」）為 D。僅供參考。`])
-    + '<h4>排序</h4>' + ul([score]) + '<p class="ip">依序比較：</p>' + ol(['7 天的總分，高的在前', 'A 的天數，多的在前', 'D 的天數，少的在前']) + ul([nodata, tie]);
-  return '<h4>比較標準</h4>' + ul([...std, '每 3 小時一格，每格一個燈號。', ...(mode === 'today' ? ['今天已過的時段不計分。'] : [])])
-    + '<h4>排序</h4>' + ul([score]) + '<p class="ip">依序比較：</p>' + ol(['登山時段中 D 的數量，少的在前', '登山時段的總分，高的在前', '登山時段中 A 的數量，多的在前', '當天所有時段的總分，高的在前']) + ul(['登山時段都過了，就改看當天剩下的時段。', nodata, tie]);
+  if (week) return '<h4>排序</h4>' + ul([score]) + '<p class="ip">依序比較：</p>' + ol(['7 天的總分，高的在前', 'A 的天數，多的在前', 'D 的天數，少的在前']) + ul([nodata, tie]);
+  return '<h4>排序</h4>' + ul([score, ...(mode === 'today' ? ['今天已過的時段不計分。'] : [])]) + '<p class="ip">依序比較：</p>' + ol(['登山時段中 D 的數量，少的在前', '登山時段的總分，高的在前', '登山時段中 A 的數量，多的在前', '當天所有時段的總分，高的在前']) + ul(['登山時段都過了，就改看當天剩下的時段。', nodata, tie]);
 }
 // 說明文字中的燈號（A、B、C、D、—）換成小燈號方塊，顏色與列表一致（2026-10-20 使用者選「選項 1」）
 const GRADE_RE = /—|(?<![A-Za-z0-9°])[ABCD](?![A-Za-z0-9+])/g,   // 「°C」的 C 不是燈號（2026-10-20）
