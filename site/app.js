@@ -211,8 +211,9 @@ const bodyRow = r => `<tr data-k="${r.k}" tabindex="0"><th class="mt" scope="row
 const pickHead = () => cols.map(c => `<span class="ph${c.peak?' peak':''}${c.wkd?' we':''}${c.ref?' ref':''}" aria-hidden="true">${c.short}</span>`).join('');
 const pickCard = (r, head) => `<div class="pick" data-k="${r.k}" tabindex="0" role="button"><div class="p1"><span class="nm">${esc(r.m.n)}</span><span class="meta">${sub(r.m)}</span>${star(r.k)}</div><div class="p2"><span class="lights" style="--n:${cols.length}">${head}${r.cells.map(c=>lamp(c,true)).join('')}</span></div></div>`;
 
-// 分數不同的山之間加分隔線（2026-10-21 使用者決定；燈號排序列表與我的收藏都有；分數不顯示；沒有資料的山另成一組）
-const grp = r => r.nd + '|' + r.s1;
+// 排序條件不同的山之間加分隔線（2026-10-21 使用者選「選項 A」：任何一項排序條件不同就畫線，線與線之間是條件完全相同、每天隨機排序的山）
+// 燈號排序列表與我的收藏都有；分數不顯示；沒有資料的山另成一組。一週模式 s2 都是 0，不影響
+const grp = r => [r.nd, r.s1, r.p1, r.c1, r.s2].join('|');
 const brk = (list, i) => i > 0 && i < list.length && grp(list[i]) !== grp(list[i-1]);
 const grpRows = list => list.map((r, i) => brk(list, i+1) ? bodyRow(r).replace('<tr ', '<tr class="gend" ') : bodyRow(r)).join('');   // 電腦表格：該組最後一列加粗下框
 const grpCards = (list, ph) => list.map((r, i) => (brk(list, i) ? '<hr class="grp" aria-hidden="true">' : '') + pickCard(r, ph)).join('');   // 手機卡片：卡片之間一條線
@@ -291,11 +292,11 @@ function pickInfo(week){
     '依氣象署預報檢查降雨機率、天氣描述（霧、雪、雷）、平均風速，以及颱風、豪雨、大雨特報；標高 1,000 公尺以下另看高溫。以最差的一項作為燈號。',
     '跨多個鄉鎮的山，取最差的鄉鎮。'];
   const score = '計分：A 3 分、B 2 分、C 1 分、D 0 分。已過的時段和無資料不計分。';
-  const tie = '以上所有條件都相同時：每天隨機排序一次同條件山岳。', nodata = '完全沒有資料的山排在最後。';
+  const tie = '以上所有條件都相同時：每天隨機排序一次同條件山岳。', sep = '排序條件不同的山之間以分隔線區隔，同一段內是條件完全相同的山。', nodata = '完全沒有資料的山排在最後。';
   if (week) return '<h4>比較標準</h4>' + ul([...std, `每天依你選的登頂時段（${esc(slots)}）對應到白天或晚上，取最差的作為當天燈號。登頂時段都在 12 點前時，白天描述的「午後」部分不計。`, '第 4–7 天氣象署沒有降雨機率，依天氣描述判定：「局部」「短暫」的雨為 C，其他的雨（例如「陣雨」「有雨」）為 D。僅供參考。'])
-    + '<h4>排序</h4>' + ul([score]) + '<p class="ip">依序比較：</p>' + ol(['7 天的總分，高的在前', 'A 的天數，多的在前', 'D 的天數，少的在前']) + ul([nodata, tie]);
+    + '<h4>排序</h4>' + ul([score]) + '<p class="ip">依序比較：</p>' + ol(['7 天的總分，高的在前', 'A 的天數，多的在前', 'D 的天數，少的在前']) + ul([nodata, tie, sep]);
   return '<h4>比較標準</h4>' + ul([...std, '每 3 小時一格，每格一個燈號。', ...(state.mode === 'today' ? ['今天已過的時段不計分。'] : [])])
-    + '<h4>排序</h4>' + ul([score]) + '<p class="ip">依序比較：</p>' + ol(['計分範圍（登頂時段及前後各 3 小時，作為上山與下山時間）的總分，高的在前', '計分範圍中 A 的數量，多的在前', '計分範圍中 D 的數量，少的在前', '當天所有時段的總分，高的在前']) + ul(['計分範圍都過了，就改看當天剩下的時段。', nodata, tie]);
+    + '<h4>排序</h4>' + ul([score]) + '<p class="ip">依序比較：</p>' + ol(['計分範圍（登頂時段及前後各 3 小時，作為上山與下山時間）的總分，高的在前', '計分範圍中 A 的數量，多的在前', '計分範圍中 D 的數量，少的在前', '當天所有時段的總分，高的在前']) + ul(['計分範圍都過了，就改看當天剩下的時段。', nodata, tie, sep]);
 }
 // 說明文字中的燈號（A、B、C、D、—）換成小燈號方塊，顏色與列表一致（2026-10-20 使用者選「選項 1」）
 const GRADE_RE = /—|(?<![A-Za-z0-9°])[ABCD](?![A-Za-z0-9+])/g,   // 「°C」的 C 不是燈號（2026-10-20）
