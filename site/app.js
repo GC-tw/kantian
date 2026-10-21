@@ -505,9 +505,6 @@ const sameSet = (set, arr) => set.size === arr.length && arr.every(x => set.has(
   $('f-kw').oninput = e => { const was = state.name.trim(); state.name = e.target.value; if (!was && state.name.trim()) resetForSearch();   // 從空白開始輸入時才重設篩選，搜尋中改篩選照常套用
  $('search').classList.toggle('has', !!state.name.trim()); if ($('view-find').hidden) $('tab-find').click(); refilter(); };
   // 搜尋框一直展開（2026-10-21 使用者決定）；× 只清除文字
-  // 手機上搜尋框較窄，提示文字縮短（完整說明仍在 aria-label）
-  const kwPh = () => { $('f-kw').placeholder = matchMedia('(max-width:640px)').matches ? '搜尋山名或縣市' : '搜尋山名、別名或縣市'; };
-  kwPh(); addEventListener('resize', kwPh);
   $('s-x').onclick = () => { const f = $('f-kw'); f.value = ''; f.dispatchEvent(new Event('input')); f.focus(); };
   // 搜尋提示（2026-10-21）：搜尋框下方列出符合的山，點了把山名填進搜尋框、列出搜尋結果（不開詳情）
   const sg = $('suggest');
