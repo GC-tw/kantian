@@ -110,12 +110,12 @@ let fails = 0; const ok = (c, m) => { console.log((c ? '✓ ' : '✗ ') + m); if
     w.eval('saveFilters()');
   }
   { // 開始搜尋時，類別、標高、縣市篩選回到預設並記住；登山時段不變
-    click(w, d.querySelector('#f-cat [data-c="小百岳"]')); click(w, d.querySelector('#f-slots [data-h="15"]'));
+    click(w, d.querySelector('#f-cat [data-c="小百岳"]')); click(w, d.querySelector('#f-slots [data-h="18"]'));
     w.eval('saveFilters()');
     inp.value = '玉山東峰'; inp.dispatchEvent(new w.Event('input', {bubbles: true}));
     const found = [...d.querySelectorAll('#matrix tbody tr[data-k]')].some(tr => /玉山東峰/.test(tr.textContent));
     const saved = JSON.parse(w.localStorage.getItem('filters') || '{}');
-    ok(found && w.eval('state.cats.size') === 0 && !saved.cats?.length && d.getElementById('cat-all').getAttribute('aria-pressed') === 'true' && w.eval('state.slots.has(15)'),
+    ok(found && w.eval('state.cats.size') === 0 && !saved.cats?.length && d.getElementById('cat-all').getAttribute('aria-pressed') === 'true' && w.eval('state.slots.has(18)'),
       '開始搜尋時，類別篩選回到「全部」並記住，登山時段保留，搜得到玉山東峰');
     // 搜尋中再改篩選：照常套用，不符合就顯示「沒有符合條件的山」；繼續打字也不會再重設
     click(w, d.querySelector('#f-cat [data-c="小百岳"]')); w.eval('refilter()');

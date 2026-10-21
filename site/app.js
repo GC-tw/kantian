@@ -26,7 +26,7 @@ const dayAt = i => { const d = new Date(); d.setHours(0,0,0,0); d.setDate(d.getD
 const beaufort = ws => BF.reduce((b, v, i) => ws >= v ? i : b, 0);
 const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));  // 外部資料（氣象署文字）放進畫面前先轉義
 const sortedSlots = () => [...state.slots].sort((a,b)=>a-b);
-const DEF_SLOTS = [6, 9, 12];                               // 預設登山時段 06–15（2026-10-21 由「登山時段 09–12」改為「登山時段」）
+const DEF_SLOTS = [6, 9, 12, 15];                           // 預設登山時段 06–18（2026-10-21：登頂時段 09–12 → 登山時段 06–15 → 06–18）
 const HT_BAND = h => h == null ? -1 : h < 1000 ? 0 : h < 2000 ? 1 : h < 3000 ? 2 : 3;   // 標高篩選：0＝1,000 m 以下、1＝1,000–2,000、2＝2,000–3,000、3＝3,000 m 以上（2026-10-20）
 const store = {                                             // 瀏覽器儲存：讀寫失敗時不影響畫面
   raw(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } },
@@ -128,12 +128,12 @@ function loadFilters(){
 }
 const state = {
   mode: (m => MODES[m] ? m : 'today')(store.get('mode')),
-  slots: new Set((a => Array.isArray(a) && a.length ? a : DEF_SLOTS)(store.get('hike'))),   // 儲存名稱改為 hike：2026-10-21 改成「登山時段」，讓舊的登山時段設定一起換成新預設 06–15
+  slots: new Set((a => Array.isArray(a) && a.length ? a : DEF_SLOTS)(store.get('hike18'))),   // 儲存名稱 hike18：2026-10-21 預設改 06–18 時換名稱，讓舊的預設（06–15）一起換成新預設
   name: '', shown: PAGE,
   ...loadFilters()
 };
 const filterCount = () => state.cats.size + state.counties.size + state.hts.size + (sameSet(state.slots, DEF_SLOTS) ? 0 : 1);   // 「篩選」按鈕：改了幾項（登山時段不是預設算 1 項）
-const saveFilters = () => { store.set('hike', [...state.slots]); store.set('filters', {cats:[...state.cats], counties:[...state.counties], hts:[...state.hts]}); };
+const saveFilters = () => { store.set('hike18', [...state.slots]); store.set('filters', {cats:[...state.cats], counties:[...state.counties], hts:[...state.hts]}); };
 const favs = new Set((a => Array.isArray(a) ? a : [])(store.get('favs')));
 let cols = [], all = [], rows = [], favRows = [], byKey = new Map();
 let evalStamp = '', dataStamp = '';
@@ -419,7 +419,7 @@ const sameSet = (set, arr) => set.size === arr.length && arr.every(x => set.has(
   const resetForSearch = () => { if (!state.cats.size && !state.counties.size && !state.hts.size) return;
     state.cats.clear(); state.counties.clear(); state.hts.clear(); syncs.forEach(f => f()); lockChips(); saveFilters(); syncReset(); };
   const syncSlots = chipGroup($('f-slots'), 'data-h', state.slots, {parse: Number, keepOne: true, onChange: onPick});
-  // 「恢復預設條件」（2026-10-21）：登山時段回到 06–15，類別、標高、縣市回到全部；和其他選項一樣按「完成」才套用
+  // 「恢復預設條件」（2026-10-21）：登山時段回到 06–18，類別、標高、縣市回到全部；和其他選項一樣按「完成」才套用
   $('filter-reset').onclick = () => { if (isDef()) return;
     state.cats.clear(); state.counties.clear(); state.hts.clear(); state.slots.clear(); DEF_SLOTS.forEach(h => state.slots.add(h));
     syncs.forEach(f => f()); syncSlots(); onPick(); };
