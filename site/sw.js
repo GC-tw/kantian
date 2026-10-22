@@ -1,8 +1,9 @@
 // 看天爬山：離線查看（2026-10-21 使用者決定）
 // 有網路時一律先抓最新的網頁與預報，順便存一份在手機裡；沒有網路時改用存著的版本。
 // 從存檔拿出來的預報會加上 x-kantian-offline 標記，網頁看到後顯示「目前沒有網路」提示。
-const CACHE = 'kantian-v1';
-const FONT = /^https:\/\/fonts\.(googleapis|gstatic)\.com\//;
+// Google 字型不存（2026-10-22 資安檢查選「戊」）：跨網站的檔案存起來會被算成很大，可能讓整份離線存檔被清掉；
+// 沒網路時改用手機內建字型。快取名稱改 v2，順便清掉舊版存過的字型。
+const CACHE = 'kantian-v2';
 
 self.addEventListener('install', () => self.skipWaiting());
 self.addEventListener('activate', e => e.waitUntil((async () => {
@@ -26,18 +27,17 @@ async function networkFirst(req, mark){
     return new Response(await hit.blob(), {status: 200, headers: h});
   }
 }
-async function cacheFirst(req){                       // 字型、圖示：不會變，存過就直接用
+async function cacheFirst(req){                       // 圖示：不會變，存過就直接用
   const c = await caches.open(CACHE), hit = await c.match(req);
   if (hit) return hit;
   const r = await fetch(req);
-  if (r.ok || r.type === 'opaque') await c.put(req, r.clone());
+  if (r.ok) await c.put(req, r.clone());
   return r;
 }
 
 self.addEventListener('fetch', e => {
   const req = e.request; if (req.method !== 'GET') return;
   const u = new URL(req.url);
-  if (FONT.test(req.url)) return e.respondWith(cacheFirst(req));
   if (u.origin !== location.origin) return;
   if (u.pathname.endsWith('/forecast.json')) return e.respondWith(networkFirst(req, true));
   if (req.mode === 'navigate' || u.pathname.endsWith('/index.html')) return e.respondWith(networkFirst(req, false));
