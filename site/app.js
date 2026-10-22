@@ -390,7 +390,7 @@ function renderDetail(){
       ${(() => { const ls = pts.map(p => [p, cwaUrl(p)]).filter(y => y[1]); return ls.length ? `<span class="cwa">${ls.map(([p, u]) => `<a href="${u}" target="_blank" rel="noopener">${ls.length > 1 ? esc(p.key.slice(3)) + ' ' : ''}氣象署原始預報 ↗</a>`).join('')}</span>` : ''; })()}
       <span>${pts.length>1?'跨多個鄉鎮，各自列出；燈號取最差的鄉鎮。':''}${x.low?'標高 1,000 公尺以下，另判斷高溫。':''}</span>
       <span class="issued">資料來源：交通部中央氣象署・本站更新 ${FC ? fmtTime(Date.parse(FC.fetchedAt)) : '—'}</span></div>
-    ${alerts.map(a=>a.lv > 0 ? `<div class="alert"><b>${esc(a.type)}・${SYM[a.lv]}</b>　${esc(a.county)}${a.roll ? `，陸上警報期間，本站更新後 36 小時內列 D（目前到 ${fmtTime(a.end)}）` : a.end?`，有效至 ${fmtTime(a.end)}`:''}</div>`
+    ${alerts.map(a=>a.lv > 0 ? `<div class="alert"><b>${esc(a.type)}・${SYM[a.lv]}</b>　${esc(a.county)}${a.roll ? `，陸上警報期間，本站更新後 24 小時內列 D（目前到 ${fmtTime(a.end)}）` : a.end?`，有效至 ${fmtTime(a.end)}`:''}</div>`
       : `<div class="alert al-ref"><b>${esc(a.type)}</b>　${esc(a.county)}${a.end?`，有效至 ${fmtTime(a.end)}`:''}<small>特報資料範圍只到縣市，不列入燈號；這座山的風力請看下方「風」一列。</small></div>`).join('')}
     ${x.m.al?.length?`<div class="note">別名：${esc(x.m.al.join('、'))}</div>`:''}
     ${x.m.note?`<div class="note">備註：${esc(x.m.note)}</div>`:''}
