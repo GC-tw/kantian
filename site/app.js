@@ -560,7 +560,7 @@ const sameSet = (set, arr) => set.size === arr.length && arr.every(x => set.has(
   // 搜尋（2026-10-21 17:08 使用者決定）：右上角放大鏡，點了展開並把游標放進搜尋框；沒有字時離開搜尋框就收起，有字就維持展開
   const setSearch = on => { document.querySelector('header.top').classList.toggle('s-on', on); $('s-open').setAttribute('aria-expanded', on); if (on) $('f-search').focus(); };
   $('s-open').onclick = () => setSearch(true);
-  $('s-x').onclick = () => { const f = $('f-search'); f.value = ''; f.dispatchEvent(new Event('input')); f.focus(); };   // × 只清除文字
+  $('s-x').onclick = () => { const f = $('f-search'); f.value = ''; f.dispatchEvent(new Event('input')); hideSuggest(); f.blur(); setSearch(false); };   // × 清除文字並收起搜尋框（2026-10-22 使用者選甲）
   $('f-search').addEventListener('blur', () => setTimeout(() => { if (!state.name.trim() && document.activeElement !== $('f-search')) setSearch(false); }, 160));
   // 搜尋提示（2026-10-21）：搜尋框下方列出符合的山，點了把山名填進搜尋框、列出搜尋結果（不開詳情）
   const sg = $('suggest');

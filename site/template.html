@@ -53,8 +53,8 @@ header.top.s-on .row1 .tools{width:min(340px,40%)}
 .search input{flex:1;min-width:0;font:inherit;border:0;background:none;color:inherit;padding:6px 6px;outline:none}
 .search input::placeholder{color:var(--muted)}
 .search input::-webkit-search-cancel-button{-webkit-appearance:none;display:none}
-.s-x{display:none;place-items:center;width:32px;height:32px;flex:none;font-size:20px;line-height:1;border:0;background:none;color:var(--muted);cursor:pointer;padding:0}
-.search.has .s-x{display:grid}   /* 有打字才顯示 ×（清除） */
+.s-x{display:grid;place-items:center;width:32px;height:32px;flex:none;font-size:20px;line-height:1;border:0;background:none;color:var(--muted);cursor:pointer;padding:0}
+/* × 一直顯示：按了清除文字並收起搜尋框（2026-10-22 使用者選甲） */
 .search svg,.filter-btn svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;flex:none}
 .filter-btn{display:inline-flex;align-items:center;gap:5px;font:inherit;font-weight:500;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:8px 13px;cursor:pointer;position:relative;flex:none}
 .filter-btn .badge{position:absolute;top:-6px;right:-6px;min-width:18px;height:18px;padding:0 4px;border-radius:9px;background:var(--accent);color:var(--accent-ink);font:700 11px/18px var(--f-body);text-align:center}
@@ -412,7 +412,7 @@ body{overflow-x:clip}
     <h1><a class="brand" id="brand" href="./" title="回到最上方"><svg class="logo" viewBox="0 0 512 512" aria-hidden="true"><rect width="512" height="512" rx="112" fill="#2f363d"/><circle cx="352" cy="168" r="56" fill="#f2b544"/><path d="M40 412 196 176l70 104 44-58 162 190z" fill="#8f99a3"/><path d="M40 412 196 176l116 236z" fill="#f4f5f6"/></svg>看天爬山</a><small>看天氣，找出適合造訪的山</small></h1>
       <div class="tools">
       <button type="button" class="s-open" id="s-open" aria-label="搜尋山名、別名或縣市" title="搜尋" aria-controls="search" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></svg></button>
-      <div class="search" id="search" role="search"><svg class="s-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></svg><input id="f-search" name="search" type="search" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" aria-label="搜尋山名、別名或縣市" placeholder="搜尋山名、別名或縣市"><button type="button" class="s-x" id="s-x" aria-label="清除搜尋">×</button></div>
+      <div class="search" id="search" role="search"><svg class="s-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></svg><input id="f-search" name="search" type="search" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" aria-label="搜尋山名、別名或縣市" placeholder="搜尋山名、別名或縣市"><button type="button" class="s-x" id="s-x" aria-label="關閉搜尋" title="關閉搜尋">×</button></div>
       </div>
     </div>
     <div class="suggest" id="suggest" role="listbox" aria-label="搜尋提示" hidden></div>
