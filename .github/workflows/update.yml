@@ -1,13 +1,12 @@
-# 看天爬山：每天在氣象署發布後自動抓資料、更新網站
-# 氣象署約在 05:30、11:30、17:30、23:30（台灣時間）發布；以下時間為 UTC（台灣時間減 8 小時），排在發布後約 30 分鐘
+# 看天爬山：自動抓資料、更新網站（2026-10-22 使用者決定）
+# 平常每 3 小時一次（台灣 00:07、03:07…21:07，包含氣象署約 05:30、11:30、17:30、23:30 發布後的那一次）；
+# 有颱風警報或豪雨、大雨特報時，其他整點也更新（等於每小時）。以下時間為 UTC（台灣時間減 8 小時）
 name: 更新天氣資料
 
 on:
   schedule:
-    - cron: '7 22 * * *'   # 台灣 06:07
-    - cron: '7 4 * * *'    # 台灣 12:07
-    - cron: '7 10 * * *'   # 台灣 18:07
-    - cron: '7 16 * * *'   # 台灣 00:07
+    - cron: '7 1-22/3 * * *'                                # 台灣 09:07、12:07…06:07（每 3 小時，一定更新）
+    - cron: '7 0,2,3,5,6,8,9,11,12,14,15,17,18,20,21,23 * * *'   # 其他整點：只在有特報時更新
   workflow_dispatch: {}    # 也可以在 GitHub 上手動按「Run workflow」（會重新抓資料）
   push:                    # 只改網頁時：沿用網站上最新的天氣資料（較快）；改到山岳資料或抓資料程式時：自動重新抓資料
     branches: [main]
@@ -23,7 +22,34 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  # 其他整點的排程：看最近一次的執行紀錄，有颱風警報或豪雨、大雨特報（還沒過期）才更新
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      go: ${{ steps.c.outputs.go }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          sparse-checkout: data/last-run.json
+          sparse-checkout-cone-mode: false
+      - id: c
+        run: |
+          if [ "${{ github.event_name }}" != "schedule" ] || [ "${{ github.event.schedule }}" = "7 1-22/3 * * *" ]; then
+            echo "go=true" >> "$GITHUB_OUTPUT"; echo "每 3 小時的更新"; exit 0
+          fi
+          node -e "
+            let r = {}; try { r = require('./data/last-run.json'); } catch {}
+            const s = r.summary || {}, now = Date.now();
+            const al = (s.alerts || []).filter(a => /颱風|豪雨|大雨/.test(a.type) && (a.end == null || a.end > now));
+            const ty = (s.typhoons || []).some(t => t.warn);
+            const go = al.length > 0 || ty;
+            console.log(go ? '有特報，這次更新：' + [...new Set(al.map(a => a.type))].join('、') + (ty ? '（颱風警報）' : '') : '沒有特報，這次略過');
+            require('fs').appendFileSync(process.env.GITHUB_OUTPUT, 'go=' + go + '\\n');
+          "
   update:
+    needs: check
+    if: needs.check.outputs.go == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 20       # 最多 20 分鐘，避免卡住
     environment:

@@ -54,9 +54,9 @@ function useForecast(data){
   const t0 = data.t0, wx = data.wx || [];
   for (const [key, p] of Object.entries(data.points || {}))
     fcIndex.set(key, {geo: p.geo || '', h3: new Map(decodeRows(p.h3, t0, 3*H, wx).map(r => [r.s, r])), week: new Map(decodeRows(p.week, t0 - 6*H, 12*H, wx).map(r => [r.s, r]))});
-  // 特報：只採用颱風、豪雨、大雨（列入燈號，D）。陸上強風、低溫、高溫、濃霧特報不採用、不顯示：
-  // 氣象署資料只到縣市層級，無法對應到每座山；改看各山的風速、氣溫、天氣描述預報（2026-10-20 使用者決定）
-  FC.alerts = (data.alerts || []).filter(a => ALERT_LV(a.type) > 0).map(a => ({...a, lv: ALERT_LV(a.type)})).sort((a, b) => b.lv - a.lv);
+  // 特報：颱風、豪雨、大雨列入燈號（D）。陸上強風只在詳情列出供參考、不列入燈號（2026-10-22 使用者選「乙」）；
+  // 低溫、高溫、濃霧特報不採用、不顯示。氣象署資料只到縣市層級，無法對應到每座山；改看各山的風速、氣溫、天氣描述預報（2026-10-20）
+  FC.alerts = (data.alerts || []).filter(a => ALERT_LV(a.type) >= 0).map(a => ({...a, lv: ALERT_LV(a.type)})).sort((a, b) => b.lv - a.lv);
 }
 function slotForecast(p, di, hr){                           // 逐 3 小時：沒有資料時回傳 null
   return fcIndex.get(p.key)?.h3.get(dayAt(di) + hr*H) || null;
@@ -82,7 +82,7 @@ function judgeDay(fc, lowHill, alert, noPop, am){
   if (am && fc.halves.some(x => x.day && dropPM(x.wx) !== x.wx)) why.push('登山時段在 12 點前，「午後」部分不計');
   return {lv, why, plus: lv === 0 && js.every(j => j.plus)};
 }
-const ALERT_LV = type => /颱風|豪雨|大雨/.test(type || '') ? 2 : 0;
+const ALERT_LV = type => /颱風|豪雨|大雨/.test(type || '') ? 2 : /陸上強風/.test(type || '') ? 0 : -1;   // 0：只顯示、不列入燈號
 const alertHits = (p, start, end) => (FC?.alerts || []).filter(a => p.counties.includes(a.county) && (a.start == null || a.start < end) && (a.end == null || a.end > start));
 function alertFor(p, start, end){                           // 列入燈號的特報：時段內生效、涵蓋這座山所在縣市，取最嚴重
   return alertHits(p, start, end).find(a => a.lv > 0) || null;
@@ -356,7 +356,7 @@ function mergeWhy(list){
 function renderDetail(){
   const {k, mode} = dState, x = MBYK.get(k), week = mode === 'week', pts = x.pts;
   const dc = buildCols(mode), cells = cellsFor(x, mode, dc);
-  const alerts = [...new Map(pts.flatMap(p => alertHits(p, dc[0].ws, dc[dc.length-1].we)).map(a => [a.county+a.type, a])).values()];   // 詳情列出所有生效中的特報（颱風、豪雨、大雨）
+  const alerts = [...new Map(pts.flatMap(p => alertHits(p, dc[0].ws, dc[dc.length-1].we)).map(a => [a.county+a.type, a])).values()];   // 詳情列出所有生效中的特報（颱風、豪雨、大雨；陸上強風只供參考）
   const v = (y, f) => y == null ? '—' : f(y);
   // 詳情表格：時段橫排（tenki.jp 做法，2026-10-20 使用者選「選項 1」）。欄是時段、列是項目，手機也不需左右滑動；
   // C、D 的原因列在表格下方
@@ -390,7 +390,8 @@ function renderDetail(){
       ${(() => { const ls = pts.map(p => [p, cwaUrl(p)]).filter(y => y[1]); return ls.length ? `<span class="cwa">${ls.map(([p, u]) => `<a href="${u}" target="_blank" rel="noopener">${ls.length > 1 ? esc(p.key.slice(3)) + ' ' : ''}氣象署原始預報 ↗</a>`).join('')}</span>` : ''; })()}
       <span>${pts.length>1?'跨多個鄉鎮，各自列出；燈號取最差的鄉鎮。':''}${x.low?'標高 1,000 公尺以下，另判斷高溫。':''}</span>
       <span class="issued">資料來源：交通部中央氣象署・本站更新 ${FC ? fmtTime(Date.parse(FC.fetchedAt)) : '—'}</span></div>
-    ${alerts.map(a=>`<div class="alert"><b>${esc(a.type)}・${SYM[a.lv]}</b>　${esc(a.county)}${a.end?`，有效至 ${fmtTime(a.end)}`:''}</div>`).join('')}
+    ${alerts.map(a=>a.lv > 0 ? `<div class="alert"><b>${esc(a.type)}・${SYM[a.lv]}</b>　${esc(a.county)}${a.end?`，有效至 ${fmtTime(a.end)}`:''}</div>`
+      : `<div class="alert al-ref"><b>${esc(a.type)}</b>　${esc(a.county)}${a.end?`，有效至 ${fmtTime(a.end)}`:''}<small>範圍只到縣市，不列入燈號；這座山的風力請看下方「風」一列。</small></div>`).join('')}
     ${x.m.al?.length?`<div class="note">別名：${esc(x.m.al.join('、'))}</div>`:''}
     ${x.m.note?`<div class="note">備註：${esc(x.m.note)}</div>`:''}
     ${pts.map((p, k) => groups.map(g => table(p, k, g.idx, g.title)).join('')).join('')}
@@ -464,7 +465,7 @@ function showTyphoon(){
   // 文字接在同一段；「一週預報第 5–7 天僅供參考」一句已拿掉（2026-10-21 18:44 使用者決定）
   const nm = t => `${t.scale ? esc(t.scale) : '颱風'}${esc(t.name)}`;
   box.innerHTML = `<div class="ty-body"><p><b>⚠ ${ts.map(nm).join('、')}</b>：`
-    + ts.map(t => `${ts.length > 1 ? nm(t) + '：' : ''}${t.warn ? `氣象署已發布「${esc(t.warn.headline)}」。` : ''}${t.near ? `氣象署預測${when(t.near.t)}最接近臺灣，中心距臺灣陸地約 ${t.near.km} 公里。` : ''}`).join('')
+    + ts.map(t => `${ts.length > 1 ? nm(t) + '：' : ''}${t.warn ? `氣象署已發布「${esc(t.warn.headline)}」${t.warn.land?.length ? `，陸上警戒：${t.warn.land.map(esc).join('、')}` : ''}。` : ''}${t.near ? `氣象署預測${when(t.near.t)}最接近臺灣，中心距臺灣陸地約 ${t.near.km} 公里。` : ''}`).join('')
     + `出發前請看<a href="https://www.cwa.gov.tw/V8/C/P/Typhoon/TY_NEWS.html" target="_blank" rel="noopener">氣象署颱風消息</a>。</p></div>`
     + '<svg class="ty-more" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>';
   fitTyphoon();

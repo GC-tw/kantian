@@ -130,11 +130,11 @@ let fails = 0; const ok = (c, m) => { console.log((c ? '✓ ' : '✗ ') + m); if
     const el = d.getElementById('f-search');
     ok(!/name/i.test(el.id + (el.name || '')) && el.getAttribute('autocomplete') === 'off', '搜尋框的 id、name 不含 name，關閉自動填寫（避免 iPhone 跳出聯絡人）');
   }
-  // 特報：宜蘭縣今天陸上強風（不採用）
+  // 特報：宜蘭縣今天陸上強風（詳情列出、不列入燈號，2026-10-22）
   click(w, d.querySelector('#seg [data-mode="today"]'));
   inp.value = '南湖北山'; inp.dispatchEvent(new w.Event('input', {bubbles: true}));
   click(w, d.querySelector('#matrix tbody tr[data-k] td'));
-  ok(!/陸上強風/.test(d.getElementById('drawer').innerHTML), '陸上強風特報不顯示，也不列入燈號');
+  ok(/陸上強風/.test(d.querySelector('#drawer .alert.al-ref')?.textContent || '') && !d.querySelector('#drawer .alert:not(.al-ref)'), '陸上強風特報在詳情列出（參考樣式），不列入燈號');
   click(w, d.getElementById('d-close'));
   click(w, d.querySelector('#seg [data-mode="tmr"]'));
   inp.value = '玉山北峰'; inp.dispatchEvent(new w.Event('input', {bubbles: true}));

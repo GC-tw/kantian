@@ -289,10 +289,10 @@ async function main(){
   const missingTown = [...townsNeeded].filter(t => !result.points[t]);
   if (missingTown.length) warn('鄉鎮預報缺少：' + missingTown.join('、'));
 
-  // 3. 天氣警特報：只保留颱風、豪雨、大雨（列入燈號）
+  // 3. 天氣警特報：颱風、豪雨、大雨列入燈號（2）；陸上強風只在詳情列出、不列入燈號（0，2026-10-22 使用者選「乙」）
   try{
     const j = await getDataset(ALERT_ID); saveSample('alerts', j);
-    const LV = [[/颱風|豪雨|大雨/, 2]];   // 陸上強風、低溫、高溫、濃霧不收集（2026-10-20：只到縣市層級，改看各山預報）
+    const LV = [[/颱風|豪雨|大雨/, 2], [/陸上強風/, 0]];   // 低溫、高溫、濃霧不收集（2026-10-20：只到縣市層級，改看各山預報）
     const locs = [].concat(pick(j.records || j, 'location', 'Location') || []);
     for (const loc of locs){
       const county = pick(loc, 'locationName', 'LocationName');
@@ -301,7 +301,7 @@ async function main(){
         const info = pick(h, 'info', 'Info') || {}, vt = pick(h, 'validTime', 'ValidTime') || {};
         const ph = String(pick(info, 'phenomena', 'Phenomena') || ''), sig = String(pick(info, 'significance', 'Significance') || '');
         const lv = (LV.find(([re]) => re.test(ph)) || [])[1];
-        if (!lv) continue;
+        if (lv == null) continue;
         result.alerts.push({county, type: ph + sig, lv, start: twTime(pick(vt, 'startTime', 'StartTime')), end: twTime(pick(vt, 'endTime', 'EndTime'))});
       }
     }
@@ -377,14 +377,14 @@ function logWx(points, alerts){
   log.terms ||= {}; log.runs ||= [];
   const wx = {};
   for (const p of points) for (const x of [...(p.h3 || []), ...(p.week || [])]) if (x.wx) wx[x.wx] = (wx[x.wx] || 0) + 1;
-  const active = [...new Set(alerts.filter(a => !(a.end < now)).map(a => a.type))];
+  const active = [...new Set(alerts.filter(a => a.end == null || a.end >= now).map(a => a.type))];   // 結束時間空白（颱風陸上警報）也算生效中（2026-10-22 修正）
   for (const [w, c] of Object.entries(wx)){
     const t = log.terms[w] ||= {n: 0, first: day, withAlerts: []};
     t.n += c; t.last = day;
     for (const a of active) if (!t.withAlerts.includes(a)) t.withAlerts.push(a);
   }
   log.runs.push({time: new Date(now).toISOString(), alerts: active, wx: Object.fromEntries(Object.entries(wx).sort((a, b) => b[1] - a[1]))});
-  log.runs = log.runs.slice(-120);                         // 約 30 天（每天 4 次）
+  log.runs = log.runs.slice(-240);                         // 約 30 天（每 3 小時一次；特報期間每小時，天數較少）
   log.watch = Object.keys(log.terms).filter(w => /大雨|豪雨|霧|雪|冰|雷/.test(w)).sort();
   fs.writeFileSync(file, JSON.stringify(log, null, 1));
 }

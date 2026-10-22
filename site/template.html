@@ -234,7 +234,10 @@ aside.drawer{position:fixed;top:0;right:0;bottom:0;width:min(520px,100%);backgro
 .src b{font-weight:700}
 .note{font-size:13px;color:var(--muted)}
 .alert{background:var(--stop-soft);border:1px solid var(--stop);color:var(--ink);border-radius:6px;padding:8px 12px;font-size:13px}
+.alert.al-ref{background:var(--surface);border-color:var(--line)}   /* 陸上強風：只供參考（2026-10-22） */
+.alert.al-ref small{display:block;color:var(--muted);font-size:12.5px;margin-top:2px}
 .alert b{color:var(--stop)}
+.alert.al-ref b{color:var(--ink)}
 .pt h3{font-size:15px;margin:0 0 6px;font-weight:700}
 .trange{font-size:14px;color:var(--muted);margin:0 0 8px}.trange b{color:var(--ink);font-weight:600}   /* 詳情的最高、最低氣溫（2026-10-21） */
 /* 詳情表格：時段橫排（欄＝時段、列＝項目），手機 360 寬也放得下 8 欄（2026-10-20） */
@@ -545,7 +548,7 @@ body{overflow-x:clip}
         <li><b>天氣描述</b><ul><li>有「霧」（例如「晴有霧」）：C</li><li>有「雪」（例如「雨或雪」）：C</li><li>有「下雪」「積冰」「暴風雪」：D</li><li>有「雷」：D</li></ul></li>
         <li><b>風速</b>（平均風速）<ul><li>4 級以下：B</li><li>5–6 級：C</li><li>7 級以上：D</li><li>陣風通常是平均風速的 1.5–3 倍，稜線上請特別小心。</li></ul></li>
         <li><b>高溫</b>（只看標高 1,000 公尺以下的山）<ul><li>體感溫度 36°C 以上：C</li></ul></li>
-        <li><b>天氣特報</b>（特報涵蓋的縣市內的山）<ul><li>颱風、豪雨、大雨：D（預報只有降雨機率、沒有雨量，雨勢大小要靠特報）</li><li>颱風只看「海上陸上颱風警報」的陸上警戒縣市；只有海上颱風警報時不列入。陸上警報期間，警戒縣市的山所有時段都是 D，直到氣象署解除警報。</li><li>陸上強風、低溫、高溫、濃霧特報不採用：氣象署的特報範圍只到縣市，無法對應到每座山；請看各山的風速、氣溫、天氣描述預報。</li></ul></li>
+        <li><b>天氣特報</b>（特報涵蓋的縣市內的山）<ul><li>颱風、豪雨、大雨：D（預報只有降雨機率、沒有雨量，雨勢大小要靠特報）</li><li>颱風只看「海上陸上颱風警報」的陸上警戒縣市；只有海上颱風警報時不列入。陸上警報期間，警戒縣市的山所有時段都是 D，直到氣象署解除警報。</li><li>陸上強風特報：在山的詳情列出供參考，不列入燈號。</li><li>低溫、高溫、濃霧特報不採用。</li><li>陸上強風、低溫、高溫、濃霧的特報範圍只到縣市，無法對應到每座山；請看各山的風速、氣溫、天氣描述預報。</li></ul></li>
         <li><b>低溫不列入燈號</b><ul><li>可以靠保暖裝備應對，請參考預報準備對應衣物。</li></ul></li>
       </ul>
       <h3>特殊情況</h3>
@@ -567,7 +570,7 @@ body{overflow-x:clip}
         <li><b>百岳與部分山岳：</b>氣象署登山預報（共 151 個預報點），詳情會標示預報點代號。</li>
         <li><b>其他小百岳：</b>氣象署鄉鎮預報。因氣象署無直接對應點位，鄉鎮預報代表的是鄉鎮，不是山頂，僅供參考。</li>
         <li><b>天氣特報：</b>氣象署警特報。</li>
-        <li><b>更新時間：</b>氣象署每天約 <span class="kbd">05:30</span> <span class="kbd">11:30</span> <span class="kbd">17:30</span> <span class="kbd">23:30</span> 發布，本站在每次發布後更新。</li>
+        <li><b>更新時間：</b>氣象署每天約 <span class="kbd">05:30</span> <span class="kbd">11:30</span> <span class="kbd">17:30</span> <span class="kbd">23:30</span> 發布。本站每 3 小時更新一次；有颱風警報或豪雨、大雨特報時，改為每小時更新。</li>
       </ul>
       <h3>注意事項</h3>
       <ul>
