@@ -317,8 +317,9 @@ async function main(){
     const isTy = a => /颱風/.test(a.type);
     const drop = result.alerts.filter(a => isTy(a) && !land.has(a.county)).map(a => a.county);
     if (drop.length) console.log('颱風特報不在陸上警戒縣市，不採用：' + [...new Set(drop)].join('、'));
-    // 陸上警報期間，警戒縣市所有時段都列 D，直到氣象署解除警報（2026-10-21 使用者選「甲」）：特報的結束時間通常只寫到下一報，不是颱風離開的時間
-    result.alerts = result.alerts.filter(a => !isTy(a)).concat([...land].map(c => ({county: c, type: '颱風警報', lv: 2, start: null, end: null})));
+    // 陸上警報期間，警戒縣市從現在起 36 小時內都列 D，之後照各山預報（2026-10-22 使用者決定，原本是所有時段 D 直到解除）。
+    // 特報的結束時間通常只寫到下一報，不是颱風離開的時間，所以不用它；警報期間每小時更新，36 小時的界線會跟著往後滾動
+    result.alerts = result.alerts.filter(a => !isTy(a)).concat([...land].map(c => ({county: c, type: '颱風警報', lv: 2, start: null, end: Date.now() + 36*H, roll: 36})));
   }
 
   fs.mkdirSync(path.dirname(OUT), {recursive: true});

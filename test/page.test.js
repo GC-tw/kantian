@@ -202,6 +202,14 @@ let fails = 0; const ok = (c, m) => { console.log((c ? '✓ ' : '✗ ') + m); if
   }
   ok(errors.length === 0, '沒有程式錯誤' + (errors.length ? '：' + errors[0] : ''));
 
+  { // 陸上颱風警報：本站更新後 36 小時內 D、之後照預報（2026-10-22）
+    const now = Date.now(), al = [...forecast.alerts, {county: '臺東縣', type: '颱風警報', lv: 2, start: null, end: now + 36*3600e3, roll: 36}];
+    const {d: d2, w: w2} = await open({data: {...forecast, alerts: al}});
+    const hits = w2.eval(`(() => { const x = [...MBYK.values()].find(x => x.m.n === '都蘭山'); return [alertFor(x.pts[0], ${now}, ${now + 3600e3}), alertFor(x.pts[0], ${now + 40*3600e3}, ${now + 43*3600e3})].map(a => a ? a.type : null); })()`);
+    ok(hits[0] === '颱風警報' && hits[1] === null, '陸上颱風警報：36 小時內列入燈號，之後不列入');
+    w2.eval(`dState = {k: [...MBYK.values()].find(x => x.m.n === '都蘭山').k, mode: 'today'}; renderDetail()`);
+    ok(/颱風警報・D/.test(d2.getElementById('drawer').textContent) && /36 小時內列 D/.test(d2.getElementById('drawer').textContent), '詳情寫明陸上警報期間 36 小時內列 D');
+  }
   ({d} = await open({data: {...forecast, typhoons: []}}));
   ok(d.getElementById('typhoon').hidden, '沒有颱風時不顯示颱風提示');
 
