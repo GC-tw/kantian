@@ -30,8 +30,7 @@
   --go:#5cc287; --go-soft:#173826; --warn:#e3b24a; --warn-soft:#3a2f14; --stop:#ec7a6c; --stop-soft:#43221e; color-scheme:dark}
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.6;
-  background-image:repeating-radial-gradient(ellipse 120% 80% at 90% 0%,transparent 0 30px,var(--contour) 30px 31px),
-    repeating-radial-gradient(ellipse 90% 70% at 0% 100%,transparent 0 26px,var(--contour) 26px 27px);   /* 背景等高線（2026-10-22 改兩組，像地形圖） */
+  background-image:var(--grain);   /* 紙的顆粒質感（2026-10-22 使用者要求：不要等高線，改紙的顆粒）；--grain 定義在最後的美學改版段落 */
   background-attachment:fixed}
 .wrap{max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px;display:flex;flex-direction:column;gap:18px}
 header.top{display:flex;flex-direction:column;gap:10px}
@@ -349,7 +348,7 @@ footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);paddin
 .src .town{color:var(--muted)}
 @media (max-width:640px){.suggest{left:10px;right:10px}.seg-wrap{gap:6px}
   /* 手機往下捲時，日期按鈕固定在標題列下方（2026-10-21 設計檢查，選丙）；--hh 是標題列高度，由 app.js 量 */
-  .seg-wrap{position:sticky;top:var(--hh,62px);z-index:13;background:var(--bg);margin:0 -16px;padding:6px 16px 8px}
+  .seg-wrap{position:sticky;top:var(--hh,62px);z-index:13;background-color:var(--bg);background-image:var(--grain);background-attachment:fixed;margin:0 -16px;padding:6px 16px 8px}
   .seg-wrap.stuck{box-shadow:0 4px 10px rgba(0,0,0,.1)}}
 
 /* ===== 2026-10-22 美學改版（使用者選「甲＋乙」） =====
@@ -376,7 +375,7 @@ header.top::before,header.top::after{content:"";position:absolute;left:0;right:0
 header.top::before{height:34px;background:rgba(255,255,255,.22);
   -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 40' preserveAspectRatio='none'%3E%3Cpath d='M0 40V24l38-10 30 7 42-17 38 15 40-11 42 16 38-18 48 14 40-9 44 12v17z'/%3E%3C/svg%3E") 0 0/100% 100%;
   mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 40' preserveAspectRatio='none'%3E%3Cpath d='M0 40V24l38-10 30 7 42-17 38 15 40-11 42 16 38-18 48 14 40-9 44 12v17z'/%3E%3C/svg%3E") 0 0/100% 100%}
-header.top::after{height:22px;background:var(--bg);
+header.top::after{height:22px;background-color:var(--bg);background-image:var(--grain);background-attachment:fixed;
   -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 24' preserveAspectRatio='none'%3E%3Cpath d='M0 24V14l52-8 40 9 50-12 44 10 48-7 46 11 52-13 40 9 28-4v15z'/%3E%3C/svg%3E") 0 0/100% 100%;
   mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 24' preserveAspectRatio='none'%3E%3Cpath d='M0 24V14l52-8 40 9 50-12 44 10 48-7 46 11 52-13 40 9 28-4v15z'/%3E%3C/svg%3E") 0 0/100% 100%}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) header.top{background:linear-gradient(rgba(0,0,0,.3),rgba(0,0,0,.3)),var(--sky)}}   /* 深色模式天色調暗 */
@@ -387,6 +386,10 @@ header.top .s-open{background:rgba(255,255,255,.18);border-color:rgba(255,255,25
 @media (min-width:641px){header.top{margin:-20px -16px 0;padding:22px 24px 44px;border-radius:0 0 18px 18px}
   header.top .search{background:rgba(255,255,255,.92);border-color:transparent;color:#1f2b35}
   header.top .search input::placeholder,header.top .search .s-ico,header.top .s-x{color:#5d6670}}
+/* 紙的顆粒質感（2026-10-22）：兩層雜訊圖，細顆粒＋淡淡的紙纖維深淺；深色模式用淡白顆粒 */
+:root{--grain:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .36 0 0 0 0 .30 0 0 0 0 .20 .55 0 0 0 -.2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='600'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.012' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .45 0 0 0 0 .38 0 0 0 0 .25 .35 0 0 0 -.12'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--grain:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 .22 0 0 0 -.1'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='600'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.012' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 .12 0 0 0 -.04'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}}
+:root[data-theme="dark"]{--grain:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 .22 0 0 0 -.1'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='600'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.012' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 .12 0 0 0 -.04'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
 </style>
 
 <div class="wrap">
