@@ -97,7 +97,7 @@ let fails = 0; const ok = (c, m) => { console.log((c ? '✓ ' : '✗ ') + m); if
   ok(shown, '一週：詳情寫出「陰陣雨（第 5–7 天無降雨機率）」這類原因');
   // 缺資料的山（鹿山）應顯示無資料
   click(w, d.querySelector('#seg [data-mode="tmr"]'));
-  const inp = d.getElementById('f-kw'); inp.value = '鹿山'; inp.dispatchEvent(new w.Event('input', {bubbles: true}));
+  const inp = d.getElementById('f-search'); inp.value = '鹿山'; inp.dispatchEvent(new w.Event('input', {bubbles: true}));
   ok(lamps().length && lamps().every(x => x === 'na'), '缺少資料的預報點顯示「無資料」');
   inp.value = ''; inp.dispatchEvent(new w.Event('input', {bubbles: true}));
   { // 篩選防呆：選百岳後「1,000 m 以下」和沒有百岳的縣市不能選；取消後恢復
@@ -127,7 +127,7 @@ let fails = 0; const ok = (c, m) => { console.log((c ? '✓ ' : '✗ ') + m); if
     inp.value = ''; inp.dispatchEvent(new w.Event('input', {bubbles: true}));
     click(w, d.querySelector('#f-slots [data-h="12"]')); w.eval('saveFilters()');
     ok(w.eval('rows.length') === 235, '清掉搜尋後列出全部 235 座');
-    const el = d.getElementById('f-kw');
+    const el = d.getElementById('f-search');
     ok(!/name/i.test(el.id + (el.name || '')) && el.getAttribute('autocomplete') === 'off', '搜尋框的 id、name 不含 name，關閉自動填寫（避免 iPhone 跳出聯絡人）');
   }
   // 特報：宜蘭縣今天陸上強風（不採用）

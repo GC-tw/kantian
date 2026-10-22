@@ -555,26 +555,26 @@ const sameSet = (set, arr) => set.size === arr.length && arr.every(x => set.has(
   seg.forEach(b => b.onclick = () => { state.mode = b.dataset.mode; state.shown = PAGE; syncSeg(); store.set('mode', state.mode); refresh(); });
   syncSeg();
 
-  $('f-kw').oninput = e => { const was = state.name.trim(); state.name = e.target.value; if (!was && state.name.trim()) resetForSearch();   // 從空白開始輸入時才重設篩選，搜尋中改篩選照常套用
+  $('f-search').oninput = e => { const was = state.name.trim(); state.name = e.target.value; if (!was && state.name.trim()) resetForSearch();   // 從空白開始輸入時才重設篩選，搜尋中改篩選照常套用
  $('search').classList.toggle('has', !!state.name.trim()); if ($('view-find').hidden) $('tab-find').click(); refilter(); };
   // 搜尋（2026-10-21 17:08 使用者決定）：右上角放大鏡，點了展開並把游標放進搜尋框；沒有字時離開搜尋框就收起，有字就維持展開
-  const setSearch = on => { document.querySelector('header.top').classList.toggle('s-on', on); $('s-open').setAttribute('aria-expanded', on); if (on) $('f-kw').focus(); };
+  const setSearch = on => { document.querySelector('header.top').classList.toggle('s-on', on); $('s-open').setAttribute('aria-expanded', on); if (on) $('f-search').focus(); };
   $('s-open').onclick = () => setSearch(true);
-  $('s-x').onclick = () => { const f = $('f-kw'); f.value = ''; f.dispatchEvent(new Event('input')); f.focus(); };   // × 只清除文字
-  $('f-kw').addEventListener('blur', () => setTimeout(() => { if (!state.name.trim() && document.activeElement !== $('f-kw')) setSearch(false); }, 160));
+  $('s-x').onclick = () => { const f = $('f-search'); f.value = ''; f.dispatchEvent(new Event('input')); f.focus(); };   // × 只清除文字
+  $('f-search').addEventListener('blur', () => setTimeout(() => { if (!state.name.trim() && document.activeElement !== $('f-search')) setSearch(false); }, 160));
   // 搜尋提示（2026-10-21）：搜尋框下方列出符合的山，點了把山名填進搜尋框、列出搜尋結果（不開詳情）
   const sg = $('suggest');
-  const showSuggest = () => { const list = document.activeElement === $('f-kw') ? suggestions(state.name) : [];
+  const showSuggest = () => { const list = document.activeElement === $('f-search') ? suggestions(state.name) : [];
     sg.innerHTML = list.map(o => `<button type="button" class="sg" data-sg="${esc(o.x.m.n)}" role="option"><span class="nm">${esc(o.x.m.n)}</span>${o.alias ? `<span class="al">${esc(o.alias)}</span>` : ''}<span class="meta">${sub(o.x.m)}</span></button>`).join('');
     sg.hidden = !list.length; };
   const hideSuggest = () => { sg.hidden = true; };
   sg.addEventListener('pointerdown', e => e.preventDefault());   // 點提示時搜尋框不先失去焦點
   sg.addEventListener('click', e => { const b = e.target.closest('[data-sg]'); if (!b) return;
-    const f = $('f-kw'); f.value = b.dataset.sg; f.dispatchEvent(new Event('input')); hideSuggest(); f.blur(); window.scrollTo(0, 0); });
-  $('f-kw').addEventListener('input', showSuggest);
-  $('f-kw').addEventListener('focus', showSuggest);
-  $('f-kw').addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); hideSuggest(); e.target.blur(); } });   // 按「搜尋」／Enter：收起手機鍵盤（搜尋框有字所以維持展開）
-  $('f-kw').addEventListener('blur', () => setTimeout(hideSuggest, 150));
+    const f = $('f-search'); f.value = b.dataset.sg; f.dispatchEvent(new Event('input')); hideSuggest(); f.blur(); window.scrollTo(0, 0); });
+  $('f-search').addEventListener('input', showSuggest);
+  $('f-search').addEventListener('focus', showSuggest);
+  $('f-search').addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); hideSuggest(); e.target.blur(); } });   // 按「搜尋」／Enter：收起手機鍵盤（搜尋框有字所以維持展開）
+  $('f-search').addEventListener('blur', () => setTimeout(hideSuggest, 150));
   const setFilter = open => {
     $('q').classList.toggle('open', open); $('f-scrim').hidden = !open;
     $('cond').setAttribute('aria-expanded', open);
@@ -602,7 +602,7 @@ const sameSet = (set, arr) => set.size === arr.length && arr.every(x => set.has(
   setSky(); setInterval(setSky, 5 * 6e4);
   const stuck = () => segW.classList.toggle('stuck', segW.getBoundingClientRect().top <= hdr.offsetHeight + 1 && scrollY > 0 && getComputedStyle(segW).position === 'sticky');
   addEventListener('scroll', stuck, {passive: true});
-  document.addEventListener('keydown', e => { if (e.key === 'Escape'){ setFilter(false); hideSuggest(); if (document.activeElement === $('f-kw')) $('f-kw').blur(); } });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape'){ setFilter(false); hideSuggest(); if (document.activeElement === $('f-search')) $('f-search').blur(); } });
   $('q').onsubmit = e => e.preventDefault();
   $('brand').onclick = e => { e.preventDefault(); window.scrollTo({top: 0, behavior: 'smooth'}); };   // 點標題：回到最上方（不重新整理）
   $('more').onclick = () => { state.shown += PAGE; if (!fresh()) evaluate(); render(); };
