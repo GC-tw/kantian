@@ -366,6 +366,16 @@ h1 small{letter-spacing:.16em}
 :root[data-sky=dawn]{--sky:linear-gradient(180deg,#5a6fa3 0%,#e9a98a 70%,#f6cf9c 100%)}
 :root[data-sky=dusk]{--sky:linear-gradient(180deg,#3a3f73 0%,#b5607a 60%,#f0a06a 100%)}
 :root[data-sky=night]{--sky:linear-gradient(180deg,#0c1426 0%,#1f2f52 100%)}
+/* 深色模式天色調暗（2026-10-22 改成直接換暗一點的顏色，方便電腦版把天空延伸到整個寬度） */
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){--sky:linear-gradient(180deg,#2b547f 0%,#64839d 100%)}
+  :root:not([data-theme="light"])[data-sky=dawn]{--sky:linear-gradient(180deg,#3f4e72 0%,#a37661 70%,#ac916d 100%)}
+  :root:not([data-theme="light"])[data-sky=dusk]{--sky:linear-gradient(180deg,#292c51 0%,#7f4355 60%,#a8704a 100%)}
+  :root:not([data-theme="light"])[data-sky=night]{--sky:linear-gradient(180deg,#080e1b 0%,#162139 100%)}}
+:root[data-theme="dark"]{--sky:linear-gradient(180deg,#2b547f 0%,#64839d 100%)}
+:root[data-theme="dark"][data-sky=dawn]{--sky:linear-gradient(180deg,#3f4e72 0%,#a37661 70%,#ac916d 100%)}
+:root[data-theme="dark"][data-sky=dusk]{--sky:linear-gradient(180deg,#292c51 0%,#7f4355 60%,#a8704a 100%)}
+:root[data-theme="dark"][data-sky=night]{--sky:linear-gradient(180deg,#080e1b 0%,#162139 100%)}
 header.top{background:var(--sky);color:#fff}
 header.top h1{text-shadow:0 1px 6px rgba(0,0,0,.25)}
 header.top h1 small{color:rgba(255,255,255,.88)}
@@ -378,12 +388,14 @@ header.top::before{height:34px;background:rgba(255,255,255,.22);
 header.top::after{height:22px;background-color:var(--bg);background-image:var(--grain);background-attachment:fixed;
   -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 24' preserveAspectRatio='none'%3E%3Cpath d='M0 24V14l52-8 40 9 50-12 44 10 48-7 46 11 52-13 40 9 28-4v15z'/%3E%3C/svg%3E") 0 0/100% 100%;
   mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 24' preserveAspectRatio='none'%3E%3Cpath d='M0 24V14l52-8 40 9 50-12 44 10 48-7 46 11 52-13 40 9 28-4v15z'/%3E%3C/svg%3E") 0 0/100% 100%}
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) header.top{background:linear-gradient(rgba(0,0,0,.3),rgba(0,0,0,.3)),var(--sky)}}   /* 深色模式天色調暗 */
-:root[data-theme="dark"] header.top{background:linear-gradient(rgba(0,0,0,.3),rgba(0,0,0,.3)),var(--sky)}
 header.top .s-open{background:rgba(255,255,255,.18);border-color:rgba(255,255,255,.45);color:#fff}
 @media (max-width:640px){header.top{padding-bottom:28px}}
-@media (max-width:640px){header.top{background:var(--sky)}@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) header.top{background:linear-gradient(rgba(0,0,0,.3),rgba(0,0,0,.3)),var(--sky)}}:root[data-theme="dark"] header.top{background:linear-gradient(rgba(0,0,0,.3),rgba(0,0,0,.3)),var(--sky)}}
-@media (min-width:641px){header.top{margin:-20px -16px 0;padding:22px 24px 44px;border-radius:0 0 18px 18px}
+@media (max-width:640px){header.top{background:var(--sky)}}
+/* 電腦版天空延伸到整個畫面寬度（2026-10-22 使用者要求）：標題列本身的位置不變（標題、搜尋仍和下面內容對齊），
+   天空用 border-image 往左右延伸，山稜剪影剛好延伸到畫面左右邊緣、置中並每 1180 px 重複一次；body 用 overflow-x:clip 避免出現左右捲動 */
+body{overflow-x:clip}
+@media (min-width:641px){header.top{margin:-20px -16px 0;padding:22px 24px 44px;background:none;border-image:var(--sky) fill 0 / 0 / 0 100vw}
+  header.top::before,header.top::after{left:calc((100% - 100vw) / 2);right:calc((100% - 100vw) / 2);-webkit-mask-size:1180px 100%;mask-size:1180px 100%;-webkit-mask-repeat:repeat-x;mask-repeat:repeat-x;-webkit-mask-position:center 0;mask-position:center 0}
   header.top .search{background:rgba(255,255,255,.92);border-color:transparent;color:#1f2b35}
   header.top .search input::placeholder,header.top .search .s-ico,header.top .s-x{color:#5d6670}}
 /* 紙的顆粒質感（2026-10-22）：兩層雜訊圖，細顆粒＋淡淡的紙纖維深淺；深色模式用淡白顆粒 */
