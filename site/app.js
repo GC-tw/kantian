@@ -654,5 +654,18 @@ const sameSet = (set, arr) => set.size === arr.length && arr.every(x => set.has(
   let lastLoad = Date.now();
   const tick = () => { if (Date.now() - lastLoad > 15*60e3){ lastLoad = Date.now(); loadForecast(); } else if (!fresh()) refresh(); showStatus(); };
   setInterval(tick, 60000);
-  document.addEventListener('visibilitychange', () => { if (!document.hidden){ lastLoad = 0; tick(); } });
+  // 自動換新版（2026-10-22 使用者選甲）：加到主畫面的 App 回到前景時不會重新載入網頁，所以回到前景時比對 version.json，
+  // 和這頁的版本不同就重新載入。網址帶版本代碼，避開加速網路暫存的舊網頁；同一個新版本只試一次，避免一直重新載入
+  const BUILD = '__BUILD__';
+  let lastVer = 0;
+  const checkVersion = async () => {
+    if (Date.now() - lastVer < 60e3) return; lastVer = Date.now();
+    try{
+      const r = await fetch('version.json?t=' + Date.now(), {cache: 'no-store'}); if (!r.ok) return;
+      const v = (await r.json()).v; if (!v || v === BUILD || !/^[0-9a-f]{10}$/.test(v)) return;
+      try{ if (sessionStorage.getItem('reloadFor') === v) return; sessionStorage.setItem('reloadFor', v); }catch(e){}
+      location.replace(location.pathname + '?v=' + v + location.hash);
+    }catch(e){}   // 沒有網路：維持現在的版本
+  };
+  document.addEventListener('visibilitychange', () => { if (!document.hidden){ lastLoad = 0; tick(); if (BUILD.length === 10) checkVersion(); } });
 })();
