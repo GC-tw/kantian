@@ -597,7 +597,7 @@ const sameSet = (set, arr) => set.size === arr.length && arr.every(x => set.has(
     const h = new Date(Date.now() + 8 * 36e5).getUTCHours();
     const s = h >= 5 && h < 8 ? 'dawn' : h >= 8 && h < 16 ? 'day' : h >= 16 && h < 19 ? 'dusk' : 'night';
     document.documentElement.dataset.sky = s;
-    const m = document.querySelector('meta[name="theme-color"]'); if (m) m.content = SKY[s];
+    const m = document.querySelector('meta[name="theme-color"]'); if (m) m.content = getComputedStyle(document.documentElement).getPropertyValue('--sky-top').trim() || SKY[s];   // 狀態列顏色＝標題列最上面的顏色（深色模式也一致）
   };
   setSky(); setInterval(setSky, 5 * 6e4);
   const stuck = () => segW.classList.toggle('stuck', segW.getBoundingClientRect().top <= hdr.offsetHeight + 1 && scrollY > 0 && getComputedStyle(segW).position === 'sticky');

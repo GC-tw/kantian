@@ -390,7 +390,23 @@ header.top::after{height:22px;background-color:var(--bg);background-image:var(--
   mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 24' preserveAspectRatio='none'%3E%3Cpath d='M0 24V14l52-8 40 9 50-12 44 10 48-7 46 11 52-13 40 9 28 1v10z'/%3E%3C/svg%3E") 0 0/100% 100%}
 header.top .s-open{background:rgba(255,255,255,.18);border-color:rgba(255,255,255,.45);color:#fff}
 @media (max-width:640px){header.top{padding-bottom:28px}}
-@media (max-width:640px){header.top{background:var(--sky)}}
+/* iPhone 狀態列接縫（2026-10-22 15:30）：Safari 用標題列的「底色」塗狀態列，漸層沒有底色時會自己挑一個顏色，交界就出現接縫。
+   手機標題列的底色設成天空最上面的顏色（--sky-top），狀態列那一段（安全區）用純色，漸層從狀態列下方開始 */
+:root{--sky-top:#3d78b5}
+:root[data-sky=dawn]{--sky-top:#5a6fa3}
+:root[data-sky=dusk]{--sky-top:#3a3f73}
+:root[data-sky=night]{--sky-top:#0c1426}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){--sky-top:#2b547f}
+  :root:not([data-theme="light"])[data-sky=dawn]{--sky-top:#3f4e72}
+  :root:not([data-theme="light"])[data-sky=dusk]{--sky-top:#292c51}
+  :root:not([data-theme="light"])[data-sky=night]{--sky-top:#080e1b}}
+:root[data-theme="dark"]{--sky-top:#2b547f}
+:root[data-theme="dark"][data-sky=dawn]{--sky-top:#3f4e72}
+:root[data-theme="dark"][data-sky=dusk]{--sky-top:#292c51}
+:root[data-theme="dark"][data-sky=night]{--sky-top:#080e1b}
+@media (max-width:640px){header.top{background-color:var(--sky-top);background-image:var(--sky);background-repeat:no-repeat;
+  background-position:0 env(safe-area-inset-top,0px);background-size:100% calc(100% - env(safe-area-inset-top,0px))}}
 /* 電腦版天空延伸到整個畫面寬度（2026-10-22 使用者要求）：標題列本身的位置不變（標題、搜尋仍和下面內容對齊），
    天空用 border-image 往左右延伸，山稜剪影剛好延伸到畫面左右邊緣、置中並每 1180 px 重複一次；body 用 overflow-x:clip 避免出現左右捲動 */
 body{overflow-x:clip}
