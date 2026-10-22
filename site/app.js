@@ -391,7 +391,7 @@ function renderDetail(){
       <span>${pts.length>1?'跨多個鄉鎮，各自列出；燈號取最差的鄉鎮。':''}${x.low?'標高 1,000 公尺以下，另判斷高溫。':''}</span>
       <span class="issued">資料來源：交通部中央氣象署・本站更新 ${FC ? fmtTime(Date.parse(FC.fetchedAt)) : '—'}</span></div>
     ${alerts.map(a=>a.lv > 0 ? `<div class="alert"><b>${esc(a.type)}・${SYM[a.lv]}</b>　${esc(a.county)}${a.end?`，有效至 ${fmtTime(a.end)}`:''}</div>`
-      : `<div class="alert al-ref"><b>${esc(a.type)}</b>　${esc(a.county)}${a.end?`，有效至 ${fmtTime(a.end)}`:''}<small>範圍只到縣市，不列入燈號；這座山的風力請看下方「風」一列。</small></div>`).join('')}
+      : `<div class="alert al-ref"><b>${esc(a.type)}</b>　${esc(a.county)}${a.end?`，有效至 ${fmtTime(a.end)}`:''}<small>特報資料範圍只到縣市，不列入燈號；這座山的風力請看下方「風」一列。</small></div>`).join('')}
     ${x.m.al?.length?`<div class="note">別名：${esc(x.m.al.join('、'))}</div>`:''}
     ${x.m.note?`<div class="note">備註：${esc(x.m.note)}</div>`:''}
     ${pts.map((p, k) => groups.map(g => table(p, k, g.idx, g.title)).join('')).join('')}
