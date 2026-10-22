@@ -447,7 +447,8 @@ function setInfo(v){ $('info-ref').hidden = !v; $('info-btn').setAttribute('aria
 // 讀取預報資料；失敗時保留已有資料並提示
 async function loadForecast(){
   try{
-    const r = await fetch('forecast.json?t=' + Date.now(), {cache: 'no-store'});
+    // 網址每 10 分鐘換一次（2026-10-22 資安檢查選「乙」）：同 10 分鐘內大家共用加速網路的暫存，被大量造訪時比較不會直接打到 GitHub
+    const r = await fetch('forecast.json?t=' + Math.floor(Date.now() / 6e5), {cache: 'no-store'});
     if (!r.ok) throw new Error('HTTP ' + r.status);
     const data = await r.json();
     loadError = ''; offline = r.headers?.get?.('x-kantian-offline') === '1';
