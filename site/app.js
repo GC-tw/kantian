@@ -591,6 +591,15 @@ const sameSet = (set, arr) => set.size === arr.length && arr.every(x => set.has(
   const hdr = document.querySelector('header.top'), segW = $('seg');
   const setHH = () => document.documentElement.style.setProperty('--hh', hdr.offsetHeight + 'px');
   if (window.ResizeObserver) new ResizeObserver(setHH).observe(hdr); setHH();
+  // 標題列天色（2026-10-22 美學改版「天空時刻」）：依台灣時間換清晨／白天／黃昏／夜晚，只是裝飾，和燈號無關；手機狀態列顏色跟著換
+  const SKY = {dawn: '#5a6fa3', day: '#3d78b5', dusk: '#3a3f73', night: '#0c1426'};
+  const setSky = () => {
+    const h = new Date(Date.now() + 8 * 36e5).getUTCHours();
+    const s = h >= 5 && h < 8 ? 'dawn' : h >= 8 && h < 16 ? 'day' : h >= 16 && h < 19 ? 'dusk' : 'night';
+    document.documentElement.dataset.sky = s;
+    const m = document.querySelector('meta[name="theme-color"]'); if (m) m.content = SKY[s];
+  };
+  setSky(); setInterval(setSky, 5 * 6e4);
   const stuck = () => segW.classList.toggle('stuck', segW.getBoundingClientRect().top <= hdr.offsetHeight + 1 && scrollY > 0 && getComputedStyle(segW).position === 'sticky');
   addEventListener('scroll', stuck, {passive: true});
   document.addEventListener('keydown', e => { if (e.key === 'Escape'){ setFilter(false); hideSuggest(); if (document.activeElement === $('f-kw')) $('f-kw').blur(); } });
