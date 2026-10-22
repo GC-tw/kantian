@@ -43,8 +43,9 @@ jobs:
             const s = r.summary || {}, now = Date.now();
             const al = (s.alerts || []).filter(a => /颱風|豪雨|大雨/.test(a.type) && (a.end == null || a.end > now));
             const ty = (s.typhoons || []).some(t => t.warn);
-            const go = al.length > 0 || ty;
-            console.log(go ? '有特報，這次更新：' + [...new Set(al.map(a => a.type))].join('、') + (ty ? '（颱風警報）' : '') : '沒有特報，這次略過');
+            const failed = r.ok !== true;   // 上一次失敗（例如氣象署連線逾時）時紀錄是空的，也照常更新＝下個整點自動重試（2026-10-22）
+            const go = al.length > 0 || ty || failed;
+            console.log(failed ? '上一次更新失敗，這次重試' : go ? '有特報，這次更新：' + [...new Set(al.map(a => a.type))].join('、') + (ty ? '（颱風警報）' : '') : '沒有特報，這次略過');
             require('fs').appendFileSync(process.env.GITHUB_OUTPUT, 'go=' + go + '\\n');
           "
   update:
