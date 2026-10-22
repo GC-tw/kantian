@@ -1,0 +1,63 @@
+# 颱風期間資料紀錄（2026-10-22 使用者要求；只做紀錄，不影響網站）
+# 每小時存一份網站當時的預報與特報、氣象署實際觀測，存到 typhoon-log 分支，
+# 到台灣時間 2026-10-27 00:00（10/26 週一結束）自動停止，之後用來檢討燈號門檻。
+name: 颱風期間資料紀錄
+
+on:
+  schedule:
+    - cron: '23 * * * *'     # 每小時 23 分（網站整點 07 分更新完之後）
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: typhoon-log
+  cancel-in-progress: false
+
+env:
+  STOP_AT: '2026-10-27T00:00:00+08:00'
+
+jobs:
+  log:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - id: on
+        run: |
+          if [ "$(date -u +%s)" -ge "$(date -u -d "$STOP_AT" +%s)" ]; then echo "紀錄期間已結束"; echo "go=false" >> "$GITHUB_OUTPUT"; else echo "go=true" >> "$GITHUB_OUTPUT"; fi
+      - uses: actions/checkout@v7
+        if: steps.on.outputs.go == 'true'
+        with:
+          sparse-checkout: .github/typhoon-log.mjs
+          sparse-checkout-cone-mode: false
+          path: main
+      - uses: actions/setup-node@v7
+        if: steps.on.outputs.go == 'true'
+        with:
+          node-version: 22
+          package-manager-cache: false
+      - name: 取出紀錄分支
+        if: steps.on.outputs.go == 'true'
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          if git ls-remote --exit-code --heads "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}" typhoon-log >/dev/null; then
+            git clone --depth 1 --branch typhoon-log "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}" logrepo
+          else
+            mkdir logrepo && cd logrepo && git init -b typhoon-log && git remote add origin "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}"
+          fi
+      - name: 抓資料
+        if: steps.on.outputs.go == 'true'
+        env:
+          CWA_API_KEY: ${{ secrets.CWA_API_KEY }}
+        run: node main/.github/typhoon-log.mjs logrepo/log
+      - name: 存回紀錄分支
+        if: steps.on.outputs.go == 'true'
+        run: |
+          cd logrepo
+          git add -A
+          git diff --cached --quiet && exit 0
+          git commit -qm "颱風紀錄 $(TZ=Asia/Taipei date +'%m/%d %H:%M')"
+          for i in 1 2 3; do git push -q origin typhoon-log && exit 0; git pull -q --rebase origin typhoon-log || true; sleep 5; done
+          exit 1
