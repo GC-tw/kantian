@@ -36,15 +36,27 @@
   "records": {
     "location": [
       {
-        "locationName": "彰化縣",
-        "geocode": 10007,
+        "locationName": "新竹市",
+        "geocode": 10018,
         "hazardConditions": {
-          "hazards": []
+          "hazards": [
+            {
+              "info": {
+                "language": "zh-TW",
+                "phenomena": "豪雨",
+                "significance": "特報"
+              },
+              "validTime": {
+                "startTime": "2026-10-24 15:13:00",
+                "endTime": "2026-10-24 23:00:00"
+              }
+            }
+          ]
         }
       },
       {
-        "locationName": "桃園市",
-        "geocode": 68,
+        "locationName": "苗栗縣",
+        "geocode": 10005,
         "hazardConditions": {
           "hazards": [
             {
