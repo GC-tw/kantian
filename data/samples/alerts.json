@@ -36,27 +36,15 @@
   "records": {
     "location": [
       {
-        "locationName": "連江縣",
-        "geocode": 9007,
+        "locationName": "金門縣",
+        "geocode": 9020,
         "hazardConditions": {
-          "hazards": [
-            {
-              "info": {
-                "language": "zh-TW",
-                "phenomena": "陸上強風",
-                "significance": "特報"
-              },
-              "validTime": {
-                "startTime": "2026-10-24 17:00:00",
-                "endTime": "2026-10-25 02:00:00"
-              }
-            }
-          ]
+          "hazards": []
         }
       },
       {
-        "locationName": "桃園市",
-        "geocode": 68,
+        "locationName": "彰化縣",
+        "geocode": 10007,
         "hazardConditions": {
           "hazards": []
         }
