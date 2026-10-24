@@ -36,15 +36,8 @@
   "records": {
     "location": [
       {
-        "locationName": "嘉義市",
-        "geocode": 10020,
-        "hazardConditions": {
-          "hazards": []
-        }
-      },
-      {
-        "locationName": "臺南市",
-        "geocode": 67,
+        "locationName": "臺中市",
+        "geocode": 66,
         "hazardConditions": {
           "hazards": [
             {
@@ -70,6 +63,13 @@
               }
             }
           ]
+        }
+      },
+      {
+        "locationName": "金門縣",
+        "geocode": 9020,
+        "hazardConditions": {
+          "hazards": []
         }
       }
     ]
