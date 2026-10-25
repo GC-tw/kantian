@@ -36,41 +36,17 @@
   "records": {
     "location": [
       {
-        "locationName": "嘉義縣",
-        "geocode": 10010,
+        "locationName": "苗栗縣",
+        "geocode": 10005,
         "hazardConditions": {
-          "hazards": [
-            {
-              "info": {
-                "language": "zh-TW",
-                "phenomena": "陸上強風",
-                "significance": "特報"
-              },
-              "validTime": {
-                "startTime": "2026-10-26 02:00:00",
-                "endTime": "2026-10-26 23:00:00"
-              }
-            }
-          ]
+          "hazards": []
         }
       },
       {
-        "locationName": "彰化縣",
-        "geocode": 10007,
+        "locationName": "嘉義市",
+        "geocode": 10020,
         "hazardConditions": {
-          "hazards": [
-            {
-              "info": {
-                "language": "zh-TW",
-                "phenomena": "陸上強風",
-                "significance": "特報"
-              },
-              "validTime": {
-                "startTime": "2026-10-26 02:00:00",
-                "endTime": "2026-10-26 23:00:00"
-              }
-            }
-          ]
+          "hazards": []
         }
       }
     ]
