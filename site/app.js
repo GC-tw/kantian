@@ -140,6 +140,7 @@ const state = {
   mode: (m => MODES[m] ? m : 'today')(store.get('mode')),
   slots: new Set((a => Array.isArray(a) && a.length ? a : DEF_SLOTS)(store.get('hike18'))),   // 儲存名稱 hike18：2026-10-21 預設改 06–18 時換名稱，讓舊的預設（06–15）一起換成新預設
   name: '', shown: PAGE,
+  nocd: store.get('nocd') === true,                        // 排除登山時段有 C、D 的山（2026-10-25）
 
   ...loadFilters()
 };
@@ -220,15 +221,15 @@ function evaluate(){                                       // 依時段與登山
     // 計分排序（2026-10-20 方案乙）：A 3、B 2、C 1、D 0；已過與無資料不計分
     // s1：計分範圍（登山時段）總分（一週為 7 天總分）；p1：其中 A 數；c1：其中 D 數（2026-10-20 加入，D 少的在前）；s2：所有時段總分（只用於逐 3 小時）
     // nd：沒有任何資料（2026-10-20 加入，一律排最後）
-    let s1 = 0, p1 = 0, c1 = 0, s2 = 0, has = false;
+    let s1 = 0, p1 = 0, c1 = 0, s2 = 0, cd = 0, has = false;   // cd：登山時段 C、D 數（只給開關用，2026-10-25）
     cells.forEach((c, i) => {
       if (c.past || c.lv < 0) return;
       has = true;
       const pt = SCORE(c);
       if (week){ s1 += pt; if (c.plus) p1++; if (c.lv===2) c1++; }
-      else { s2 += pt; if (cols[i].win){ s1 += pt; if (c.plus) p1++; if (c.lv===2) c1++; } }
+      else { s2 += pt; if (cols[i].win){ s1 += pt; if (c.plus) p1++; if (c.lv===2) c1++; if (c.lv>=1) cd++; } }
     });
-    return {...x, cells, s1, p1, c1, s2, nd: has ? 0 : 1, mix: hash(day + '|' + x.k)};
+    return {...x, cells, s1, p1, c1, s2, cd, nd: has ? 0 : 1, mix: hash(day + '|' + x.k)};
   }).sort(week   // 逐 3 小時（2026-10-21 方案甲，安全優先）：D 少 → 總分 → A 數 → 所有時段總分；一週維持：總分 → A 數 → D 少
     ? (a,b) => a.nd-b.nd || b.s1-a.s1 || b.p1-a.p1 || a.c1-b.c1 || a.mix-b.mix
     : (a,b) => a.nd-b.nd || a.c1-b.c1 || b.s1-a.s1 || b.p1-a.p1 || b.s2-a.s2 || a.mix-b.mix);
@@ -243,7 +244,8 @@ function applyFilters(){                                    // 篩選不需重�
   rows = all.filter(r => (!state.cats.size || state.cats.has(r.m.c))
     && (!state.counties.size || r.counties.some(c => state.counties.has(c)))
     && (!state.hts.size || state.hts.has(r.ht))
-    && (!q || r.search.includes(q)));
+    && (!q || r.search.includes(q))
+    && (!state.nocd || state.mode === 'week' || !!q || (!r.nd && !r.cd)));   // 排除有 C、D（2026-10-25）：一週不提供；搜尋時不套用；完全沒資料的山也不列
   favRows = all.filter(r => favs.has(r.k));
 }
 // 搜尋提示（2026-10-21）：打字時在搜尋框下方列出山名或別名符合的山（名稱相同 → 開頭相同 → 包含），點了把山名填進搜尋框、列出搜尋結果（2026-10-21 改，不再直接開詳情）
@@ -295,6 +297,8 @@ function condText(){
   $('c-ht').textContent = many(state.hts, '級', i => HT_SHORT[i]);
   [['c-slots', !sameSet(state.slots, DEF_SLOTS)], ['c-county', state.counties.size], ['c-cat', state.cats.size], ['c-ht', state.hts.size]]
     .forEach(([id, on]) => $(id).parentNode.classList.toggle('on', !!on));
+  $('f-nocd').closest('.nod').hidden = state.mode === 'week';   // 一週不顯示開關
+  $('f-nocd').checked = state.nocd;
 }
 
 function render(){
@@ -582,6 +586,7 @@ const sameSet = (set, arr) => set.size === arr.length && arr.every(x => set.has(
     if (!open && pending){ pending = false; saveFilters(); state.shown = PAGE; refresh(); window.scrollTo(0, 0); }   // 按「完成」才套用並記住
   };
   // 「設定篩選條件」區塊（2026-10-21）：點了打開篩選面板
+  $('f-nocd').onchange = e => { state.nocd = e.target.checked; store.set('nocd', state.nocd); refilter(); };
   $('cond').onclick = () => { syncReset(); setFilter(true); $('q').scrollTop = 0; };
   $('filter-done').onclick = $('f-scrim').onclick = () => setFilter(false);
   const tyToggle = () => { const box = $('typhoon'); if (!box.classList.contains('more')) return; box.classList.toggle('open'); box.setAttribute('aria-expanded', box.classList.contains('open')); };
