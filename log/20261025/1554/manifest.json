@@ -1,0 +1,17 @@
+{
+ "time": "2026-10-25T07:54:37.173Z",
+ "tw": "2026-10-25 15:54",
+ "saved": {
+  "site-forecast": 213983,
+  "obs-staff": 441302,
+  "alerts": 3067,
+  "ty-track": 54355,
+  "obs-auto": 882176,
+  "obs-rain": 1132394
+ },
+ "same": {
+  "site-version": "20261025/1352",
+  "ty-warn": "20261024/2101"
+ },
+ "failed": {}
+}
