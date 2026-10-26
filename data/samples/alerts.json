@@ -36,10 +36,22 @@
   "records": {
     "location": [
       {
-        "locationName": "苗栗縣",
-        "geocode": 10005,
+        "locationName": "彰化縣",
+        "geocode": 10007,
         "hazardConditions": {
-          "hazards": []
+          "hazards": [
+            {
+              "info": {
+                "language": "zh-TW",
+                "phenomena": "陸上強風",
+                "significance": "特報"
+              },
+              "validTime": {
+                "startTime": "2026-10-26 10:24:00",
+                "endTime": "2026-10-27 23:00:00"
+              }
+            }
+          ]
         }
       },
       {
