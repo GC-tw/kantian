@@ -36,8 +36,15 @@
   "records": {
     "location": [
       {
-        "locationName": "彰化縣",
-        "geocode": 10007,
+        "locationName": "金門縣",
+        "geocode": 9020,
+        "hazardConditions": {
+          "hazards": []
+        }
+      },
+      {
+        "locationName": "新竹縣",
+        "geocode": 10004,
         "hazardConditions": {
           "hazards": [
             {
@@ -47,18 +54,11 @@
                 "significance": "特報"
               },
               "validTime": {
-                "startTime": "2026-10-26 10:24:00",
-                "endTime": "2026-10-27 23:00:00"
+                "startTime": "2026-10-27 22:23:00",
+                "endTime": "2026-10-28 23:00:00"
               }
             }
           ]
-        }
-      },
-      {
-        "locationName": "嘉義市",
-        "geocode": 10020,
-        "hazardConditions": {
-          "hazards": []
         }
       }
     ]
