@@ -93,7 +93,65 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add -A data
-          git diff --cached --quiet || (git commit -m "更新執行紀錄、資料集代碼與格式樣本" && git push)
+          if git diff --cached --quiet; then
+            echo "資料沒有變動，不存回"
+            exit 0
+          fi
+          git commit -m "更新執行紀錄、資料集代碼與格式樣本"
+          # 只有排程、以及在 main 上手動執行，才把資料寫進 main。
+          # 從其他分支手動執行時，只推那個分支，避免把該分支的 commit 推進 main。
+          if [ "${GITHUB_REF:-refs/heads/main}" != "refs/heads/main" ]; then
+            echo "這次不是在 main 上執行，只推目前的分支，不寫進 main"
+            git push
+            exit 0
+          fi
+          # 重跑時 checkout 會把本地的 origin/main 指回這次執行當初的 commit，
+          # main 若已經往前，直接 push 會被拒。每次推之前都重新抓遠端真正的 main，
+          # 把這次的資料 commit 接上去再推；被拒（main 又往前）就重試。
+          # 資料檔撞到時採用這次執行寫出的版本；程式檔有衝突就停止。不使用 --force。
+          pushlog="${RUNNER_TEMP:-/tmp}/push-err.txt"
+          for i in 1 2 3 4; do
+            if ! git fetch origin +refs/heads/main:refs/remotes/origin/main; then
+              echo "抓不到遠端 main，稍後重試（第 ${i} 次）"
+              sleep $((i * 2))
+              continue
+            fi
+            if ! git rebase --empty=drop origin/main; then
+              conflicted="$(git diff --name-only --diff-filter=U || true)"
+              printf '%s\n' "$conflicted"
+              if [ -z "$conflicted" ] || printf '%s\n' "$conflicted" | grep -qv '^data/'; then
+                echo "接上 main 失敗（資料檔以外有衝突，或不是衝突造成的），停止推送"
+                git rebase --abort || true
+                exit 1
+              fi
+              echo "資料檔有衝突，採用這次執行寫出的版本"
+              while IFS= read -r f; do
+                [ -n "$f" ] || continue
+                git checkout --theirs -- "$f" || git rm -f -- "$f"
+                git add -A -- "$f"
+              done <<< "$conflicted"
+              if git diff --cached --quiet && git diff --quiet; then
+                git rebase --skip
+              else
+                GIT_EDITOR=true git rebase --continue
+              fi
+            fi
+            if git push origin HEAD:main >"$pushlog" 2>&1; then
+              cat "$pushlog"
+              exit 0
+            fi
+            cat "$pushlog"
+            if ! grep -qE 'non-fast-forward|fetch first|\[rejected\]|Updates were rejected' "$pushlog"; then
+              echo "推送失敗，不是 main 往前造成的，不再重試"
+              exit 1
+            fi
+            echo "推送被拒，接上最新的 main 後重試（第 ${i} 次）"
+            sleep $((i * 2))
+          done
+          echo "存回資料失敗：推不上 main"
+          exit 1
+      # 不使用 enablement：這個選項不能用工作流程自帶的 GITHUB_TOKEN（開 Pages 要另外的管理權限）。
+      # Pages 要在專案 Settings → Pages → Source 選 GitHub Actions，手動開一次。
       - uses: actions/configure-pages@v6
       - uses: actions/upload-pages-artifact@v5
         with:
