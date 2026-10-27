@@ -142,11 +142,17 @@ let fails = 0; const ok = (c, m) => { console.log((c ? '✓ ' : '✗ ') + m); if
   ok(!/低溫/.test(d.getElementById('drawer').innerHTML), '低溫特報不顯示，也不列入燈號');
   click(w, d.querySelector('#seg [data-mode="today"]'));
   click(w, d.getElementById('d-close'));
-  // 豪雨特報：屏東縣的山今天未過的時段都是 C
+  // 豪雨特報（2026-10-27 改）：屏東縣的山，降雨機率 30% 以上的時段 D、未滿 30% 的時段 C，不會是 A、B
   inp.value = '笠頂山'; inp.dispatchEvent(new w.Event('input', {bubbles: true}));
-  ok([...d.querySelectorAll('#matrix tbody .lamp:not(.past)')].every(x => x.classList.contains('r')), '豪雨特報期間，涵蓋縣市的山判 C');
+  ok([...d.querySelectorAll('#matrix tbody .lamp:not(.past)')].every(x => x.classList.contains('r') || x.classList.contains('y')), '豪雨特報期間，涵蓋縣市的山判 C 或 D');
   click(w, d.querySelector('#matrix tbody tr[data-k] td'));
-  ok(/豪雨特報・D/.test(d.getElementById('drawer').innerHTML), '詳情顯示豪雨特報・D');
+  ok(/豪雨特報・D／C/.test(d.getElementById('drawer').innerHTML), '詳情顯示豪雨特報・D／C');
+  { // 詳情表格逐欄：降雨機率未滿 30% 為 C、30% 以上為 D
+    const vt = d.querySelector('#drawer .vt'), rows = [...vt.querySelectorAll('tr')];
+    const lampRow = rows.find(r => r.querySelector('.lamp')), popRow = rows.find(r => /降雨/.test(r.cells[0]?.textContent || ''));
+    const pairs = [...lampRow.querySelectorAll('td')].map((td, i) => [td.querySelector('.lamp'), parseInt(popRow.querySelectorAll('td')[i]?.textContent)]).filter(([l, p]) => l && !l.classList.contains('past') && !isNaN(p));
+    ok(pairs.length > 0 && pairs.every(([l, p]) => l.classList.contains(p >= 30 ? 'r' : 'y') || (p < 30 && l.classList.contains('r'))) && pairs.some(([l, p]) => p < 30 && l.classList.contains('y')), '豪雨特報期間：降雨機率 30% 以上為 D，未滿 30% 為 C（其他項目可能更差）');
+  }
   { // 燈號名稱（2026-10-20 定案）：A 佳、B 可、C 注意、D 不建議；說明頁的字母換成小燈號方塊，°C 不上色
     const lg = d.querySelector('.legend').textContent;
     ok(/A佳/.test(lg) && /B可/.test(lg) && /C注意/.test(lg) && /D不建議/.test(lg) && !/A\+/.test(d.body.textContent), '圖例為 A 佳、B 可、C 注意、D 不建議，畫面上沒有 A+');

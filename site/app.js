@@ -54,7 +54,7 @@ function useForecast(data){
   const t0 = data.t0, wx = data.wx || [];
   for (const [key, p] of Object.entries(data.points || {}))
     fcIndex.set(key, {geo: p.geo || '', h3: new Map(decodeRows(p.h3, t0, 3*H, wx).map(r => [r.s, r])), week: new Map(decodeRows(p.week, t0 - 6*H, 12*H, wx).map(r => [r.s, r]))});
-  // 特報：颱風、豪雨、大雨列入燈號（D）。陸上強風只在詳情列出供參考、不列入燈號（2026-10-22 使用者選「乙」）；
+  // 特報：颱風、豪雨、大雨列入燈號（颱風 D；豪雨、大雨看降雨機率 D 或 C，2026-10-27）。陸上強風只在詳情列出供參考、不列入燈號（2026-10-22 使用者選「乙」）；
   // 低溫、高溫、濃霧特報不採用、不顯示。氣象署資料只到縣市層級，無法對應到每座山；改看各山的風速、氣溫、天氣描述預報（2026-10-20）
   FC.alerts = (data.alerts || []).filter(a => ALERT_LV(a.type) >= 0).map(a => ({...a, lv: ALERT_LV(a.type)})).sort((a, b) => b.lv - a.lv);
 }
@@ -84,9 +84,11 @@ function judgeDay(fc, lowHill, alert, noPop, am){
 }
 const ALERT_LV = type => /颱風|豪雨|大雨/.test(type || '') ? 2 : /陸上強風/.test(type || '') ? 0 : -1;   // 0：只顯示、不列入燈號
 const alertHits = (p, start, end) => (FC?.alerts || []).filter(a => p.counties.includes(a.county) && (a.start == null || a.start < end) && (a.end == null || a.end > start));
-function alertFor(p, start, end){                           // 列入燈號的特報：時段內生效、涵蓋這座山所在縣市，取最嚴重
-  return alertHits(p, start, end).find(a => a.lv > 0) || null;
+function alertFor(p, start, end){                           // 列入燈號的特報：時段內生效、涵蓋這座山所在縣市，颱風優先（一律 D），其次豪雨、大雨
+  const hs = alertHits(p, start, end).filter(a => a.lv > 0);
+  return hs.find(a => /颱風/.test(a.type)) || hs[0] || null;
 }
+const RAIN_ALERT = type => /豪雨|大雨/.test(type || '');
 
 // 第 4–7 天（沒有降雨機率）雨的分級（2026-10-20 使用者決定）：「局部」「短暫」的雨為 C（注意）；
 // 其他的雨（陣雨、有雨、雨天、雨或雪等）為 D（不建議）。描述中每個「雨」分別判斷，取最重的。
@@ -97,7 +99,9 @@ const rainLv = wx => Math.max(0, ...[...(wx || '').matchAll(RAIN_RE)].map(m => m
 function judge(fc, lowHill, alert, noPop){
   const why = []; let lv = 0;
   const up = (n, w) => { if (n > lv) lv = n; if (n > 0 && !why.includes(w)) why.push(w); };
-  if (alert) up(alert.lv, alert.type);
+  // 豪雨、大雨特報（2026-10-27 使用者選「乙」）：這座山這個時段的降雨機率 30% 以上才 D，未滿 30% 為 C；
+  // 沒有降雨機率（第 5–7 天、無資料）時維持 D。颱風警報一律 D。
+  if (alert){ if (RAIN_ALERT(alert.type) && !noPop && fc?.pop != null && fc.pop < 30) up(1, alert.type + '（降雨機率 ' + fc.pop + '%）'); else up(alert.lv, alert.type); }
   if (!fc) return alert ? {lv, why} : {lv: -1, why: ['無資料']};
   const wx = fc.wx || '';
   if (wx.includes('雷')) up(2, '有雷');
@@ -107,7 +111,8 @@ function judge(fc, lowHill, alert, noPop){
   if (!noPop && fc.pop != null){ if (fc.pop>=60) up(2, '降雨機率 '+fc.pop+'%'); else if (fc.pop>=30) up(1, '降雨機率 '+fc.pop+'%'); }
   else if (noPop && wx.includes('雨')) up(rainLv(wx), wx + '（第 5–7 天無降雨機率）');   // 第 5–7 天（一週預報）：依雨的用語分級，寫出原始描述
   else if (wx.includes('雨')) up(1, '可能下雨');
-  if (fc.ws != null){ if (fc.ws>=13.9) up(2, '風速 '+beaufort(fc.ws)+' 級'); else if (fc.ws>=8) up(1, '風速 '+beaufort(fc.ws)+' 級'); }   // 風速只顯示「級」（2026-10-20）
+  // 風速只顯示「級」（2026-10-20）。氣象署山區與鄉鎮預報風速最高只寫到每秒 11 公尺（6 級），達到最高值就 D（2026-10-27 使用者選「乙」）
+  if (fc.ws != null){ if (fc.ws>=11) up(2, '風速 '+beaufort(fc.ws)+' 級以上（氣象署預報最高值）'); else if (fc.ws>=8) up(1, '風速 '+beaufort(fc.ws)+' 級'); }
   if (lowHill && fc.at != null && fc.at>=36) up(1, '高溫 體感 '+fc.at+'°C');
   // 天氣代碼當備援（2026-10-21 使用者選「甲」）：描述是本站沒收錄的用語、但氣象署代碼表示有雷／雪／霧／雨時，依代碼取較嚴格的燈號
   const hint = WXH[wx] || '';
@@ -394,7 +399,7 @@ function renderDetail(){
       ${(() => { const ls = pts.map(p => [p, cwaUrl(p)]).filter(y => y[1]); return ls.length ? `<span class="cwa">${ls.map(([p, u]) => `<a href="${u}" target="_blank" rel="noopener">${ls.length > 1 ? esc(p.key.slice(3)) + ' ' : ''}氣象署原始預報 ↗</a>`).join('')}</span>` : ''; })()}
       <span>${pts.length>1?'跨多個鄉鎮，各自列出；燈號取最差的鄉鎮。':''}${x.low?'標高 1,000 公尺以下，另判斷高溫。':''}</span>
       <span class="issued">資料來源：交通部中央氣象署・本站更新 ${FC ? fmtTime(Date.parse(FC.fetchedAt)) : '—'}</span></div>
-    ${alerts.map(a=>a.lv > 0 ? `<div class="alert"><b>${esc(a.type)}・${SYM[a.lv]}</b>　${esc(a.county)}${a.roll ? `，陸上警報期間，本站更新後 ${a.roll} 小時內列 D（目前到 ${fmtTime(a.end)}）；氣象署解除警報後，下一次更新起照各山預報判定` : a.end?`，有效至 ${fmtTime(a.end)}`:''}</div>`
+    ${alerts.map(a=>a.lv > 0 ? `<div class="alert"><b>${esc(a.type)}・${RAIN_ALERT(a.type) ? 'D／C' : SYM[a.lv]}</b>　${esc(a.county)}${a.roll ? `，陸上警報期間，本站更新後 ${a.roll} 小時內列 D（目前到 ${fmtTime(a.end)}）；氣象署解除警報後，下一次更新起照各山預報判定` : a.end?`，有效至 ${fmtTime(a.end)}`:''}${RAIN_ALERT(a.type) ? '；這座山降雨機率 30% 以上的時段列 D，未滿 30% 列 C' : ''}</div>`
       : `<div class="alert al-ref"><b>${esc(a.type)}</b>　${esc(a.county)}${a.end?`，有效至 ${fmtTime(a.end)}`:''}<small>特報資料範圍只到縣市，不列入燈號；這座山的風力請看下方「風」一列。</small></div>`).join('')}
     ${x.m.al?.length?`<div class="note">別名：${esc(x.m.al.join('、'))}</div>`:''}
     ${x.m.note?`<div class="note">備註：${esc(x.m.note)}</div>`:''}
@@ -419,6 +424,7 @@ function stdInfo(mode){   // 燈號的判定標準：放在燈號圖例旁的 i�
   const ul = a => '<ul>' + a.map(x => '<li>' + x + '</li>').join('') + '</ul>';
   const std = ['A：佳，各項都適合，且天氣描述是「晴」；B：可，各項都適合；C：注意；D：不建議。',
     '依氣象署預報檢查降雨機率、天氣描述（霧、雪、雷）、平均風速，以及颱風、豪雨、大雨特報；標高 1,000 公尺以下另看高溫。以最差的一項作為燈號。',
+    '豪雨、大雨特報期間，這座山降雨機率 30% 以上為 D、未滿 30% 為 C；颱風陸上警報為 D。',
     '跨多個鄉鎮的山，取最差的鄉鎮。',
     '燈號只看天氣，不代表路線難度、體能需求或步道狀況。'];   // 2026-10-21 使用者決定（新手角度）
   if (mode === 'week') return '<h4>判定標準</h4>' + ul([...std, `前 4 天（今天到大後天）用逐 3 小時預報：你選的登山時段（${esc(slots)}）中，取最差的一段作為當天燈號；今天已過的時段不算。`, `第 5–7 天用一週預報：登山時段對應到白天或晚上，取最差的；登山時段都在 12 點前時，白天描述的「午後」部分不計。氣象署沒有降雨機率，依天氣描述判定：「局部」「短暫」的雨為 C，其他的雨（例如「陣雨」「有雨」）為 D。僅供參考。`]);
