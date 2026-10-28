@@ -36,15 +36,8 @@
   "records": {
     "location": [
       {
-        "locationName": "嘉義縣",
-        "geocode": 10010,
-        "hazardConditions": {
-          "hazards": []
-        }
-      },
-      {
-        "locationName": "彰化縣",
-        "geocode": 10007,
+        "locationName": "新竹市",
+        "geocode": 10018,
         "hazardConditions": {
           "hazards": [
             {
@@ -54,11 +47,18 @@
                 "significance": "特報"
               },
               "validTime": {
-                "startTime": "2026-10-28 10:31:00",
+                "startTime": "2026-10-28 16:22:00",
                 "endTime": "2026-10-28 23:00:00"
               }
             }
           ]
+        }
+      },
+      {
+        "locationName": "南投縣",
+        "geocode": 10008,
+        "hazardConditions": {
+          "hazards": []
         }
       }
     ]
