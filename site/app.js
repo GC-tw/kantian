@@ -129,7 +129,7 @@ const MOUNTAINS = M.map(m => {
   const pts = m.pid
     ? [{key:m.pid, label:'氣象署登山預報點「'+(m.pt||m.n)+'」', code:m.pid, county:counties[0], counties}]
     : (m.tw || []).map(t => ({key:t, label:t+' 鄉鎮預報', code:'', county:t.slice(0,3), counties:[t.slice(0,3)]}));
-  return {m, k:m.c+m.no, pts, counties, low: m.h!=null && m.h<1000, ht: HT_BAND(m.h), search: [m.n, ...(m.al||[]), m.note||'', m.co].join('\n')};   // 搜尋範圍：山名、別名、備註、縣市（縣市 2026-10-21 加入）
+  return {m, k:m.c+m.no, pts, counties, low: m.h!=null && m.h<1000, ht: HT_BAND(m.h), search: [m.n, ...(m.al||[]), m.note||'', m.co, ...(m.tw||[])].join('\n')};   // 搜尋範圍：山名、別名、備註、縣市（2026-10-21 加入）、鄉鎮（2026-10-28 加入，只有鄉鎮預報的山有）
 });
 
 // ---------- 狀態 ----------
