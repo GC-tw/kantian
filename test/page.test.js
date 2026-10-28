@@ -7,10 +7,10 @@ const html = fs.readFileSync(path.join(dist, 'index.html'), 'utf8');
 const forecast = JSON.parse(fs.readFileSync(path.join(dist, 'forecast.json'), 'utf8'));
 const tick = () => new Promise(r => setTimeout(r, 30));
 
-async function open({data = forecast, fail = false, now = Date.now()} = {}){
+async function open({data = forecast, fail = false, now = Date.now(), url = 'https://example.org/'} = {}){
   const errors = [], vc = new VirtualConsole();
   vc.on('jsdomError', e => errors.push(String(e.message || e)));
-  const dom = new JSDOM(html, {url: 'https://example.org/', runScripts: 'dangerously', virtualConsole: vc, beforeParse(w){
+  const dom = new JSDOM(html, {url, runScripts: 'dangerously', virtualConsole: vc, beforeParse(w){
     const RD = w.Date; class D extends RD{ constructor(...a){ a.length ? super(...a) : super(now); } static now(){ return now; } } w.Date = D;
     w.fetch = async () => { if (fail) throw new Error('offline'); return {ok: true, json: async () => JSON.parse(JSON.stringify(data))}; };
     w.HTMLElement.prototype.focus = function(){};
@@ -222,6 +222,13 @@ let fails = 0; const ok = (c, m) => { console.log((c ? '✓ ' : '✗ ') + m); if
   // 2. 資料過舊
   ({d} = await open({data: {...forecast, fetchedAt: new Date(Date.now() - 10*3600e3).toISOString()}}));
   ok(!d.getElementById('status').hidden && /可能不是最新/.test(d.getElementById('status').textContent), '超過 9 小時顯示「可能不是最新」');
+
+  // 分享網址（2026-10-28）：?m=山名 直接打開詳情（同名的山加編號），打開後網址拿掉 ?m=
+  ({w, d} = await open({url: 'https://example.org/kantian/?m=' + encodeURIComponent('觀音山-075')}));
+  ok(!d.getElementById('drawer').hidden && /高雄市/.test(d.querySelector('#drawer .sub').textContent) && !/m=/.test(w.location.href), '分享網址打開觀音山-075（高雄）詳情，網址拿掉 ?m=');
+  ok(!!d.querySelector('#drawer #d-share') && d.querySelectorAll('#drawer .vt .lamp:not(.na)').length > 0, '詳情有分享按鈕，資料到了詳情也有燈號');
+  ({d} = await open({url: 'https://example.org/?m=' + encodeURIComponent('台灣不存在的山')}));
+  ok(d.getElementById('drawer').hidden, '分享網址的山名不存在時不打開詳情');
 
   // 3. 抓取失敗
   ({d} = await open({fail: true}));

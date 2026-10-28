@@ -392,7 +392,7 @@ function renderDetail(){
   const town = pts.some(p => !p.code);
   const dr = $('drawer'), top = dr.scrollTop;
   dr.innerHTML = `
-    <div class="d-head"><div><h2 id="d-title">${esc(x.m.n)}${star(x.k)}</h2><div class="sub">${sub(x.m)}</div></div><button class="close" type="button" id="d-close" aria-label="關閉">×</button></div>
+    <div class="d-head"><div><h2 id="d-title">${esc(x.m.n)}${star(x.k)}</h2><div class="sub">${sub(x.m)}</div></div><div class="d-btns"><button class="share" type="button" id="d-share"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7.5 7.5 12 3l4.5 4.5M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg><span>分享</span></button><button class="close" type="button" id="d-close" aria-label="關閉">×</button></div></div>
     <div class="d-seg" role="tablist" aria-label="詳情日期">${Object.keys(MODES).map(m => `<button type="button" role="tab" data-dmode="${m}" aria-selected="${m === mode}">${MODES[m].name}<small>${segLabel(m)}</small></button>`).join('')}</div>
     <div class="src"><span><b>採用預報</b>：${esc(pts.map(p=>p.label+(p.code?'（'+p.code+'）':'')).join('、'))}</span>
       ${town ? '<span class="town">因氣象署無直接對應點位，此為鄉鎮預報，僅供參考。</span>' : ''}
@@ -418,6 +418,30 @@ function cwaUrl(p){
   return t ? 'https://www.cwa.gov.tw/V8/C/W/Town/Town.html?TID=' + t : '';
 }
 function closeDetail(){ $('drawer').hidden = true; $('scrim').hidden = true; }
+// 單座山分享網址（2026-10-28 使用者選「甲 詳情加分享按鈕」）：網址帶 ?m=山名，打開網頁直接看那座山的詳情。
+// 同名的山（觀音山、大尖山、大棟山、石門山）加編號，例如 ?m=觀音山-005；也接受內部代碼（例如 ?m=百岳001）
+const NAME_N = MOUNTAINS.reduce((a, x) => a.set(x.m.n, (a.get(x.m.n) || 0) + 1), new Map());
+const slugOf = m => NAME_N.get(m.n) > 1 ? `${m.n}-${m.no}` : m.n;
+const BY_SLUG = new Map(MOUNTAINS.map(x => [slugOf(x.m), x.k]));
+const shareUrl = x => location.origin + location.pathname + '?m=' + encodeURIComponent(slugOf(x.m));
+async function shareDetail(btn){
+  const x = dState && MBYK.get(dState.k); if (!x) return;
+  const url = shareUrl(x), title = `${x.m.n}｜看天爬山`;
+  if (navigator.share && matchMedia('(pointer:coarse)').matches){   // 手機：叫出內建分享選單（LINE 等）
+    try{ await navigator.share({title, url}); }catch(e){}   // 使用者取消：不做事
+    return;
+  }
+  const done = t => { const sp = btn.querySelector('span'); sp.textContent = t; setTimeout(() => { sp.textContent = '分享'; }, 2000); };
+  try{ await navigator.clipboard.writeText(url); done('已複製網址'); }   // 電腦：複製網址
+  catch(e){ window.prompt('請複製這個網址', url); }
+}
+function openFromUrl(){
+  let q; try{ q = new URLSearchParams(location.search).get('m'); }catch(e){ return; }
+  if (!q) return;
+  const k = BY_SLUG.get(q) || (MBYK.has(q) ? q : BY_SLUG.get(q.replace(/台/g, '臺')));
+  try{ const u = new URL(location.href); u.searchParams.delete('m'); history.replaceState(null, '', u.pathname + u.search + u.hash); }catch(e){}   // 打開後拿掉 ?m=，重新整理不會再自動打開
+  if (k) openDetail(k);
+}
 // 燈號排序旁的 i：依目前模式說明比較標準與排序，用字與「排序規則與說明」頁一致（2026-10-20）
 function stdInfo(mode){   // 燈號的判定標準：放在燈號圖例旁的 i（2026-10-21 由燈號排序旁的 i 移過來）
   const slots = sortedSlots().map(slotLabel).join('、');
@@ -463,7 +487,7 @@ async function loadForecast(){
     if (!r.ok) throw new Error('HTTP ' + r.status);
     const data = await r.json();
     loadError = ''; offline = r.headers?.get?.('x-kantian-offline') === '1';
-    if (data.fetchedAt !== FC?.fetchedAt){ useForecast(data); refresh(); }
+    if (data.fetchedAt !== FC?.fetchedAt){ useForecast(data); refresh(); if (dState && !$('drawer').hidden) renderDetail(); }   // 詳情開著時跟著換新資料（2026-10-28，分享網址打開時資料常常還沒到）
   }catch(e){ loadError = '暫時無法取得天氣資料，請稍後重新整理。'; }
   showStatus();
 }
@@ -647,6 +671,7 @@ const sameSet = (set, arr) => set.size === arr.length && arr.every(x => set.has(
       return;
     }
     if (e.target.closest('#d-close')) return closeDetail();
+    const sh = e.target.closest('#d-share'); if (sh) return shareDetail(sh);
     const dm = e.target.closest('[data-dmode]');
     if (dm && dState){ dState.mode = dm.dataset.dmode; renderDetail(); return; }   // 詳情裡切換日期（不影響列表）
     const t = e.target.closest('[data-k]');
@@ -661,6 +686,7 @@ const sameSet = (set, arr) => set.size === arr.length && arr.every(x => set.has(
   // 離線查看（2026-10-21）：sw.js 把最近一次的網頁與預報存在手機裡，沒有網路時改用存著的版本
   if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) navigator.serviceWorker.register('sw.js').catch(() => {});
   refresh();                                                // 先顯示山岳清單，資料到了再補上燈號
+  openFromUrl();                                            // 分享網址 ?m=山名：直接打開那座山的詳情
   loadForecast();
   // 網頁開著時：每分鐘檢查是否跨時段；每 15 分鐘或回到網頁時，檢查是否有新資料
   let lastLoad = Date.now();
