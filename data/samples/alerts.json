@@ -36,8 +36,15 @@
   "records": {
     "location": [
       {
-        "locationName": "新竹市",
-        "geocode": 10018,
+        "locationName": "金門縣",
+        "geocode": 9020,
+        "hazardConditions": {
+          "hazards": []
+        }
+      },
+      {
+        "locationName": "桃園市",
+        "geocode": 68,
         "hazardConditions": {
           "hazards": [
             {
@@ -52,13 +59,6 @@
               }
             }
           ]
-        }
-      },
-      {
-        "locationName": "南投縣",
-        "geocode": 10008,
-        "hazardConditions": {
-          "hazards": []
         }
       }
     ]
