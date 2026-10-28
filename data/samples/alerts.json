@@ -36,8 +36,15 @@
   "records": {
     "location": [
       {
-        "locationName": "雲林縣",
-        "geocode": 10009,
+        "locationName": "嘉義縣",
+        "geocode": 10010,
+        "hazardConditions": {
+          "hazards": []
+        }
+      },
+      {
+        "locationName": "彰化縣",
+        "geocode": 10007,
         "hazardConditions": {
           "hazards": [
             {
@@ -47,18 +54,11 @@
                 "significance": "特報"
               },
               "validTime": {
-                "startTime": "2026-10-28 04:24:00",
+                "startTime": "2026-10-28 10:31:00",
                 "endTime": "2026-10-28 23:00:00"
               }
             }
           ]
-        }
-      },
-      {
-        "locationName": "宜蘭縣",
-        "geocode": 10002,
-        "hazardConditions": {
-          "hazards": []
         }
       }
     ]
