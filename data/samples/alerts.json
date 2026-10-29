@@ -36,27 +36,15 @@
   "records": {
     "location": [
       {
-        "locationName": "屏東縣",
-        "geocode": 10013,
+        "locationName": "新竹縣",
+        "geocode": 10004,
         "hazardConditions": {
-          "hazards": [
-            {
-              "info": {
-                "language": "zh-TW",
-                "phenomena": "陸上強風",
-                "significance": "特報"
-              },
-              "validTime": {
-                "startTime": "2026-10-30 17:00:00",
-                "endTime": "2026-10-30 23:00:00"
-              }
-            }
-          ]
+          "hazards": []
         }
       },
       {
-        "locationName": "基隆市",
-        "geocode": 10017,
+        "locationName": "新北市",
+        "geocode": 65,
         "hazardConditions": {
           "hazards": []
         }
