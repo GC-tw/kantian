@@ -36,15 +36,27 @@
   "records": {
     "location": [
       {
-        "locationName": "新竹縣",
-        "geocode": 10004,
+        "locationName": "臺中市",
+        "geocode": 66,
         "hazardConditions": {
-          "hazards": []
+          "hazards": [
+            {
+              "info": {
+                "language": "zh-TW",
+                "phenomena": "陸上強風",
+                "significance": "特報"
+              },
+              "validTime": {
+                "startTime": "2026-10-30 17:00:00",
+                "endTime": "2026-10-30 23:00:00"
+              }
+            }
+          ]
         }
       },
       {
-        "locationName": "新北市",
-        "geocode": 65,
+        "locationName": "嘉義縣",
+        "geocode": 10010,
         "hazardConditions": {
           "hazards": []
         }
