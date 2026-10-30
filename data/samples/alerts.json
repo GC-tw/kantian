@@ -36,27 +36,15 @@
   "records": {
     "location": [
       {
-        "locationName": "屏東縣",
-        "geocode": 10013,
+        "locationName": "嘉義縣",
+        "geocode": 10010,
         "hazardConditions": {
-          "hazards": [
-            {
-              "info": {
-                "language": "zh-TW",
-                "phenomena": "陸上強風",
-                "significance": "特報"
-              },
-              "validTime": {
-                "startTime": "2026-10-30 17:00:00",
-                "endTime": "2026-10-31 19:00:00"
-              }
-            }
-          ]
+          "hazards": []
         }
       },
       {
-        "locationName": "連江縣",
-        "geocode": 9007,
+        "locationName": "臺南市",
+        "geocode": 67,
         "hazardConditions": {
           "hazards": [
             {
@@ -66,7 +54,7 @@
                 "significance": "特報"
               },
               "validTime": {
-                "startTime": "2026-10-30 17:00:00",
+                "startTime": "2026-10-30 16:22:00",
                 "endTime": "2026-10-31 19:00:00"
               }
             }
