@@ -36,15 +36,8 @@
   "records": {
     "location": [
       {
-        "locationName": "宜蘭縣",
-        "geocode": 10002,
-        "hazardConditions": {
-          "hazards": []
-        }
-      },
-      {
-        "locationName": "連江縣",
-        "geocode": 9007,
+        "locationName": "桃園市",
+        "geocode": 68,
         "hazardConditions": {
           "hazards": [
             {
@@ -54,11 +47,18 @@
                 "significance": "特報"
               },
               "validTime": {
-                "startTime": "2026-10-31 04:29:00",
-                "endTime": "2026-10-31 19:00:00"
+                "startTime": "2026-10-31 16:31:00",
+                "endTime": "2026-10-31 23:00:00"
               }
             }
           ]
+        }
+      },
+      {
+        "locationName": "金門縣",
+        "geocode": 9020,
+        "hazardConditions": {
+          "hazards": []
         }
       }
     ]
