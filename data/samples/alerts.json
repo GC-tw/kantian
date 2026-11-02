@@ -36,15 +36,27 @@
   "records": {
     "location": [
       {
-        "locationName": "雲林縣",
-        "geocode": 10009,
+        "locationName": "屏東縣",
+        "geocode": 10013,
         "hazardConditions": {
-          "hazards": []
+          "hazards": [
+            {
+              "info": {
+                "language": "zh-TW",
+                "phenomena": "陸上強風",
+                "significance": "特報"
+              },
+              "validTime": {
+                "startTime": "2026-11-02 17:00:00",
+                "endTime": "2026-11-03 23:00:00"
+              }
+            }
+          ]
         }
       },
       {
-        "locationName": "臺中市",
-        "geocode": 66,
+        "locationName": "金門縣",
+        "geocode": 9020,
         "hazardConditions": {
           "hazards": [
             {
