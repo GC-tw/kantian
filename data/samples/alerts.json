@@ -36,27 +36,15 @@
   "records": {
     "location": [
       {
-        "locationName": "屏東縣",
-        "geocode": 10013,
+        "locationName": "新竹縣",
+        "geocode": 10004,
         "hazardConditions": {
-          "hazards": [
-            {
-              "info": {
-                "language": "zh-TW",
-                "phenomena": "陸上強風",
-                "significance": "特報"
-              },
-              "validTime": {
-                "startTime": "2026-11-02 17:00:00",
-                "endTime": "2026-11-03 23:00:00"
-              }
-            }
-          ]
+          "hazards": []
         }
       },
       {
-        "locationName": "金門縣",
-        "geocode": 9020,
+        "locationName": "彰化縣",
+        "geocode": 10007,
         "hazardConditions": {
           "hazards": [
             {
@@ -66,7 +54,7 @@
                 "significance": "特報"
               },
               "validTime": {
-                "startTime": "2026-11-02 17:00:00",
+                "startTime": "2026-11-02 22:22:00",
                 "endTime": "2026-11-03 23:00:00"
               }
             }
