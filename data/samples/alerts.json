@@ -36,15 +36,8 @@
   "records": {
     "location": [
       {
-        "locationName": "新竹縣",
-        "geocode": 10004,
-        "hazardConditions": {
-          "hazards": []
-        }
-      },
-      {
-        "locationName": "彰化縣",
-        "geocode": 10007,
+        "locationName": "苗栗縣",
+        "geocode": 10005,
         "hazardConditions": {
           "hazards": [
             {
@@ -59,6 +52,13 @@
               }
             }
           ]
+        }
+      },
+      {
+        "locationName": "南投縣",
+        "geocode": 10008,
+        "hazardConditions": {
+          "hazards": []
         }
       }
     ]
