@@ -36,8 +36,15 @@
   "records": {
     "location": [
       {
-        "locationName": "雲林縣",
-        "geocode": 10009,
+        "locationName": "新竹市",
+        "geocode": 10018,
+        "hazardConditions": {
+          "hazards": []
+        }
+      },
+      {
+        "locationName": "澎湖縣",
+        "geocode": 10016,
         "hazardConditions": {
           "hazards": [
             {
@@ -52,13 +59,6 @@
               }
             }
           ]
-        }
-      },
-      {
-        "locationName": "嘉義市",
-        "geocode": 10020,
-        "hazardConditions": {
-          "hazards": []
         }
       }
     ]
