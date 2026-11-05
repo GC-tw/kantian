@@ -36,15 +36,8 @@
   "records": {
     "location": [
       {
-        "locationName": "新竹市",
-        "geocode": 10018,
-        "hazardConditions": {
-          "hazards": []
-        }
-      },
-      {
-        "locationName": "澎湖縣",
-        "geocode": 10016,
+        "locationName": "苗栗縣",
+        "geocode": 10005,
         "hazardConditions": {
           "hazards": [
             {
@@ -54,11 +47,18 @@
                 "significance": "特報"
               },
               "validTime": {
-                "startTime": "2026-11-03 16:29:00",
-                "endTime": "2026-11-03 22:00:00"
+                "startTime": "2026-11-05 23:00:00",
+                "endTime": "2026-11-06 23:00:00"
               }
             }
           ]
+        }
+      },
+      {
+        "locationName": "臺南市",
+        "geocode": 67,
+        "hazardConditions": {
+          "hazards": []
         }
       }
     ]
