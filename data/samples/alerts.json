@@ -36,27 +36,15 @@
   "records": {
     "location": [
       {
-        "locationName": "苗栗縣",
-        "geocode": 10005,
+        "locationName": "高雄市",
+        "geocode": 64,
         "hazardConditions": {
-          "hazards": [
-            {
-              "info": {
-                "language": "zh-TW",
-                "phenomena": "陸上強風",
-                "significance": "特報"
-              },
-              "validTime": {
-                "startTime": "2026-11-05 23:00:00",
-                "endTime": "2026-11-06 23:00:00"
-              }
-            }
-          ]
+          "hazards": []
         }
       },
       {
-        "locationName": "臺南市",
-        "geocode": 67,
+        "locationName": "南投縣",
+        "geocode": 10008,
         "hazardConditions": {
           "hazards": []
         }
