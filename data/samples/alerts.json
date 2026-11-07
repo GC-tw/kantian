@@ -36,15 +36,38 @@
   "records": {
     "location": [
       {
-        "locationName": "雲林縣",
-        "geocode": 10009,
+        "locationName": "臺東縣",
+        "geocode": 10014,
         "hazardConditions": {
-          "hazards": []
+          "hazards": [
+            {
+              "info": {
+                "language": "zh-TW",
+                "phenomena": "大雨",
+                "significance": "特報"
+              },
+              "validTime": {
+                "startTime": "2026-11-07 17:20:00",
+                "endTime": "2026-11-08 00:00:00"
+              }
+            },
+            {
+              "info": {
+                "language": "zh-TW",
+                "phenomena": "陸上強風",
+                "significance": "特報"
+              },
+              "validTime": {
+                "startTime": "2026-11-07 16:31:00",
+                "endTime": "2026-11-08 23:00:00"
+              }
+            }
+          ]
         }
       },
       {
-        "locationName": "臺北市",
-        "geocode": 63,
+        "locationName": "南投縣",
+        "geocode": 10008,
         "hazardConditions": {
           "hazards": []
         }
