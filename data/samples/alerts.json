@@ -36,38 +36,15 @@
   "records": {
     "location": [
       {
-        "locationName": "宜蘭縣",
-        "geocode": 10002,
+        "locationName": "雲林縣",
+        "geocode": 10009,
         "hazardConditions": {
-          "hazards": [
-            {
-              "info": {
-                "language": "zh-TW",
-                "phenomena": "大雨",
-                "significance": "特報"
-              },
-              "validTime": {
-                "startTime": "2026-11-07 14:12:00",
-                "endTime": "2026-11-08 00:00:00"
-              }
-            },
-            {
-              "info": {
-                "language": "zh-TW",
-                "phenomena": "陸上強風",
-                "significance": "特報"
-              },
-              "validTime": {
-                "startTime": "2026-11-07 16:31:00",
-                "endTime": "2026-11-08 23:00:00"
-              }
-            }
-          ]
+          "hazards": []
         }
       },
       {
-        "locationName": "高雄市",
-        "geocode": 64,
+        "locationName": "臺北市",
+        "geocode": 63,
         "hazardConditions": {
           "hazards": []
         }
