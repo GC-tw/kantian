@@ -36,15 +36,38 @@
   "records": {
     "location": [
       {
-        "locationName": "高雄市",
-        "geocode": 64,
+        "locationName": "屏東縣",
+        "geocode": 10013,
         "hazardConditions": {
-          "hazards": []
+          "hazards": [
+            {
+              "info": {
+                "language": "zh-TW",
+                "phenomena": "大雨",
+                "significance": "特報"
+              },
+              "validTime": {
+                "startTime": "2026-11-07 19:13:00",
+                "endTime": "2026-11-08 01:00:00"
+              }
+            },
+            {
+              "info": {
+                "language": "zh-TW",
+                "phenomena": "陸上強風",
+                "significance": "特報"
+              },
+              "validTime": {
+                "startTime": "2026-11-07 16:31:00",
+                "endTime": "2026-11-08 23:00:00"
+              }
+            }
+          ]
         }
       },
       {
-        "locationName": "桃園市",
-        "geocode": 68,
+        "locationName": "臺中市",
+        "geocode": 66,
         "hazardConditions": {
           "hazards": [
             {
