@@ -36,17 +36,41 @@
   "records": {
     "location": [
       {
-        "locationName": "新竹縣",
-        "geocode": 10004,
+        "locationName": "桃園市",
+        "geocode": 68,
         "hazardConditions": {
-          "hazards": []
+          "hazards": [
+            {
+              "info": {
+                "language": "zh-TW",
+                "phenomena": "陸上強風",
+                "significance": "特報"
+              },
+              "validTime": {
+                "startTime": "2026-11-07 22:27:00",
+                "endTime": "2026-11-08 23:00:00"
+              }
+            }
+          ]
         }
       },
       {
-        "locationName": "南投縣",
-        "geocode": 10008,
+        "locationName": "臺中市",
+        "geocode": 66,
         "hazardConditions": {
-          "hazards": []
+          "hazards": [
+            {
+              "info": {
+                "language": "zh-TW",
+                "phenomena": "陸上強風",
+                "significance": "特報"
+              },
+              "validTime": {
+                "startTime": "2026-11-07 22:27:00",
+                "endTime": "2026-11-08 23:00:00"
+              }
+            }
+          ]
         }
       }
     ]
