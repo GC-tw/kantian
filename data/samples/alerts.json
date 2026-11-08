@@ -36,17 +36,41 @@
   "records": {
     "location": [
       {
-        "locationName": "高雄市",
-        "geocode": 64,
+        "locationName": "彰化縣",
+        "geocode": 10007,
         "hazardConditions": {
-          "hazards": []
+          "hazards": [
+            {
+              "info": {
+                "language": "zh-TW",
+                "phenomena": "陸上強風",
+                "significance": "特報"
+              },
+              "validTime": {
+                "startTime": "2026-11-08 10:30:00",
+                "endTime": "2026-11-09 23:00:00"
+              }
+            }
+          ]
         }
       },
       {
-        "locationName": "金門縣",
-        "geocode": 9020,
+        "locationName": "苗栗縣",
+        "geocode": 10005,
         "hazardConditions": {
-          "hazards": []
+          "hazards": [
+            {
+              "info": {
+                "language": "zh-TW",
+                "phenomena": "陸上強風",
+                "significance": "特報"
+              },
+              "validTime": {
+                "startTime": "2026-11-08 10:30:00",
+                "endTime": "2026-11-09 23:00:00"
+              }
+            }
+          ]
         }
       }
     ]
