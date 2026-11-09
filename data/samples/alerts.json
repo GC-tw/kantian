@@ -36,27 +36,15 @@
   "records": {
     "location": [
       {
-        "locationName": "新竹市",
-        "geocode": 10018,
+        "locationName": "南投縣",
+        "geocode": 10008,
         "hazardConditions": {
-          "hazards": [
-            {
-              "info": {
-                "language": "zh-TW",
-                "phenomena": "陸上強風",
-                "significance": "特報"
-              },
-              "validTime": {
-                "startTime": "2026-11-09 10:30:00",
-                "endTime": "2026-11-10 23:00:00"
-              }
-            }
-          ]
+          "hazards": []
         }
       },
       {
-        "locationName": "南投縣",
-        "geocode": 10008,
+        "locationName": "金門縣",
+        "geocode": 9020,
         "hazardConditions": {
           "hazards": []
         }
