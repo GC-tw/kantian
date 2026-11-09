@@ -36,15 +36,8 @@
   "records": {
     "location": [
       {
-        "locationName": "臺北市",
-        "geocode": 63,
-        "hazardConditions": {
-          "hazards": []
-        }
-      },
-      {
-        "locationName": "澎湖縣",
-        "geocode": 10016,
+        "locationName": "新竹市",
+        "geocode": 10018,
         "hazardConditions": {
           "hazards": [
             {
@@ -54,11 +47,18 @@
                 "significance": "特報"
               },
               "validTime": {
-                "startTime": "2026-11-09 04:29:00",
-                "endTime": "2026-11-09 23:00:00"
+                "startTime": "2026-11-09 10:30:00",
+                "endTime": "2026-11-10 23:00:00"
               }
             }
           ]
+        }
+      },
+      {
+        "locationName": "南投縣",
+        "geocode": 10008,
+        "hazardConditions": {
+          "hazards": []
         }
       }
     ]
