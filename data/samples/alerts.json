@@ -36,27 +36,15 @@
   "records": {
     "location": [
       {
-        "locationName": "宜蘭縣",
-        "geocode": 10002,
+        "locationName": "南投縣",
+        "geocode": 10008,
         "hazardConditions": {
-          "hazards": [
-            {
-              "info": {
-                "language": "zh-TW",
-                "phenomena": "陸上強風",
-                "significance": "特報"
-              },
-              "validTime": {
-                "startTime": "2026-11-09 22:23:00",
-                "endTime": "2026-11-10 23:00:00"
-              }
-            }
-          ]
+          "hazards": []
         }
       },
       {
-        "locationName": "彰化縣",
-        "geocode": 10007,
+        "locationName": "臺東縣",
+        "geocode": 10014,
         "hazardConditions": {
           "hazards": [
             {
@@ -66,8 +54,8 @@
                 "significance": "特報"
               },
               "validTime": {
-                "startTime": "2026-11-09 22:23:00",
-                "endTime": "2026-11-10 23:00:00"
+                "startTime": "2026-11-10 22:25:00",
+                "endTime": "2026-11-11 22:00:00"
               }
             }
           ]
