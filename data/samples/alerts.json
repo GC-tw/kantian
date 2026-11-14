@@ -36,27 +36,15 @@
   "records": {
     "location": [
       {
-        "locationName": "澎湖縣",
-        "geocode": 10016,
+        "locationName": "新竹市",
+        "geocode": 10018,
         "hazardConditions": {
-          "hazards": [
-            {
-              "info": {
-                "language": "zh-TW",
-                "phenomena": "陸上強風",
-                "significance": "特報"
-              },
-              "validTime": {
-                "startTime": "2026-11-14 20:00:00",
-                "endTime": "2026-11-15 23:00:00"
-              }
-            }
-          ]
+          "hazards": []
         }
       },
       {
-        "locationName": "臺北市",
-        "geocode": 63,
+        "locationName": "嘉義市",
+        "geocode": 10020,
         "hazardConditions": {
           "hazards": []
         }
