@@ -36,15 +36,8 @@
   "records": {
     "location": [
       {
-        "locationName": "宜蘭縣",
-        "geocode": 10002,
-        "hazardConditions": {
-          "hazards": []
-        }
-      },
-      {
-        "locationName": "連江縣",
-        "geocode": 9007,
+        "locationName": "屏東縣",
+        "geocode": 10013,
         "hazardConditions": {
           "hazards": [
             {
@@ -54,8 +47,27 @@
                 "significance": "特報"
               },
               "validTime": {
-                "startTime": "2026-11-15 08:00:00",
-                "endTime": "2026-11-15 23:00:00"
+                "startTime": "2026-11-15 10:29:00",
+                "endTime": "2026-11-16 04:00:00"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "locationName": "彰化縣",
+        "geocode": 10007,
+        "hazardConditions": {
+          "hazards": [
+            {
+              "info": {
+                "language": "zh-TW",
+                "phenomena": "陸上強風",
+                "significance": "特報"
+              },
+              "validTime": {
+                "startTime": "2026-11-15 10:29:00",
+                "endTime": "2026-11-16 04:00:00"
               }
             }
           ]
