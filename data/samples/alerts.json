@@ -36,27 +36,15 @@
   "records": {
     "location": [
       {
-        "locationName": "臺南市",
-        "geocode": 67,
+        "locationName": "基隆市",
+        "geocode": 10017,
         "hazardConditions": {
-          "hazards": [
-            {
-              "info": {
-                "language": "zh-TW",
-                "phenomena": "陸上強風",
-                "significance": "特報"
-              },
-              "validTime": {
-                "startTime": "2026-11-18 05:00:00",
-                "endTime": "2026-11-18 23:00:00"
-              }
-            }
-          ]
+          "hazards": []
         }
       },
       {
-        "locationName": "臺中市",
-        "geocode": 66,
+        "locationName": "彰化縣",
+        "geocode": 10007,
         "hazardConditions": {
           "hazards": [
             {
