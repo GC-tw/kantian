@@ -36,15 +36,8 @@
   "records": {
     "location": [
       {
-        "locationName": "高雄市",
-        "geocode": 64,
-        "hazardConditions": {
-          "hazards": []
-        }
-      },
-      {
-        "locationName": "臺東縣",
-        "geocode": 10014,
+        "locationName": "彰化縣",
+        "geocode": 10007,
         "hazardConditions": {
           "hazards": [
             {
@@ -59,6 +52,13 @@
               }
             }
           ]
+        }
+      },
+      {
+        "locationName": "高雄市",
+        "geocode": 64,
+        "hazardConditions": {
+          "hazards": []
         }
       }
     ]
