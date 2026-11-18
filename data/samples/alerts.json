@@ -36,17 +36,41 @@
   "records": {
     "location": [
       {
-        "locationName": "臺北市",
-        "geocode": 63,
+        "locationName": "臺中市",
+        "geocode": 66,
         "hazardConditions": {
-          "hazards": []
+          "hazards": [
+            {
+              "info": {
+                "language": "zh-TW",
+                "phenomena": "陸上強風",
+                "significance": "特報"
+              },
+              "validTime": {
+                "startTime": "2026-11-18 22:25:00",
+                "endTime": "2026-11-19 23:00:00"
+              }
+            }
+          ]
         }
       },
       {
-        "locationName": "高雄市",
-        "geocode": 64,
+        "locationName": "雲林縣",
+        "geocode": 10009,
         "hazardConditions": {
-          "hazards": []
+          "hazards": [
+            {
+              "info": {
+                "language": "zh-TW",
+                "phenomena": "陸上強風",
+                "significance": "特報"
+              },
+              "validTime": {
+                "startTime": "2026-11-18 22:25:00",
+                "endTime": "2026-11-19 23:00:00"
+              }
+            }
+          ]
         }
       }
     ]
