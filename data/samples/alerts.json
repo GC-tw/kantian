@@ -36,41 +36,17 @@
   "records": {
     "location": [
       {
-        "locationName": "臺東縣",
-        "geocode": 10014,
+        "locationName": "臺北市",
+        "geocode": 63,
         "hazardConditions": {
-          "hazards": [
-            {
-              "info": {
-                "language": "zh-TW",
-                "phenomena": "陸上強風",
-                "significance": "特報"
-              },
-              "validTime": {
-                "startTime": "2026-11-18 05:42:00",
-                "endTime": "2026-11-18 23:00:00"
-              }
-            }
-          ]
+          "hazards": []
         }
       },
       {
-        "locationName": "嘉義縣",
-        "geocode": 10010,
+        "locationName": "高雄市",
+        "geocode": 64,
         "hazardConditions": {
-          "hazards": [
-            {
-              "info": {
-                "language": "zh-TW",
-                "phenomena": "陸上強風",
-                "significance": "特報"
-              },
-              "validTime": {
-                "startTime": "2026-11-18 05:42:00",
-                "endTime": "2026-11-18 23:00:00"
-              }
-            }
-          ]
+          "hazards": []
         }
       }
     ]
