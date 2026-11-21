@@ -36,27 +36,15 @@
   "records": {
     "location": [
       {
-        "locationName": "臺東縣",
-        "geocode": 10014,
+        "locationName": "臺北市",
+        "geocode": 63,
         "hazardConditions": {
-          "hazards": [
-            {
-              "info": {
-                "language": "zh-TW",
-                "phenomena": "陸上強風",
-                "significance": "特報"
-              },
-              "validTime": {
-                "startTime": "2026-11-21 16:28:00",
-                "endTime": "2026-11-22 23:00:00"
-              }
-            }
-          ]
+          "hazards": []
         }
       },
       {
-        "locationName": "金門縣",
-        "geocode": 9020,
+        "locationName": "苗栗縣",
+        "geocode": 10005,
         "hazardConditions": {
           "hazards": []
         }
