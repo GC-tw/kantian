@@ -36,27 +36,15 @@
   "records": {
     "location": [
       {
-        "locationName": "澎湖縣",
-        "geocode": 10016,
+        "locationName": "苗栗縣",
+        "geocode": 10005,
         "hazardConditions": {
-          "hazards": [
-            {
-              "info": {
-                "language": "zh-TW",
-                "phenomena": "陸上強風",
-                "significance": "特報"
-              },
-              "validTime": {
-                "startTime": "2026-11-22 04:33:00",
-                "endTime": "2026-11-22 23:00:00"
-              }
-            }
-          ]
+          "hazards": []
         }
       },
       {
-        "locationName": "新北市",
-        "geocode": 65,
+        "locationName": "雲林縣",
+        "geocode": 10009,
         "hazardConditions": {
           "hazards": []
         }
