@@ -36,17 +36,41 @@
   "records": {
     "location": [
       {
-        "locationName": "苗栗縣",
-        "geocode": 10005,
+        "locationName": "臺東縣",
+        "geocode": 10014,
         "hazardConditions": {
-          "hazards": []
+          "hazards": [
+            {
+              "info": {
+                "language": "zh-TW",
+                "phenomena": "陸上強風",
+                "significance": "特報"
+              },
+              "validTime": {
+                "startTime": "2026-11-24 05:00:00",
+                "endTime": "2026-11-24 23:00:00"
+              }
+            }
+          ]
         }
       },
       {
-        "locationName": "雲林縣",
-        "geocode": 10009,
+        "locationName": "彰化縣",
+        "geocode": 10007,
         "hazardConditions": {
-          "hazards": []
+          "hazards": [
+            {
+              "info": {
+                "language": "zh-TW",
+                "phenomena": "陸上強風",
+                "significance": "特報"
+              },
+              "validTime": {
+                "startTime": "2026-11-24 05:00:00",
+                "endTime": "2026-11-24 23:00:00"
+              }
+            }
+          ]
         }
       }
     ]
