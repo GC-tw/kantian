@@ -36,15 +36,8 @@
   "records": {
     "location": [
       {
-        "locationName": "臺南市",
-        "geocode": 67,
-        "hazardConditions": {
-          "hazards": []
-        }
-      },
-      {
-        "locationName": "臺東縣",
-        "geocode": 10014,
+        "locationName": "新竹縣",
+        "geocode": 10004,
         "hazardConditions": {
           "hazards": [
             {
@@ -54,11 +47,18 @@
                 "significance": "特報"
               },
               "validTime": {
-                "startTime": "2026-11-25 22:26:00",
-                "endTime": "2026-11-26 04:00:00"
+                "startTime": "2026-11-28 10:26:00",
+                "endTime": "2026-11-29 23:00:00"
               }
             }
           ]
+        }
+      },
+      {
+        "locationName": "南投縣",
+        "geocode": 10008,
+        "hazardConditions": {
+          "hazards": []
         }
       }
     ]
